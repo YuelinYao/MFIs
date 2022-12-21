@@ -1,0 +1,32 @@
+
+
+
+#DTOutput
+
+TableUI <- function(){
+  tagList(
+    tags$h3(paste0("Table for deviating MFIs"), style = "color: steelblue;"),
+    textOutput("textsummary"),tags$br(),
+    DTOutput("table") %>% withSpinner(color="#4682B4")
+  )}
+
+
+
+
+Table_cluster<-function(cutoff,data_path){
+  
+  command=paste("python ./Produce_devStates.py", cutoff,data_path$devStates,data_path$trainDat,data_path$pcaCoords,sep = " ")
+  system(command)
+  Devstates<-read.csv(paste0('./',cutoff,'_devStates.csv'),colClasses = c("character"))
+  file.remove(paste0('./',cutoff,'_devStates.csv'))
+  #Devstates$state<-paste0("[",Devstates$state,"]")
+  Devstates$dev<-as.numeric(Devstates$dev)
+  Devstates$cluster<-as.numeric(Devstates$cluster)
+  Devstates$pval<-as.numeric(Devstates$pval)
+  Devstates<-Devstates[order(Devstates$cluster),]
+  Devstates<-Devstates[,-1]
+
+  return(Devstates)
+  
+}
+
