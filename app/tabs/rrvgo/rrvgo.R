@@ -76,26 +76,25 @@ rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,Gen
       }
 
   
-  if (dim( cluster_GO )[1]==0) {
+  if (is.null(cluster_GO)) {
     print("no result")
-  }
+  } else{
         
   cluster_GO <- cluster_GO@result
   cluster_GO$cluster<-i
-  cluster_GO$class<-subclass  
+  cluster_GO$class<-subclass  }
+  
   cluster_GO<-cluster_GO[cluster_GO$p.adjust<0.05,]
   
-      
-
-    print("Simplify GO terms")  
-      simMatrix <- calculateSimMatrix(cluster_GO$ID,
+  print("Simplify GO terms")  
+  simMatrix <- calculateSimMatrix(cluster_GO$ID,
                                       orgdb=go_species,
                                       ont=subclass,
                                       method="Rel")
       
-      scores <- setNames(-log10(cluster_GO$qvalue), cluster_GO$ID)
+    scores <- setNames(-log10(cluster_GO$qvalue), cluster_GO$ID)
       
-      reducedTerms <- reduceSimMatrix(simMatrix,
+    reducedTerms <- reduceSimMatrix(simMatrix,
                                       scores,
                                       threshold=0.7, # this threhold might adjust later
                                       orgdb=go_species)

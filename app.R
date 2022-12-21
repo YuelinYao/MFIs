@@ -237,18 +237,18 @@ server <- function(input, output,session) {
     if(input$TestTable){
       devStates="./data/topDeviatingHOIstates.csv"
       trainDat="./data/trainingData_CL01_14698Cells_1000Genes.csv"
-      pcaCoords="./data/trainingData_CL01_14698Cells_1000Genes_PCAcoords.csv" 
-      data_path<-list(devStates,trainDat, pcaCoords)
-      names(data_path)<-c("devStates","trainDat","pcaCoords")
+      #pcaCoords="./data/trainingData_CL01_14698Cells_1000Genes_PCAcoords.csv" 
+      data_path<-list(devStates,trainDat)#, pcaCoords
+      names(data_path)<-c("devStates","trainDat")#,"pcaCoords"
       return(data_path)
     }
     
     else{
       file_devStates<-input$topDeviatingHOIstates
       file_trainDat<-input$trainingData_matrix
-      file_pcaCoords<-input$trainingData_PCA
-      data_path<-list(file_devStates$datapath,file_trainDat$datapath,file_pcaCoords$datapath)
-      names(data_path)<-c("devStates","trainDat","pcaCoords")
+      #file_pcaCoords<-input$trainingData_PCA
+      data_path<-list(file_devStates$datapath,file_trainDat$datapath)#,file_pcaCoords$datapath
+      names(data_path)<-c("devStates","trainDat")#,"pcaCoords"
       print(data_path)
       return(data_path)
     }

@@ -88,7 +88,8 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
       Genes_set<-GenesList[[names]]
       Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                        filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
-      
+      print(head(Genes_set))
+      print("kegg")
       cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
                                  pAdjustMethod = "BH",
                                  minGSSize = 1,
@@ -96,14 +97,16 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
                                  qvalueCutoff = 0.05)
       
       
-      if (dim(cluster_kegg)[1]==0) {
+      if (is.null(cluster_kegg)) {
         print("no result")
-      } 
+      } else{
+      
       cluster_kegg<-cluster_kegg@result
       cluster_kegg$cluster<-i
-      cluster_kegg$class<-"KEGG"
+      cluster_kegg$class<-"KEGG"}
       
       
+      print("GO")
       cluster_GOBP <- enrichGO(gene = Genes_set$entrezgene_id,
                                OrgDb= go_species,
                                ont = "BP",
@@ -113,14 +116,12 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
                                qvalueCutoff = 0.05,
                                readable = TRUE)
       
-      if (dim(cluster_GOBP)[1]==0) {
+      if (is.null(cluster_GOBP)) {
         print("no result")
-      } 
-      
-      
+      } else{
       cluster_GOBP<-cluster_GOBP@result
       cluster_GOBP$cluster<-i
-      cluster_GOBP$class<-"GOBP"
+      cluster_GOBP$class<-"GOBP"}
       
       
       cluster_GOCC <- enrichGO(gene = Genes_set$entrezgene_id,
@@ -132,16 +133,15 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
                                qvalueCutoff = 0.05,
                                readable = TRUE)
       
-      if (dim(cluster_GOCC)[1]==0) {
+      if (is.null(cluster_GOCC)) {
         print("no result")
-      } 
-      
-      
-      
+      } else{
       cluster_GOCC<-cluster_GOCC@result
       cluster_GOCC$cluster<-i
-      cluster_GOCC$class<-"GOCC"
+      cluster_GOCC$class<-"GOCC"}
       
+      
+
       cluster_GOMF <- enrichGO(gene = Genes_set$entrezgene_id,
                                OrgDb= go_species,
                                ont = "MF",
@@ -151,13 +151,14 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
                                qvalueCutoff = 0.05,
                                readable = TRUE)
       
-      if (dim(cluster_GOMF)[1]==0) {
+      if (is.null(cluster_GOMF)) {
         print("no result")
-      } 
+      } else{
       
       cluster_GOMF<-cluster_GOMF@result
       cluster_GOMF$cluster<-i
-      cluster_GOMF$class<-"GOMF"
+      cluster_GOMF$class<-"GOMF"}
+      
       ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
       AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
       
@@ -187,12 +188,12 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
                            qvalueCutoff = 0.05)
   
   
-  if (dim(cluster_kegg)[1]==0) {
+  if (is.null(cluster_kegg)) {
     print("no result")
-  } 
+  } else{
   cluster_kegg<-cluster_kegg@result
   cluster_kegg$cluster<-i
-  cluster_kegg$class<-"KEGG"
+  cluster_kegg$class<-"KEGG"}
 
   
   cluster_GOBP <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
@@ -204,14 +205,12 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
                        qvalueCutoff = 0.05,
                        readable = TRUE)
   
-  if (dim(cluster_GOBP)[1]==0) {
+  if (is.null(cluster_GOBP)) {
     print("no result")
-  } 
-  
-  
+  } else{
   cluster_GOBP<-cluster_GOBP@result
   cluster_GOBP$cluster<-i
-  cluster_GOBP$class<-"GOBP"
+  cluster_GOBP$class<-"GOBP"}
   
   
   cluster_GOCC <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
@@ -223,15 +222,12 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
                        qvalueCutoff = 0.05,
                        readable = TRUE)
   
-  if (dim(cluster_GOCC)[1]==0) {
+  if (is.null(cluster_GOCC)) {
     print("no result")
-  } 
-  
-  
-  
+  } else{
   cluster_GOCC<-cluster_GOCC@result
   cluster_GOCC$cluster<-i
-  cluster_GOCC$class<-"GOCC"
+  cluster_GOCC$class<-"GOCC"}
   
   cluster_GOMF <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
                        OrgDb= go_species,
@@ -242,13 +238,13 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
                        qvalueCutoff = 0.05,
                        readable = TRUE)
   
-  if (dim(cluster_GOMF)[1]==0) {
+  if (is.null(cluster_GOMF)) {
     print("no result")
-  } 
+  } else{
   
   cluster_GOMF<-cluster_GOMF@result
   cluster_GOMF$cluster<-i
-  cluster_GOMF$class<-"GOMF"
+  cluster_GOMF$class<-"GOMF"}
   
   ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
 

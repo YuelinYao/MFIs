@@ -15,7 +15,7 @@ TableUI <- function(){
 
 Table_cluster<-function(cutoff,data_path){
   
-  command=paste("python ./Produce_devStates.py", cutoff,data_path$devStates,data_path$trainDat,data_path$pcaCoords,sep = " ")
+  command=paste("python ./Produce_devStates.py", cutoff,data_path$devStates,data_path$trainDat,sep = " ")
   system(command)
   Devstates<-read.csv(paste0('./',cutoff,'_devStates.csv'),colClasses = c("character"))
   file.remove(paste0('./',cutoff,'_devStates.csv'))

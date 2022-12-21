@@ -5,7 +5,7 @@ import sys
 diffCutoff = sys.argv[1]
 devStates_path = sys.argv[2]
 trainDat_path = sys.argv[3]
-pcaCoords_path = sys.argv[4]
+#pcaCoords_path = sys.argv[4]
 
 import pandas as pd
 import numpy as np
@@ -25,7 +25,7 @@ sns.set_palette('colorblind')
 
 devStates = pd.read_csv(devStates_path, dtype=str, index_col=0)
 trainDat=pd.read_csv(trainDat_path)
-pcaCoords= pd.read_csv(pcaCoords_path)
+#pcaCoords= pd.read_csv(pcaCoords_path)
 
 
 

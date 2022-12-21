@@ -29,12 +29,12 @@ readTableUI <- function(){
                            accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv") ),
                                           style="display:inline-block;vertical-align:top;width:70%;"
                                         ),
-                   tags$div(
-                    br("trainingData_*_PCAcoords.csv"),
-                      fileInput(inputId = "trainingData_PCA",label = NULL, multiple = FALSE,
-                                 accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-                                          ),style="display:inline-block;vertical-align:top;width:70%;"
-                                        ),
+                 #  tags$div(
+                  #  br("trainingData_*_PCAcoords.csv"),
+                   #   fileInput(inputId = "trainingData_PCA",label = NULL, multiple = FALSE,
+                    #             accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
+                     #                     ),style="display:inline-block;vertical-align:top;width:70%;"
+                      #                  ),
                      tags$div(
                       br("trainingData_*.csv"),
                        fileInput(inputId = "trainingData_matrix",label = NULL, multiple = FALSE,
