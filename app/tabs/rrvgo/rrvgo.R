@@ -60,7 +60,6 @@ rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,Gen
   } else{
   
   print("Use input background genes")
-  
   backgroud_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                            filter="external_gene_name", values=backgroud_genes, uniqueRows=TRUE)
   cluster_GO <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
@@ -79,10 +78,10 @@ rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,Gen
   if (is.null(cluster_GO)) {
     print("no result")
   } else{
-        
   cluster_GO <- cluster_GO@result
   cluster_GO$cluster<-i
   cluster_GO$class<-subclass  }
+  
   
   cluster_GO<-cluster_GO[cluster_GO$p.adjust<0.05,]
   
@@ -91,16 +90,17 @@ rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,Gen
                                       orgdb=go_species,
                                       ont=subclass,
                                       method="Rel")
-      
+    
+  
+  if(any(is.na(cluster_GO$qvalue))){
+    cluster_GO$qvalue<-cluster_GO$p.adjust
+  }
+  
     scores <- setNames(-log10(cluster_GO$qvalue), cluster_GO$ID)
-      
     reducedTerms <- reduceSimMatrix(simMatrix,
                                       scores,
                                       threshold=0.7, # this threhold might adjust later
                                       orgdb=go_species)
-  
-  
-      
   
   reducedTerms<-list(reducedTerms,simMatrix)
   names(reducedTerms)<-c("reducedTerms","simMatrix")
