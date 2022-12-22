@@ -338,7 +338,9 @@ server <- function(input, output,session) {
     })
     
     show_Table <- eventReactive(input$action_table, { 
-      summaryTable()
+      table<-summaryTable()
+      table$cluster<-paste0("Cluster:",table$cluster)
+      table
     })
     
     output$table <- renderDT({
@@ -405,7 +407,9 @@ server <- function(input, output,session) {
       })
       
       output$Functional_table <- renderDT({
-        GO()[,-c(1,5,7)]
+        go_table<-GO()[,-c(1,5,7)]
+        go_table$cluster<-paste0("Cluster:",go_table$cluster)
+        go_table
       })
       
       
