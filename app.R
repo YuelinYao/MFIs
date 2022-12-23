@@ -64,14 +64,11 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                   
                   (img(src= "logo.png",height  = 120, width = 700)) ), ##class = "pull-left" 
                 
-                
-                
-                
                 #Sidebar with a slider input for the cutoff
                 sidebarLayout(
                   sidebarPanel(
             
-                readTableUI(), 
+            readTableUI(), 
             
             conditionalPanel(
                       condition="input.tabs == 'about'",
@@ -86,16 +83,12 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                              textInput("go_species", "GO OrgDb:",value = "org.Hs.eg.db"),
                              textInput("kegg_species", "KEGG organism:",value = "hsa"),
                              textAreaInput("background_genes", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
-                             
                              actionButton(inputId = "bg_Liver0",                                       #action button to display background genes
                                           label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-                             
                              bsTooltip("bg_Liver0","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
                                        options = NULL),
                              actionButton("action_GO","Submit",icon("paper-plane"), 
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
-                             
-                             
                              ),
                             
             
@@ -107,21 +100,16 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                                                 c("Biological Process" = "BP",
                                                   "Cellular Component" = "CC",
                                                   "Molecular Function" = "MF"),selected = "BP" ),
-
                              textAreaInput("background_genesrrgvo", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
-
                              actionButton(inputId = "bg_Liver",                                       #action button to display background genes
                                           label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-                             
                              bsTooltip("bg_Liver","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
                                        options = NULL),
-                              # submit button
-                             actionButton("action_rrvgo","Submit",icon("paper-plane"), 
+                             actionButton("action_rrvgo","Submit",icon("paper-plane"),       # submit button
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
                              ),
                     
-            
-            
+
             conditionalPanel(condition= "input.tabs == 'DE'",
                              textInput("selected_clusterDE", "Select cluster(s)",value = "6,19"),
                              selectInput("Mart_DE", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
@@ -134,43 +122,30 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                                          max = 1,
                                          value = 0.05),
                              textAreaInput("background_genesDE", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
-                             
                              actionButton(inputId = "bg_Liver2",                                       #action button to display background genes
                                           label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-                             
                              bsTooltip("bg_Liver2","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
                                        options = NULL),
-      
                              actionButton("action_DE","Submit",icon("paper-plane"), 
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
                              ),
             
-      
-    
-
             ### submit button
             conditionalPanel(condition= "input.tabs == 'heatmap'",
                              actionButton("action_heatmap","Submit",icon("paper-plane"), 
                                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-            
-
-            
-            
             
             ### submit button
             conditionalPanel(condition= "input.tabs == 'upset'",
                              actionButton("action_upset","Submit",icon("paper-plane"), 
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
             
-  
             ### table
             ### submit button
             conditionalPanel(condition= "input.tabs == 'table'",
                              actionButton("action_table","Submit",icon("paper-plane"), 
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
-            
-          
-            
+
         ),
         
         
@@ -179,43 +154,26 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 
                         
                 tabPanel("About", icon = icon("circle-info"), value = 'about', aboutUI()),
-                
-                #tabPanel("Tutorial", icon = icon("diamond"), value = 'about', aboutUI()), 
-                
                 tabPanel("Table", icon = icon("table"),value="table",TableUI()),
-
                 tabPanel("Heatmap",icon = icon("map"), value="heatmap",
                          heatmapUI(), tags$br(),NMF_UI(),tags$br(),NMF_CelltypeUI()),
-                
                 tabPanel("GO & KEGG", icon = icon("chart-line"),value="GO",FunctionUI(),tags$br(),Function_tableUI()),
-                
-                
                 tabPanel("Using rrvgo", icon = icon("chart-line"),value="rrvgo",
                          rrvgoUI(),tags$br(),rrvgo2UI(),tags$br(),
                          rrvgo3UI() ,tags$br(), rrvgo_tableUI()),
-                        
-                  
                 tabPanel("Upset Plot",icon = icon("signal"),value="upset",UPsetUI()),
-                
                 tabPanel("DE analysis",icon = icon("random"),value="DE",DE_UI(),tags$br(),DE_TableUI(),
                          tags$br(),DEGO_UI(),
                          tags$br(),DEGOtable_UI())
-          
-                        
-        
-            
         ))   )
 
 )
 
 
 
-
-
-
 # Define server logic required to draw a histogram
 server <- function(input, output,session) {
-    
+
   # General:
   usedTable <- reactive({
     if(input$TestTable){
@@ -499,7 +457,7 @@ server <- function(input, output,session) {
       p_plot<- reactive({
         DEGO(p(),input$selected_clusterDE,input$cutoff,input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3())
       }) %>%
-        bindCache(p(),input$selected_clusterDE,input$cutoff,input$logfc,input$Pvalue_DE, BackgroundGenes3(),List(),usedTable(),usedTable2()) %>%
+        bindCache(p(),input$selected_clusterDE,input$cutoff,input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3(),List(),usedTable(),usedTable2()) %>%
         bindEvent(input$action_DE)
       
       output$DEG_enrichment<- renderPlot({
