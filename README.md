@@ -50,7 +50,16 @@ sns.set(style='white')
 sns.set_palette('colorblind')
 ```
 ## How to run:
+**Share as R script:**
 
-1.runGitHub( "MFIs", "YuelinYao")
+1. runGitHub( "MFIs", "YuelinYao")
 
-2.Download and run locally
+2. Download and run locally
+
+**Share as a web page:**
+
+1. shinyapps.io
+
+2. Shiny Server
+ 
+3. RStudio Connect
