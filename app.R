@@ -9,14 +9,14 @@
 
 # ====== import R libraries: ####
 # Some initial setup:
-library(shiny)            #For shiny
-library(shinythemes)      #For graphics of shiny interface
-import::from(shinycssloaders, withSpinner) #For the spinner of load during the computing of the functions
+library(shiny)            
+library(shinythemes)      
+import::from(shinycssloaders, withSpinner) 
 library(reticulate)
 reticulate::py_config()
-library(shinyBS)          #For tooltips, popovers and alerts
-library(shinyWidgets)     #For some shiny functions
-library(gridExtra, verbose=FALSE)        #Grid display
+library(shinyBS)        
+library(shinyWidgets)     
+library(gridExtra, verbose=FALSE)        
 library(RColorBrewer, verbose=FALSE)
 library(ComplexHeatmap)
 library(Seurat)
