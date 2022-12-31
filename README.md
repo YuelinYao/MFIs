@@ -10,27 +10,114 @@
 ## Libarary:
 R:
 ```
-library(shiny)            
-library(shinythemes)      
+if (!any(rownames(installed.packages()) == "shiny")){
+  install.packages("shiny")
+}
+library(shiny)
+
+if (!any(rownames(installed.packages()) == "shinythemes")){
+  install.packages("shinythemes")
+}
+library(shinythemes)
 import::from(shinycssloaders, withSpinner) 
+
+if (!any(rownames(installed.packages()) == "reticulate")){
+  install.packages("reticulate")
+}
 library(reticulate)
 reticulate::py_config()
-library(shinyBS)         
-library(shinyWidgets)     
-library(gridExtra, verbose=FALSE)      
+
+if (!any(rownames(installed.packages()) == "shinyBS")){
+  install.packages("shinyBS")
+}
+library(shinyBS)
+
+if (!any(rownames(installed.packages()) == "shinyWidgets")){
+  install.packages("shinyWidgets")
+}
+library(shinyWidgets)
+
+if (!any(rownames(installed.packages()) == "gridExtra")){
+  install.packages("gridExtra")
+}
+library(gridExtra, verbose=FALSE) 
+
+if (!any(rownames(installed.packages()) == "RColorBrewer")){
+  install.packages("RColorBrewer")
+}
 library(RColorBrewer, verbose=FALSE)
+
+if (!any(rownames(installed.packages()) == "ComplexHeatmap")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("ComplexHeatmap")
+}
 library(ComplexHeatmap)
+
+if (!any(rownames(installed.packages()) == "Seurat")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("Seurat")
+}
 library(Seurat)
+
+if (!any(rownames(installed.packages()) == "stringr")){
+  install.packages("stringr")
+}
 library(stringr)
+
+if (!any(rownames(installed.packages()) == "pheatmap")){
+  install.packages("pheatmap")
+}
 library(pheatmap)
+
+if (!any(rownames(installed.packages()) == "dplyr")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("dplyr")
+}
 library(dplyr)
+
+if (!any(rownames(installed.packages()) == "rrvgo")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("rrvgo")
+}
 library(rrvgo)
+
+if (!any(rownames(installed.packages()) == "DT")){
+  install.packages("DT")
+}
 library(DT)
+
+if (!any(rownames(installed.packages()) == "clusterProfiler")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("clusterProfiler")
+}
 library(clusterProfiler)
+
+if (!any(rownames(installed.packages()) == "data.table")){
+  install.packages("data.table")
+}
 library(data.table)
+
+if (!any(rownames(installed.packages()) == "biomaRt")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("biomaRt")
+}
 library(biomaRt)
+
+if (!any(rownames(installed.packages()) == "ggplot2")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("ggplot2")
+}
 library(ggplot2)
 ```
+
+
 Python:
 ```
 import sys
