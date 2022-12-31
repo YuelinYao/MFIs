@@ -19,6 +19,14 @@ if (!any(rownames(installed.packages()) == "shinythemes")){
   install.packages("shinythemes")
 }
 library(shinythemes)
+
+
+if (!any(rownames(installed.packages()) == "shinycssloaders")){
+  install.packages("shinycssloaders")
+}
+library(shinycssloaders)
+
+
 import::from(shinycssloaders, withSpinner) 
 
 if (!any(rownames(installed.packages()) == "reticulate")){
