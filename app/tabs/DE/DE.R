@@ -341,7 +341,7 @@ Plot_DE_enrichment<-function(DE_Enrichment){
     #xlab("GO & KEGG functional enrichment")+
     labs(color="-log10(FDR)", size="Number\nof genes")
   
-  return(print(p))
+  return(p)
 }
 
 

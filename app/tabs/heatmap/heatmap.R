@@ -117,26 +117,24 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
     
   }
   
+  Data_mtrix[Data_mtrix==0]<-2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
+  Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
+  Data_mtrix_log<--log10(Mydata_raw_m)
+  
   Mydata_raw_FDR[Mydata_raw_FDR<=0.05] <- "*"
   Mydata_raw_FDR[Mydata_raw_FDR>0.05] <- " "
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
-
-  Data_mtrix[Data_mtrix==0]<-2.2e-16
-  Data_mtrix_log<--log10(Data_mtrix)
-
-
+  
   breaksList = seq(0, 10, by = 1)
-  
-  width=dim(Data_mtrix_log)[2]/188 # ajusted width
-  
+  dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
   colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
 
   
   result=list()
   result$Data_mtrix_log=Data_mtrix_log
   result$Mydata_raw_m=Mydata_raw_m
-  
+
   print("done")
   
   return(result)
@@ -187,18 +185,17 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
     
   }
   
-
+  Data_mtrix[Data_mtrix==0]<-2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
+  Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
+  Data_mtrix_log<--log10(Mydata_raw_m)
+  
   Mydata_raw_FDR[Mydata_raw_FDR<=0.05] <- "*"
-
   Mydata_raw_FDR[Mydata_raw_FDR>0.05] <- " "
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
-
-  Data_mtrix[Data_mtrix==0]<-2.2e-16
-  Data_mtrix_log<--log10(Data_mtrix)
-
   
-
+  breaksList = seq(0, 10, by = 1)
+  dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
   colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
   
   result=list()
@@ -243,16 +240,17 @@ StateVsType<-function(Meta_data){
       Data_mtrix[,i]<-P_set
     }
   
+    Data_mtrix[Data_mtrix==0]<-2.2e-16
     Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
+    Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
+    Data_mtrix_log<--log10(Mydata_raw_m)
+    
     Mydata_raw_FDR[Mydata_raw_FDR<=0.05] <- "*"
     Mydata_raw_FDR[Mydata_raw_FDR>0.05] <- " "
     Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
-
-    Data_mtrix[Data_mtrix==0]<-2.2e-16
-    Data_mtrix_log<--log10(Data_mtrix)
     
-  
     breaksList = seq(0, 10, by = 1)
+    dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
     colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
     
     result=list()

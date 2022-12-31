@@ -271,23 +271,16 @@ Plot_enrichment<-function(GO){
   group_by(cluster,class) %>%
   slice_max(n = 4,order_by = Count)#, Count
 
-
-all_function$Gene_number <- all_function$Count
-
-
-all_function$Description<-as.factor(all_function$Description)
-
-all_function$'|log10(FDR)|' <- -(log10(all_function$p.adjust))
-
-all_function<-all_function[order(all_function$cluster),]
-all_function$Description<-paste(all_function$class,all_function$Description,sep=":")
-
-all_function$Description<-factor(all_function$Description,levels=unique(all_function$Description))
-
-all_function<-all_function[!is.na(all_function$ID),]
-
-all_function<-all_function[all_function$p.adjust<0.05,]
-p<-ggplot(all_function, aes(x = Description, y = cluster)) +
+  all_function$Gene_number <- all_function$Count
+  all_function$Description<-as.factor(all_function$Description)
+  all_function$'|log10(FDR)|' <- -(log10(all_function$p.adjust))
+  all_function<-all_function[order(all_function$cluster),]
+  all_function$Description<-paste(all_function$class,all_function$Description,sep=":")
+  all_function$Description<-factor(all_function$Description,levels=unique(all_function$Description))
+  all_function<-all_function[!is.na(all_function$ID),]
+  all_function<-all_function[all_function$p.adjust<0.05,]
+  
+  p<-ggplot(all_function, aes(x = Description, y = cluster)) +
   geom_point(data=all_function,aes(x=Description, y=cluster,size = Gene_number, colour = `|log10(FDR)|`), alpha=.7)+
   scale_color_gradient(low = "blue", high = "orange", limits=c(0, NA))+
   coord_flip()+
@@ -299,5 +292,5 @@ p<-ggplot(all_function, aes(x = Description, y = cluster)) +
         axis.title=element_blank())+
   #xlab("GO & KEGG functional enrichment")+
   labs(color="-log10(FDR)", size="Number\nof genes")
-return(print(p))
+return(p)
 }

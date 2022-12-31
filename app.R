@@ -11,12 +11,13 @@
 library(shiny)            #For shiny
 library(shinythemes)      #For graphics of shiny interface
 import::from(shinycssloaders, withSpinner) #For the spinner of load during the computing of the functions
+library(reticulate)
 reticulate::py_config()
 library(shinyBS)          #For tooltips, popovers and alerts
 library(shinyWidgets)     #For some shiny functions
 library(gridExtra, verbose=FALSE)        #Grid display
 library(RColorBrewer, verbose=FALSE)
-library(reticulate)
+
 library(ComplexHeatmap)
 library(Seurat)
 library(stringr)
@@ -151,20 +152,25 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
         
         mainPanel(
             tabsetPanel(type = "pills", id = 'tabs',
-                
-                        
                 tabPanel("About", icon = icon("circle-info"), value = 'about', aboutUI()),
                 tabPanel("Table", icon = icon("table"),value="table",TableUI()),
                 tabPanel("Heatmap",icon = icon("map"), value="heatmap",
-                         heatmapUI(), tags$br(),NMF_UI(),tags$br(),NMF_CelltypeUI()),
-                tabPanel("GO & KEGG", icon = icon("chart-line"),value="GO",FunctionUI(),tags$br(),Function_tableUI()),
+                         heatmapUI(),downloadButton("downloadheatmap1","Download as .csv"), downloadButton("downloadheatmap_plot1","Download as .pdf"),tags$br(),
+                         NMF_UI(),downloadButton("downloadheatmap2","Download as .csv"), downloadButton("downloadheatmap_plot2","Download as .pdf"),tags$br(),
+                         NMF_CelltypeUI(),downloadButton("downloadheatmap3","Download as .csv"), downloadButton("downloadheatmap_plot3","Download as .pdf")),
+                tabPanel("GO & KEGG", icon = icon("chart-line"),value="GO",FunctionUI(),downloadButton("downloadGOPlot","Download as .pdf"),tags$br(),
+                         Function_tableUI(),downloadButton("downloadGO","Download as .csv")),
                 tabPanel("Using rrvgo", icon = icon("chart-line"),value="rrvgo",
-                         rrvgoUI(),tags$br(),rrvgo2UI(),tags$br(),
-                         rrvgo3UI() ,tags$br(), rrvgo_tableUI()),
-                tabPanel("Upset Plot",icon = icon("signal"),value="upset",UPsetUI()),
-                tabPanel("DE analysis",icon = icon("random"),value="DE",DE_UI(),tags$br(),DE_TableUI(),
-                         tags$br(),DEGO_UI(),
-                         tags$br(),DEGOtable_UI())
+                         rrvgoUI(),downloadButton("rrvgo_plot1","Download as .pdf"),tags$br(),
+                         rrvgo2UI(),downloadButton("rrvgo_plot2","Download as .pdf"),tags$br(),
+                         rrvgo3UI() ,downloadButton("rrvgo_plot3","Download as .pdf"),tags$br(), 
+                         rrvgo_tableUI(),downloadButton("rrvgo_table","Download as .csv")),
+                tabPanel("Upset Plot",icon = icon("signal"),value="upset",UPsetUI(),
+                         downloadButton("upset_plot","Download as .pdf")),
+                tabPanel("DE analysis",icon = icon("random"),value="DE",DE_UI(),downloadButton("GeneHeatmap","Download as .pdf"),tags$br(),
+                         DE_TableUI(),downloadButton("DegTable","Download as .csv"),tags$br(),
+                         DEGO_UI(),downloadButton("DegAnnotationPlot","Download as .pdf"),tags$br(),
+                         DEGOtable_UI(),downloadButton("DegAnnotationTable","Download as .csv"),tags$br())
         ))   )
 
 )
@@ -305,7 +311,14 @@ server <- function(input, output,session) {
       show_Table()
     })
     
-  
+    output$downloadtable<-downloadHandler(
+      filename=function(){
+        paste0("State_Table ",Sys.Date(), '.csv')
+      },
+      content = function(file){
+        write.csv(show_Table(),file)
+      }
+    )
 
     # Heatmap1(Tab):
     result1 <- eventReactive(input$action_heatmap,{
@@ -316,10 +329,38 @@ server <- function(input, output,session) {
     
     output$heatmap_celltypes <- renderPlot({
     pheatmap::pheatmap(border_color = NA,result1()[["Data_mtrix_log"]],display_numbers = result1()[["Mydata_raw_m"]],
-                           fontsize = 12,fontsize_number = 15,fontsize_row = 15,main=result1()[["cutoff"]],
+                           fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                            main=result1()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
+    
+    
+    output$downloadheatmap1<-downloadHandler(
+      filename = function(){
+        paste('Heatmap1-', Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(result1()[["Data_mtrix_log"]],heatmap1)
+      }
+   )
+
+    output$downloadheatmap_plot1<-downloadHandler(
+      filename = function(){
+        paste('Heatmap1-', Sys.Date(), '.pdf', sep='')
+      },
+      content=function(heatmap1){
+        width=dim(result1()[["Data_mtrix_log"]])[2]/188
+        height=dim(result1()[["Data_mtrix_log"]])[1]*4.5/12
+        pdf(heatmap1,width =25*width+5,height = height)
+        pheatmap::pheatmap(border_color = NA,result1()[["Data_mtrix_log"]],display_numbers = result1()[["Mydata_raw_m"]],
+                           fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                           main=result1()[["cutoff"]],
+                           cluster_cols = T,cluster_rows = T,
+                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+        dev.off()
+
+     } )
     
     
   
@@ -332,11 +373,44 @@ server <- function(input, output,session) {
     
       output$heatmap_cellstates <- renderPlot({
       pheatmap::pheatmap(border_color = NA,result2()[["Data_mtrix_log"]],display_numbers = result2()[["Mydata_raw_m"]],
-                         fontsize = 12,fontsize_number = 15,fontsize_row = 15,main=result2()[["cutoff"]],
+                         fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                         main=result2()[["cutoff"]],
                          cluster_cols = T,cluster_rows = T,
                          color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
     
+      
+      output$downloadheatmap2<-downloadHandler(
+        filename = function(){
+          paste('Heatmap2-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap2){
+          write.csv(result2()[["Data_mtrix_log"]],heatmap2)
+        }
+      )
+      
+      output$downloadheatmap_plot2<-downloadHandler(
+        filename = function(){
+          paste('Heatmap2-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(heatmap2){
+          width=dim(result2()[["Data_mtrix_log"]])[2]/188
+          height=dim(result2()[["Data_mtrix_log"]])[1]*4.5/12
+          pdf(heatmap2,width =25*width+5,height = height)
+          pheatmap::pheatmap(border_color = NA,result2()[["Data_mtrix_log"]],display_numbers = result2()[["Mydata_raw_m"]],
+                             fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                             main=result2()[["cutoff"]],
+                             cluster_cols = T,cluster_rows = T,
+                             color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+          dev.off()
+          
+        } )
+      
+      
+      
+      
+      
+      
       #Heatmap3(Tab):
       result <- eventReactive(input$action_heatmap,{
         StateVsType(usedMeta_data())
@@ -349,7 +423,34 @@ server <- function(input, output,session) {
       })
     
       
+      output$downloadheatmap3<-downloadHandler(
+        filename = function(){
+          paste('Heatmap3-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap3){
+          write.csv(result()[["Data_mtrix_log"]],heatmap3)
+        }
+      )
       
+      output$downloadheatmap_plot3<-downloadHandler(
+        filename = function(){
+          paste('Heatmap3-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(heatmap3){
+          width=dim(result()[["Data_mtrix_log"]])[2]/188
+          height=dim(result()[["Data_mtrix_log"]])[1]*4.5/12
+          pdf(heatmap3,width =25*width+5,height = height)
+          pheatmap::pheatmap(border_color = NA,result()[["Data_mtrix_log"]],display_numbers = result()[["Mydata_raw_m"]],
+                             fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                             cluster_cols = T,cluster_rows = T,
+                             color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+          dev.off()
+          
+        } )
+      
+      
+      
+      ##GO  
       #  #http://www.genome.jp/kegg/catalog/org_list.html
       GO <- reactive({
         FunctionE(input$cutoff,input$selected_clusterGO,input$Mart,input$kegg_species,input$go_species,GetGenesList(),BackgroundGenes())
@@ -358,9 +459,9 @@ server <- function(input, output,session) {
         bindEvent(input$action_GO)
       
       
-      output$Functional_enrichment <- renderPlot(height=420,{
+      output$Functional_enrichment <- renderPlot(height=400,{
         p_go<-Plot_enrichment(GO())
-        p_go
+        print(p_go)
         
       })
       
@@ -371,6 +472,26 @@ server <- function(input, output,session) {
       })
       
       
+      output$downloadGO<-downloadHandler(
+        filename = function(){
+          paste('GOtable-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(gotable){
+          write.csv(GO(),gotable)
+        }
+      )
+      
+      
+      output$downloadGOPlot<-downloadHandler(
+        filename = function(){
+          paste('GOPlot-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(gotable){
+        ggsave(Plot_enrichment(GO()),filename = gotable,width = 6.61,height =6.22 )
+        }
+      )
+      
+      
       ###rrvgo function(cutoff,selected_cluster,subclass,go_species,Mart)
       # 
       rrvGO<- reactive({
@@ -379,26 +500,72 @@ server <- function(input, output,session) {
         bindCache(input$cutoff,input$selected_clusterrrvgo,input$subontology,input$go_species_rrgvo,input$Mart_rrgvo,BackgroundGenes2(),usedTable(),usedTable2()) %>%
         bindEvent(input$action_rrvgo)
       
-      output$SimplifyingGOBP_wordcloud<- renderPlot(height=440,{
-       wordcloudPlot( rrvGO()$reducedTerms)
+      output$SimplifyingGOBP_wordcloud<- renderPlot(height=400,{
+        par(mar = rep(0, 4))
+        wordcloudPlot( rrvGO()$reducedTerms,scale=c(3.5,0.25),use.r.layout=T)
 
       })
+      
+      output$rrvgo_plot1<-downloadHandler(
+        filename = function(){
+          paste('wordcloudPlot-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(wordcloud){
+          pdf(wordcloud)
+          wordcloudPlot(rrvGO()$reducedTerms)
+          dev.off()
+        }
+      )
       
       output$SimplifyingGOBP_treemap<- renderPlot({
         treemapPlot( rrvGO()$reducedTerms)
       })
       
+      
+      output$rrvgo_plot2<-downloadHandler(
+        filename = function(){
+          paste('TreemapPlot-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(treemap){
+          pdf(treemap)
+          treemapPlot(rrvGO()$reducedTerms)
+          dev.off()
+        }
+      )
+      
+      
       output$SimplifyingGOBP_Scatter<- renderPlot({
         scatterPlot(labelSize = 5,rrvGO()$simMatrix, rrvGO()$reducedTerms)
       })
+      
+      
+      output$rrvgo_plot3<-downloadHandler(
+        filename = function(){
+          paste('ScatterPlot-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(scatter){
+          scplot<-scatterPlot(labelSize = 5,rrvGO()$simMatrix, rrvGO()$reducedTerms)
+          ggsave(scplot,filename = scatter,width = 7,height =7)
+        }
+      )
+      
+      
       
       output$Reduced_Terms <- renderDT({
         rrvGO()$reducedTerms
         
       })
       
+      #rrvgo_table
+      output$rrvgo_table<-downloadHandler(
+        filename = function(){
+          paste('rrvgo_table-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(rrvgotable){
+       write.csv(rrvGO()$reducedTerms,rrvgotable)
+        }
+      )
       
-        
       ### upset
       m <- reactive({
         Up_set(input$selected_cluster_upset,input$cutoff,List())
@@ -414,7 +581,18 @@ server <- function(input, output,session) {
            right_annotation = upset_right_annotation(m(), add_numbers = TRUE),comb_order = order(comb_size(m())))
     })
     
-    
+      output$upset_plot<-downloadHandler(
+        filename = function(){
+          paste('UPsetPlot-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(UPsetPlot){
+          upsetplot<-ComplexHeatmap::UpSet(m(),top_annotation = upset_top_annotation(m(), add_numbers = TRUE),column_title =cutoff(),
+                                right_annotation = upset_right_annotation(m(), add_numbers = TRUE),comb_order = order(comb_size(m())))
+          pdf(UPsetPlot,width =8 ,height = 6)
+          draw(upsetplot)
+          dev.off()
+        }
+      )
   
       
       
@@ -441,6 +619,7 @@ server <- function(input, output,session) {
         PlotDEheatmap(input$selected_clusterDE,input$cutoff,p(),srt(),List())
       })
   
+      
       output$DE_heatmap<- renderPlot({
         doheatmap<-DoHeatmap(p_heatmap()[["sub"]],features = p_heatmap()[["top20"]],slot = "c",group.by = "state",
                      disp.min = 0,disp.max = 4) +scale_fill_gradient2( low = rev(c('#d1e5f0','#67a9cf','#2166ac')), mid = "white", high = rev(c('#b2182b','#ef8a62','#fddbc7')), midpoint = 0, guide = "colourbar", aesthetics = "fill")
@@ -448,9 +627,34 @@ server <- function(input, output,session) {
         print(doheatmap)
     })
       
+      
+      output$GeneHeatmap<-downloadHandler(
+        filename = function(){
+          paste('GeneHeatmap-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(genesheatmap){
+          doheatmap<-DoHeatmap(p_heatmap()[["sub"]],features = p_heatmap()[["top20"]],slot = "c",group.by = "state",
+                               disp.min = 0,disp.max = 4) +scale_fill_gradient2( low = rev(c('#d1e5f0','#67a9cf','#2166ac')), mid = "white", high = rev(c('#b2182b','#ef8a62','#fddbc7')), midpoint = 0, guide = "colourbar", aesthetics = "fill")
+          ggsave(doheatmap,filename = genesheatmap,width = 7,height =7)
+        }
+      )
+      
+      
+      
       output$DEGtable <- renderDT({
         p()[,-1]
       })
+      
+      output$DegTable<-downloadHandler(
+        filename = function(){
+          paste('DegTable-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(Degstable){
+          write.csv(p(),Degstable)
+        }
+      )
+      
+      
       
  
     ####DE function enrichment
@@ -464,10 +668,33 @@ server <- function(input, output,session) {
         Plot_DE_enrichment( p_plot())
       })
       
+      
+      output$DegAnnotationPlot<-downloadHandler(
+        filename = function(){
+          paste('DegAnnotationPlot-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(DegAnoPlot){
+          p_DegAnoPlot<- Plot_DE_enrichment( p_plot())
+          ggsave(p_DegAnoPlot,filename = DegAnoPlot)
+          
+        }
+      )
+      
+      
       output$DEG_enrichmentTable <- renderDT({
         p_plot()[,-c(1,5,7)]
       })
 
+      
+      output$DegAnnotationTable<-downloadHandler(
+        filename = function(){
+          paste('DegAnnotationTable-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(DegAnoTable){
+        write.csv(p_plot(),DegAnoTable)
+      
+        }
+      )
       }
 
 # Run the application 
