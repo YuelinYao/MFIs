@@ -1,3 +1,4 @@
+## UI
 DE_UI <- function(){
   tagList(
     tags$h3(paste0("DE analysis for two states"), style = "color: steelblue;"),
@@ -29,7 +30,7 @@ DEGOtable_UI<- function(){
 
 
 
-#input$selected_clusterDE,input$cutoff,count,srt,input$logfc,input$Pvalue_D
+
 DE_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
   
   print("Find DE genes")
@@ -59,14 +60,13 @@ DE_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
   }
   
 
-# PlotDEheatmap(input$selected_clusterDE,input$cutoff,p(),srt,List())
+
 PlotDEheatmap<-function(selected_cluster,cutoff,DE,srt,List){
   
     print("Plot DEA Heatmap")
     selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
     selected_cluster<-paste0("cluster_C:",selected_cluster)
 
-   
     selected_1<-List[[selected_cluster[1]]]
     selected_2<-List[[selected_cluster[2]]]
     
@@ -94,9 +94,9 @@ PlotDEheatmap<-function(selected_cluster,cutoff,DE,srt,List){
 
 
 
-#p(),input$selected_clusterDE,input$cutoff,input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3()
 
-DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,backgroud_genes){
+
+DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
 
   selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
   selected_cluster<-paste0("cluster_C:",selected_cluster)
@@ -108,7 +108,7 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
   
   print("DEG GO & KEGG")
   
-  if (length(backgroud_genes)==0){
+  if (length(background_genes)==0){
     
     for (cluster in unique(DE$cluster)){
       
@@ -199,8 +199,8 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
     
   else{
     
-    backgroud_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                         filter="external_gene_name", values=backgroud_genes, uniqueRows=TRUE)
+    background_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
+                         filter="external_gene_name", values=background_genes, uniqueRows=TRUE)
   
   for (cluster in unique(DE$cluster)){
   
@@ -212,7 +212,7 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
   
   
   cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
-                             pAdjustMethod = "BH",universe = as.character(backgroud_genes$entrezgene_id),
+                             pAdjustMethod = "BH",universe = as.character(background_genes$entrezgene_id),
                              minGSSize = 1,
                              pvalueCutoff = 0.05,
                              qvalueCutoff = 0.05)
@@ -226,7 +226,7 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
   cluster_kegg$class<-"KEGG"
   
   
-  cluster_GOBP <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
+  cluster_GOBP <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
                            OrgDb= go_species,
                            ont = "BP",
                            pAdjustMethod = "BH",
@@ -245,7 +245,7 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
   cluster_GOBP$class<-"GOBP"
   
   
-  cluster_GOCC <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
+  cluster_GOCC <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
                            OrgDb= go_species,
                            ont = "CC",
                            pAdjustMethod = "BH",
@@ -264,7 +264,7 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
   cluster_GOCC$cluster<-cluster
   cluster_GOCC$class<-"GOCC"
   
-  cluster_GOMF <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
+  cluster_GOMF <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
                            OrgDb= go_species,
                            ont = "MF",
                            pAdjustMethod = "BH",
@@ -282,7 +282,6 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
   cluster_GOMF$class<-"GOMF"
   
   ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
-  
   AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
   
   }
@@ -300,33 +299,22 @@ Plot_DE_enrichment<-function(DE_Enrichment){
   print("Plot DEG GO & KEGG")
   all_function<-DE_Enrichment %>%
   group_by(cluster,class) %>%
-  slice_max(n = 3, order_by = Count)
+  slice_max(n = 3, order_by = Count) %>%
+  slice_head(n=4)
 
   all_function$Gene_number <- all_function$Count
-  
-
   all_function$Description<-as.factor(all_function$Description)
-
   all_function$'|log10(FDR)|' <- -(log10(all_function$p.adjust))
-  
-  
   all_function<-all_function[order(all_function$cluster),]
-  all_function
   all_function$Description<-paste(all_function$class,all_function$Description,sep=":")
-
   all_function$Description<-factor(all_function$Description,levels=unique(all_function$Description))
-  
-  
-  
+
   # Draw the plot with ggplot2
   # to represent -log10(FDR) and Number of genes 
   # of each GO biological process per cluster 
   #---------------------------------------------------
   all_function<-all_function[!is.na(all_function$ID),]
-  all_function
-  #all_function$Description<-factor(all_function$Description,levels=all_function$Description)
   all_function<-all_function[all_function$p.adjust<0.05,]
-  
   
   p<-ggplot(all_function, aes(x = Description, y = cluster)) +
     geom_point(data=all_function,aes(x=Description, y=cluster,size = Gene_number, colour = `|log10(FDR)|`), alpha=.7)+

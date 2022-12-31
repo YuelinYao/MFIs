@@ -4,33 +4,28 @@ aboutUI <- function(){
     htmlOutput("text1")
   )
 }
-## Serveur Functions ####
 
+
+## Serveur Functions ####
 about <- function(){
   Text1 <- function(){
     text = tags$span(
       tags$h3("Explore cell states by MFIs", style = "color: #337ab7;"),
-      tags$b("MFIs",style = "color: #337ab7;"),  "takes in scRNA-seq count matrix and estimate gene interactions. Here we show how to use these MFIs to explore cell states.",
-      tags$br(),
+        tags$b("MFIs",style = "color: #337ab7;"),  "takes in scRNA-seq count matrix and estimate gene interactions. Here we show how to use these MFIs to explore cell states.",
+        tags$br(),
       
-      tags$br(),
       tags$h4("Data Visualization &  Analysis", style="color: #337ab7;"),
-      tags$li("Table - A Summary statistics for deviating state", style="list-style-type: square;"),
-      tags$li("Heatmaps - Over-representation test for MFIs and other cell annotations", style="list-style-type: square;"),
-      tags$li("GO & KEGG for genes in each state", style="list-style-type: square;"),
-      tags$li("rrvgo - Simplifying the redundance of GO sets", style="list-style-type: square;"),
-      tags$li("Upset Plot", style="list-style-type: square;"),
-      tags$li("DE analysis for mutually exclusive states", style="list-style-type: square;"),
-
-      
-      
-      tags$br(),
+        tags$li("Table - A Summary statistics for deviating state", style="list-style-type: square;"),
+        tags$li("Heatmaps - Over-representation test for MFIs and other cell annotations", style="list-style-type: square;"),
+        tags$li("GO & KEGG for genes in each state", style="list-style-type: square;"),
+        tags$li("rrvgo - Simplifying the redundance of GO sets", style="list-style-type: square;"),
+        tags$li("Upset Plot", style="list-style-type: square;"),
+        tags$li("DE analysis for mutually exclusive states", style="list-style-type: square;"),
+        tags$br(),
       
       tags$h4("Tutorial", style="color: #337ab7;"),
-      
-      tags$br(),
-      tags$br(),
-      
+        tags$br(),
+        tags$br(),
       
       html = TRUE)
   }
@@ -60,7 +55,6 @@ InformationUI <- function(){
 
 
 ## Output to UI ####
-
 aboutOutput <- function(output,Text1){
   output$text1 <- renderUI({  Text1() })
 }

@@ -1,7 +1,3 @@
-## Sources ####
-#source("./app/general/inputFunctions.R")
-
-
 ## general UI ####
 readTableUI <- function(){
   tagList(
@@ -23,25 +19,18 @@ readTableUI <- function(){
                            accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
                                           style="display:inline-block;vertical-align:top;width:70%;"
                                         ),
-                 tags$div(
-                  br("topDeviatingHOIstates.csv"),
-                   fileInput(inputId = "topDeviatingHOIstates",label = NULL, multiple = FALSE,
+                tags$div(
+                br("topDeviatingHOIstates.csv"),
+                fileInput(inputId = "topDeviatingHOIstates",label = NULL, multiple = FALSE,
                            accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv") ),
                                           style="display:inline-block;vertical-align:top;width:70%;"
                                         ),
-                 #  tags$div(
-                  #  br("trainingData_*_PCAcoords.csv"),
-                   #   fileInput(inputId = "trainingData_PCA",label = NULL, multiple = FALSE,
-                    #             accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-                     #                     ),style="display:inline-block;vertical-align:top;width:70%;"
-                      #                  ),
-                     tags$div(
-                      br("trainingData_*.csv"),
-                       fileInput(inputId = "trainingData_matrix",label = NULL, multiple = FALSE,
+                tags$div(
+                br("trainingData_*.csv"),
+                fileInput(inputId = "trainingData_matrix",label = NULL, multiple = FALSE,
                                   accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
                                           style="display:inline-block;vertical-align:top;width:70%;"
                                         )
-                                        
                                       )
                      )
     ),
@@ -55,15 +44,10 @@ readTableUI <- function(){
     
     
   )
-  
-  
-  
-  
 }
 
-
+# Read count matrix:
 read_data<-function(path_countmatrix){
-  
   print("Read count matrix")
   ## Count matrix
   Count_matrix <- as.matrix(fread(path_countmatrix),rownames=1)
@@ -77,13 +61,13 @@ read_data<-function(path_countmatrix){
   
 }
 
-# example background_genes
-backgroud_genes<-read.table("./data/Background_genes.txt")
-background<-paste0(backgroud_genes$V1,collapse='\n')
+# Example background_genes:
+background_genes<-read.table("./data/Background_genes.txt")
+background<-paste0(background_genes$V1,collapse='\n')
 
-## processed_seruat
 
-processed_srt<-function(Count_matrix){
+## processed_seruat ftunction:
+processe_srt<-function(Count_matrix){
   
   # Creat CreateSeuratObject
   Count_matrix<-t(Count_matrix) 

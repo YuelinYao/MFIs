@@ -1,42 +1,37 @@
+## UI
 rrvgoUI <- function(){
   tagList(
     tags$h3(paste0("Word cloud"), style = "color: steelblue;"),
-    plotOutput(outputId ="SimplifyingGOBP_wordcloud", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="SimplifyingGO_wordcloud", width = "90%") %>% withSpinner(color="#4682B4")
   )}
 
 
 rrvgo2UI <- function(){
   tagList(
     tags$h3(paste0("Treemap plot"), style = "color: steelblue;"),
-    plotOutput(outputId ="SimplifyingGOBP_treemap", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="SimplifyingGO_treemap", width = "90%") %>% withSpinner(color="#4682B4")
   )}
 
 
 rrvgo3UI <- function(){
   tagList(
     tags$h3(paste0("Scatter plot"), style = "color: steelblue;"),
-    plotOutput(outputId ="SimplifyingGOBP_Scatter", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="SimplifyingGO_Scatter", width = "90%") %>% withSpinner(color="#4682B4")
   )}
 
 
-
-
 rrvgo_tableUI<-function(){
-  
   tagList(
     tags$h3(paste0("Reduced Terms"), style = "color: steelblue;"),
     DTOutput(outputId ="Reduced_Terms", width = "80%") %>% withSpinner(color="#4682B4")
   )}
 
 
-rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,GenesList,backgroud_genes){
+rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,GenesList,background_genes){
   
-
   mart <- useMart("ENSEMBL_MART_ENSEMBL")
   mart <- useDataset(Mart, mart)
   
-
-
   i=selected_cluster
   names<-paste0("cluster_",i)
   Genes_set<-GenesList[[names]]
@@ -47,7 +42,7 @@ rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,Gen
   
   print("GO analysis")  
   
-  if (length(backgroud_genes)==0){
+  if (length(background_genes)==0){
     print("No user-defined background genes")
     cluster_GO <- enrichGO(gene = Genes_set$entrezgene_id,
                            OrgDb= go_species,
@@ -60,9 +55,9 @@ rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,Gen
   } else{
   
   print("Use input background genes")
-  backgroud_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                           filter="external_gene_name", values=backgroud_genes, uniqueRows=TRUE)
-  cluster_GO <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
+  background_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
+                           filter="external_gene_name", values=background_genes, uniqueRows=TRUE)
+  cluster_GO <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
                                OrgDb= go_species,
                                ont = subclass,
                                pAdjustMethod = "BH",

@@ -8,6 +8,7 @@
 #
 
 # ====== import R libraries: ####
+# Some initial setup:
 library(shiny)            #For shiny
 library(shinythemes)      #For graphics of shiny interface
 import::from(shinycssloaders, withSpinner) #For the spinner of load during the computing of the functions
@@ -17,24 +18,19 @@ library(shinyBS)          #For tooltips, popovers and alerts
 library(shinyWidgets)     #For some shiny functions
 library(gridExtra, verbose=FALSE)        #Grid display
 library(RColorBrewer, verbose=FALSE)
-
 library(ComplexHeatmap)
 library(Seurat)
 library(stringr)
 library(pheatmap)
 library(dplyr)
 library(rrvgo)
-
-# Some initial setup:
 library(DT)
-#library(org.Hs.eg.db)
 library(clusterProfiler)
 library(data.table)
 library(biomaRt)
 library(ggplot2)
-#load("./data/Example.Rdata")
 options(shiny.maxRequestSize = 1000*1024^2)
-#source("./app/general/readData.R")
+
 source("./app/general/general.R") # conditionalPanel
 source("./app/tabs/about/about.R") # about
 source("./app/tabs/heatmap/heatmap.R") # heatmap
@@ -51,7 +47,6 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 
                 # Application title
                 titlePanel("",windowTitle = "MFIs project"),
-                
                 tags$head(
                   tags$style(
                     HTML("@import url('//fonts.googleapis.com/css?family=Righteous|');"),
@@ -62,7 +57,6 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 ),
                 
                 headerPanel(                              ### add logos 
-                  
                   (img(src= "logo.png",height  = 120, width = 700)) ), ##class = "pull-left" 
                 
                 #Sidebar with a slider input for the cutoff
@@ -97,7 +91,7 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                              textInput("selected_clusterrrvgo", "Input a cluster:",value = "5"),
                              selectInput("Mart_rrgvo", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
                              textInput("go_species_rrgvo", "GO OrgDb:",value = "org.Hs.eg.db"),
-                             radioButtons("subontology", "Select sub-ontology:",
+                             radioButtons("subOntology", "Select sub-ontology:",
                                                 c("Biological Process" = "BP",
                                                   "Cellular Component" = "CC",
                                                   "Molecular Function" = "MF"),selected = "BP" ),
@@ -155,7 +149,7 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 tabPanel("About", icon = icon("circle-info"), value = 'about', aboutUI()),
                 tabPanel("Table", icon = icon("table"),value="table",TableUI()),
                 tabPanel("Heatmap",icon = icon("map"), value="heatmap",
-                         heatmapUI(),downloadButton("downloadheatmap1","Download as .csv"), downloadButton("downloadheatmap_plot1","Download as .pdf"),tags$br(),
+                         heatmapUI(),downloadButton("downloadheatmap1","Download as .csv"),downloadButton("downloadheatmap_plot1","Download as .pdf"),
                          NMF_UI(),downloadButton("downloadheatmap2","Download as .csv"), downloadButton("downloadheatmap_plot2","Download as .pdf"),tags$br(),
                          NMF_CelltypeUI(),downloadButton("downloadheatmap3","Download as .csv"), downloadButton("downloadheatmap_plot3","Download as .pdf")),
                 tabPanel("GO & KEGG", icon = icon("chart-line"),value="GO",FunctionUI(),downloadButton("downloadGOPlot","Download as .pdf"),tags$br(),
@@ -180,7 +174,7 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
 # Define server logic required to draw a histogram
 server <- function(input, output,session) {
 
-  # General:
+  # Load example data or read uploaded data
   usedTable <- reactive({
     if(input$TestTable){
       load("./data/Example.Rdata")
@@ -201,19 +195,17 @@ server <- function(input, output,session) {
     if(input$TestTable){
       devStates="./data/topDeviatingHOIstates.csv"
       trainDat="./data/trainingData_CL01_14698Cells_1000Genes.csv"
-      #pcaCoords="./data/trainingData_CL01_14698Cells_1000Genes_PCAcoords.csv" 
-      data_path<-list(devStates,trainDat)#, pcaCoords
-      names(data_path)<-c("devStates","trainDat")#,"pcaCoords"
+      data_path<-list(devStates,trainDat)
+      names(data_path)<-c("devStates","trainDat")
       return(data_path)
     }
     
     else{
       file_devStates<-input$topDeviatingHOIstates
       file_trainDat<-input$trainingData_matrix
-      #file_pcaCoords<-input$trainingData_PCA
-      data_path<-list(file_devStates$datapath,file_trainDat$datapath)#,file_pcaCoords$datapath
-      names(data_path)<-c("devStates","trainDat")#,"pcaCoords"
-      print(data_path)
+      data_path<-list(file_devStates$datapath,file_trainDat$datapath)
+      names(data_path)<-c("devStates","trainDat")
+      #print(data_path)
       return(data_path)
     }
   })  
@@ -228,7 +220,6 @@ server <- function(input, output,session) {
       Meta_data_path<-input$Meta_Data 
       Meta_data<-read.csv(Meta_data_path$datapath,row.names = 1,colClasses = "character")
     }
-      
       
       colnames(Meta_data)<-c("Cell_State","Cell_Types")
       return(Meta_data)
@@ -248,7 +239,7 @@ server <- function(input, output,session) {
     background<-strsplit(input$background_genesDE, "\n")[[1]]
   }) 
   
-  # load background genes
+  # Load background genes
   observe({
     if (input$bg_Liver0) {
       updateTextInput(session, "background_genes", value = background)
@@ -260,7 +251,6 @@ server <- function(input, output,session) {
       updateTextInput(session, "background_genesrrgvo", value = background)
     }
   })
-  
   
   observe({
     if (input$bg_Liver2) {
@@ -289,7 +279,6 @@ server <- function(input, output,session) {
     GetGenesList<-reactive({
       GetGenes(input$cutoff,summaryTable())
     })%>% bindCache(input$cutoff,usedTable(),usedTable2()) 
-    
     
     
     ## Table:  
@@ -403,12 +392,7 @@ server <- function(input, output,session) {
                              cluster_cols = T,cluster_rows = T,
                              color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
           dev.off()
-          
         } )
-      
-      
-      
-      
       
       
       #Heatmap3(Tab):
@@ -450,8 +434,8 @@ server <- function(input, output,session) {
       
       
       
-      ##GO  
-      #  #http://www.genome.jp/kegg/catalog/org_list.html
+      ##GO Tab
+      #http://www.genome.jp/kegg/catalog/org_list.html
       GO <- reactive({
         FunctionE(input$cutoff,input$selected_clusterGO,input$Mart,input$kegg_species,input$go_species,GetGenesList(),BackgroundGenes())
       }) %>%
@@ -482,25 +466,38 @@ server <- function(input, output,session) {
       )
       
       
+      plot_size<-reactive({
+        width=length(unique(GO()$cluster))*6.61/2
+        all_function<-GO() %>%
+          group_by(cluster,class) %>%
+          slice_max(n = 4,order_by = Count)%>%
+          slice_head(n=4)
+        height=dim(all_function)[1]*6.22/25
+        size_lists<-list(width,height)
+        names(size_lists)<-c("width","height")
+        return(size_lists)
+      })
+      
+      
       output$downloadGOPlot<-downloadHandler(
         filename = function(){
           paste('GOPlot-', Sys.Date(), '.pdf', sep='')
         },
         content=function(gotable){
-        ggsave(Plot_enrichment(GO()),filename = gotable,width = 6.61,height =6.22 )
+        ggsave(Plot_enrichment(GO()),filename = gotable,width = plot_size()[["width"]],height =plot_size()[["height"]] )
         }
       )
       
       
-      ###rrvgo function(cutoff,selected_cluster,subclass,go_species,Mart)
-      # 
+      ###rrvgo Tab:
       rrvGO<- reactive({
-        rrvgo_FunctionE(input$cutoff,input$selected_clusterrrvgo,input$subontology,input$go_species_rrgvo,input$Mart_rrgvo,GetGenesList(),BackgroundGenes2())
+        rrvgo_FunctionE(input$cutoff,input$selected_clusterrrvgo,input$subOntology,input$go_species_rrgvo,input$Mart_rrgvo,GetGenesList(),BackgroundGenes2())
       }) %>%
-        bindCache(input$cutoff,input$selected_clusterrrvgo,input$subontology,input$go_species_rrgvo,input$Mart_rrgvo,BackgroundGenes2(),usedTable(),usedTable2()) %>%
+        bindCache(input$cutoff,input$selected_clusterrrvgo,input$subOntology,input$go_species_rrgvo,input$Mart_rrgvo,BackgroundGenes2(),usedTable(),usedTable2()) %>%
         bindEvent(input$action_rrvgo)
       
-      output$SimplifyingGOBP_wordcloud<- renderPlot(height=400,{
+      ###rrvgo wordcloudPlot:
+      output$SimplifyingGO_wordcloud<- renderPlot(height=400,{
         par(mar = rep(0, 4))
         wordcloudPlot( rrvGO()$reducedTerms,scale=c(3.5,0.25),use.r.layout=T)
 
@@ -517,10 +514,12 @@ server <- function(input, output,session) {
         }
       )
       
-      output$SimplifyingGOBP_treemap<- renderPlot({
+      
+      
+      ###rrvgo treemapPlot
+      output$SimplifyingGO_treemap<- renderPlot({
         treemapPlot( rrvGO()$reducedTerms)
       })
-      
       
       output$rrvgo_plot2<-downloadHandler(
         filename = function(){
@@ -534,7 +533,8 @@ server <- function(input, output,session) {
       )
       
       
-      output$SimplifyingGOBP_Scatter<- renderPlot({
+      ###rrvgo ScatterPlot
+      output$SimplifyingGO_Scatter<- renderPlot({
         scatterPlot(labelSize = 5,rrvGO()$simMatrix, rrvGO()$reducedTerms)
       })
       
@@ -550,13 +550,12 @@ server <- function(input, output,session) {
       )
       
       
-      
+      ###rrvgo Table
       output$Reduced_Terms <- renderDT({
         rrvGO()$reducedTerms
         
       })
       
-      #rrvgo_table
       output$rrvgo_table<-downloadHandler(
         filename = function(){
           paste('rrvgo_table-', Sys.Date(), '.csv', sep='')
@@ -566,7 +565,9 @@ server <- function(input, output,session) {
         }
       )
       
-      ### upset
+      
+      
+      ### Upset Plot
       m <- reactive({
         Up_set(input$selected_cluster_upset,input$cutoff,List())
       }) %>%
@@ -594,16 +595,13 @@ server <- function(input, output,session) {
         }
       )
   
-      
-      
-      
+  
     ####DEA heatmap
-    
       srt<-reactive({
         if(input$TestTable){
           return(usedTable()$srt)
         } else{ 
-       processed_srt(usedTable()$Count_matrix)
+       processe_srt(usedTable()$Count_matrix)
           }
       })%>%bindEvent(input$action_DE)
       
@@ -638,8 +636,7 @@ server <- function(input, output,session) {
           ggsave(doheatmap,filename = genesheatmap,width = 7,height =7)
         }
       )
-      
-      
+    
       
       output$DEGtable <- renderDT({
         p()[,-1]

@@ -1,4 +1,3 @@
-
 ## UI ####
 FunctionUI <- function(){
   tagList(
@@ -8,13 +7,13 @@ FunctionUI <- function(){
 
 
 Function_tableUI<-function(){
-  
   tagList(
     tags$h3(paste0("Functional enrichment table"), style = "color: steelblue;"),
     DTOutput(outputId ="Functional_table", width = "80%") %>% withSpinner(color="#4682B4")
   )}
 
-## function
+
+## show all the reference set from ENSEMBL
 mart <- useMart("ENSEMBL_MART_ENSEMBL")
 datasets <- listDatasets(mart)
 datasets_list<-as.list(datasets$dataset)
@@ -26,9 +25,9 @@ GetGenes<-function(cutoff,Devstates){
   print("Get genes in each state")
   Geneset<-NULL
   for (i in unique(Devstates$cluster)){
-    #print(i)
+
     cluster<-Devstates[Devstates$cluster==i,]
-    #print(paste0("Cluster: ",i))
+    print(paste0("Cluster: ",i))
     Genes_set<-NULL
     
     for (c in 1:length(cluster$genes)){
@@ -37,7 +36,6 @@ GetGenes<-function(cutoff,Devstates){
       Genes<-str_split(Genes, "_")[[1]]
       
       #print(length(Genes))
-      
       state<-cluster$state[c]
       State<-as.numeric(strsplit(as.character(state),"")[[1]])
       #print(State)
@@ -63,22 +61,20 @@ GetGenes<-function(cutoff,Devstates){
 
 
 
-FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,GenesList, backgroud_genes){
+FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,GenesList, background_genes){
 
   
   mart <- useMart("ENSEMBL_MART_ENSEMBL")
   mart <- useDataset(Mart, mart) 
   
-
-  
   selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
-  selected_cluster
-  
+
+  print(paste0("GO & KEGG for cluster(s): ",selected_cluster))
   print("GO & KEGG...")
   
   AllEnrichment<-NULL
   
-  if (length(backgroud_genes)==0){
+  if (length(background_genes)==0){
     
     print("No user-defined background genes")
     
@@ -89,7 +85,7 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
       Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                        filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
       print(head(Genes_set))
-      print("kegg")
+      print("KEGG")
       cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
                                  pAdjustMethod = "BH",
                                  minGSSize = 1,
@@ -104,7 +100,6 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
       cluster_kegg<-cluster_kegg@result
       cluster_kegg$cluster<-i
       cluster_kegg$class<-"KEGG"}
-      
       
       print("GO")
       cluster_GOBP <- enrichGO(gene = Genes_set$entrezgene_id,
@@ -140,8 +135,7 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
       cluster_GOCC$cluster<-i
       cluster_GOCC$class<-"GOCC"}
       
-      
-
+    
       cluster_GOMF <- enrichGO(gene = Genes_set$entrezgene_id,
                                OrgDb= go_species,
                                ont = "MF",
@@ -167,10 +161,9 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
   }
   
   else{
-  
   print("Use input background genes")
-  backgroud_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                                               filter="external_gene_name", values=backgroud_genes, uniqueRows=TRUE)
+  background_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
+                                               filter="external_gene_name", values=background_genes, uniqueRows=TRUE)
   
   
   for (i in selected_cluster){
@@ -182,7 +175,7 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
                    filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
   
   cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
-                           pAdjustMethod = "BH",universe = as.character(backgroud_genes$entrezgene_id),
+                           pAdjustMethod = "BH",universe = as.character(background_genes$entrezgene_id),
                            minGSSize = 1,
                            pvalueCutoff = 0.05,
                            qvalueCutoff = 0.05)
@@ -196,7 +189,7 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
   cluster_kegg$class<-"KEGG"}
 
   
-  cluster_GOBP <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
+  cluster_GOBP <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
                        OrgDb= go_species,
                        ont = "BP",
                        pAdjustMethod = "BH",
@@ -213,7 +206,7 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
   cluster_GOBP$class<-"GOBP"}
   
   
-  cluster_GOCC <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
+  cluster_GOCC <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
                        OrgDb= go_species,
                        ont = "CC",
                        pAdjustMethod = "BH",
@@ -229,7 +222,7 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
   cluster_GOCC$cluster<-i
   cluster_GOCC$class<-"GOCC"}
   
-  cluster_GOMF <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(backgroud_genes$entrezgene_id),
+  cluster_GOMF <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
                        OrgDb= go_species,
                        ont = "MF",
                        pAdjustMethod = "BH",
@@ -269,7 +262,8 @@ Plot_enrichment<-function(GO){
   print("Plot")
   all_function<-GO %>%
   group_by(cluster,class) %>%
-  slice_max(n = 4,order_by = Count)#, Count
+  slice_max(n = 4,order_by = Count)%>%
+  slice_head(n=4)#, Count
 
   all_function$Gene_number <- all_function$Count
   all_function$Description<-as.factor(all_function$Description)
