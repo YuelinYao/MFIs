@@ -137,9 +137,9 @@ sns.set(style='white')
 sns.set_palette('colorblind')
 ```
 ## How to run:
-**Share as R script:**
+**Share as R script with R studio:**
 
-1. runGitHub( "MFIs", "YuelinYao")
+1. Enter runGitHub( "MFIs", "YuelinYao")
 
 2. Download and run locally
 
