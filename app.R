@@ -7,30 +7,15 @@
 #    http://shiny.rstudio.com/
 #
 #
-# Define any Python packages needed for the app here:
-PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
-                        'matplotlib','Pillow','seaborn')
-
-
-# ------------------ App virtualenv setup (Do not edit) ------------------- #
-virtualenv_dir = Sys.getenv('VIRTUALENV_NAME')
-python_path = Sys.getenv('PYTHON_PATH')
-
-
-# Create virtual env and install dependencies
-reticulate::virtualenv_create(envname = virtualenv_dir, python = python_path)
-reticulate::virtualenv_install(virtualenv_dir, packages = PYTHON_DEPENDENCIES, ignore_installed=TRUE)
-reticulate::use_virtualenv(virtualenv_dir, required = T)
-reticulate::py_config()
-
 # ====== import R libraries: ####
 # Some initial setup:
-library(BiocManager)
-options(repos = BiocManager::repositories())
+#library(BiocManager)
+#options(repos = BiocManager::repositories())
 library(shiny)            
 library(shinythemes)      
 import::from(shinycssloaders, withSpinner) 
-library(reticulate)
+#library(reticulate)
+reticulate::py_config()
 library(shinyBS)        
 library(shinyWidgets)     
 library(gridExtra, verbose=FALSE)        
@@ -56,7 +41,6 @@ source("./app/tabs/upsetplot/upsetplot.R")
 source("./app/tabs/table/table.R") 
 source("./app/tabs/DE/DE.R") 
 source("./app/tabs/rrvgo/rrvgo.R") 
-
 
 
 # Define UI for application that draws a histogram
