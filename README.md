@@ -158,15 +158,16 @@ reticulate::use_virtualenv(virtualenv_dir, required = T)
 
 ## How to run:
 **Share as R script with R studio:**
+Once all the packages have been installed, 
 
-1. Enter runGitHub( "MFIs", "YuelinYao")
+1. Enter shiny::runGitHub( "MFIs", "YuelinYao")
 
-2. Download and run locally
+2. Download and run locally: shiny::runApp()
 
 **Share as a web page:**
 
-1. shinyapps.io
+1. shinyapps.io (Server is provided by Rstudio, but the memory for free is not enough.)
 
-2. Shiny Server
+2. Shiny Server (We need to provide a server to host this application)
  
 3. RStudio Connect
