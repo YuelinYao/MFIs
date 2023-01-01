@@ -128,22 +128,25 @@ library(ggplot2)
 
 Python:
 ```
-import sys
-import pandas as pd
-import numpy as np
-import igraph as ig
-import argparse
-import sys
-from scipy.cluster.hierarchy import dendrogram, linkage, fcluster, cut_tree
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.offsetbox import OffsetImage,AnnotationBbox
-import io
-from PIL import Image
-import seaborn as sns
-sns.set(style='white')
-sns.set_palette('colorblind')
+# Define any Python packages needed for the app here:
+PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
+                        'matplotlib','Pillow','seaborn')
+
+
+
+
+# ------------------ App virtualenv setup (Do not edit) ------------------- #
+virtualenv_dir = Sys.getenv('VIRTUALENV_NAME')
+python_path = Sys.getenv('PYTHON_PATH')
+
+
+# Create virtual env and install dependencies
+reticulate::virtualenv_create(envname = virtualenv_dir, python = python_path)
+reticulate::virtualenv_install(virtualenv_dir, packages = PYTHON_DEPENDENCIES, ignore_installed=TRUE)
+reticulate::use_virtualenv(virtualenv_dir, required = T)
 ```
+
+
 ## How to run:
 **Share as R script with R studio:**
 
