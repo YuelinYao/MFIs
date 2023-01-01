@@ -423,7 +423,7 @@ server <- function(input, output,session) {
         },
         content=function(heatmap3){
           width=dim(result()[["Data_mtrix_log"]])[2]/188
-          height=dim(result()[["Data_mtrix_log"]])[1]*4.5/12
+          height=dim(result()[["Data_mtrix_log"]])[1]*4.5/12+1.1
           pdf(heatmap3,width =25*width+5,height = height)
           pheatmap::pheatmap(border_color = NA,result()[["Data_mtrix_log"]],display_numbers = result()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,fontsize_row = 15,
