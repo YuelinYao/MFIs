@@ -21,7 +21,7 @@ python_path = Sys.getenv('PYTHON_PATH')
 reticulate::virtualenv_create(envname = virtualenv_dir, python = python_path)
 reticulate::virtualenv_install(virtualenv_dir, packages = PYTHON_DEPENDENCIES, ignore_installed=TRUE)
 reticulate::use_virtualenv(virtualenv_dir, required = T)
-
+reticulate::py_config()
 
 # ====== import R libraries: ####
 # Some initial setup:
@@ -31,7 +31,6 @@ library(shiny)
 library(shinythemes)      
 import::from(shinycssloaders, withSpinner) 
 library(reticulate)
-#reticulate::py_config()
 library(shinyBS)        
 library(shinyWidgets)     
 library(gridExtra, verbose=FALSE)        
