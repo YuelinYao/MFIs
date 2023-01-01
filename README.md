@@ -10,6 +10,14 @@
 ## Libarary:
 R:
 ```
+#------renv package: https://rstudio.github.io/renv/articles/renv.html
+# renv::restore() use the information from renv.lock file to retrieve and reinstall those packages in this project.
+# just enter the following in the project directory:
+renv::restore()
+
+
+#----- alternatively, install one by one...
+
 if (!any(rownames(installed.packages()) == "shiny")){
   install.packages("shiny")
 }
@@ -128,7 +136,7 @@ library(ggplot2)
 
 Python:
 ```
-# Define any Python packages needed for the app here:
+# Define any Python packages needed for the app in R:
 PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
                         'matplotlib','Pillow','seaborn')
 
@@ -136,6 +144,7 @@ PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
 
 
 # ------------------ App virtualenv setup (Do not edit) ------------------- #
+# VIRTUALENV_NAME and PYTHON_PATH are definded in .Rprofile
 virtualenv_dir = Sys.getenv('VIRTUALENV_NAME')
 python_path = Sys.getenv('PYTHON_PATH')
 
@@ -150,14 +159,16 @@ reticulate::use_virtualenv(virtualenv_dir, required = T)
 ## How to run:
 **Share as R script with R studio:**
 
-1. Enter runGitHub( "MFIs", "YuelinYao")
+Once all the packages have been installed, 
 
-2. Download and run locally
+1. Enter: ```shiny::runGitHub( "MFIs", "YuelinYao")```
+
+2. Download and run locally: ```shiny::runApp()```
 
 **Share as a web page:**
 
-1. shinyapps.io
+1. shinyapps.io (Server is provided by Rstudio, but the memory for free is not enough.)
 
-2. Shiny Server
+2. Shiny Server (We need to provide a server to host this application)
  
 3. RStudio Connect
