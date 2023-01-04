@@ -31,7 +31,7 @@ library(clusterProfiler)
 library(data.table)
 library(biomaRt)
 library(ggplot2)
-options(shiny.maxRequestSize = 1000*1024^2)
+options(shiny.maxRequestSize = 5000*1024^2)
 
 source("./app/general/general.R") # conditionalPanel
 source("./app/tabs/about/about.R") # about
