@@ -42,11 +42,9 @@ InformationUI <- function(){
        a("Sjoerd Viktor Beentjes and Ava Khamseh, Phys. Rev. E. 2020 Nov 102, 053314", href= "https://journals.aps.org/pre/abstract/10.1103/PhysRevE.102.053314", target="_blank", style = "color: grey;")),
     
     tags$br(),
-    tags$b("MFIs",style = "color: #337ab7;"), "application code is available through Github:", a("xxx", href="https://github.com/AJnsm", target="_blank", style = "color: steelblue;"),
-    
-    br( a(icon("mail-bulk"), href="mailto:s1914230@ed.ac.uk"),
-        "If you have any question, you can send an e-mail to",
-        br(a("contact", href="mailto: s1914230@ed.ac.uk",  style = "color: steelblue;")) )
+    tags$b("MFIs",style = "color: #337ab7;"), "application code is available through Github", a(icon("house"), href="https://github.com/AJnsm", target="_blank", style = "color: steelblue;"),
+    tags$br(),
+    br( "If you have any question, you can send an e-mail",a(icon("mail-bulk"), href="mailto: s1914230@ed.ac.uk",  style = "color: steelblue;")) 
   )
 }
 
