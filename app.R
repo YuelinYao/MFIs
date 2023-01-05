@@ -468,7 +468,7 @@ server <- function(input, output,session) {
       
       
       plot_size<-reactive({
-        width=length(unique(GO()$cluster))*6.61/2+3
+        width=length(unique(GO()$cluster))*6.61/2+4
         all_function<-GO() %>%
           group_by(cluster,class) %>%
           slice_max(n = 4,order_by = Count)%>%
