@@ -50,8 +50,8 @@ n = len(binReps)
 
 
 # Labels that combine the genes and their states---once as list, once as string with newlines
-labsWithStates = devStates.apply(lambda x: [''.join(g) for g in list(zip(x['genes'].split('_'), ['+' if int(s)==1 else '-' for s in x['state']]))], axis=1)
-labsWithStates_str = labsWithStates.apply(lambda x: '\n'.join(x)).values
+#labsWithStates = devStates.apply(lambda x: [''.join(g) for g in list(zip(x['genes'].split('_'), ['+' if int(s)==1 else '-' for s in x['state']]))], axis=1)
+#labsWithStates_str = labsWithStates.apply(lambda x: '\n'.join(x)).values
 
 
 

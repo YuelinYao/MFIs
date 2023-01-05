@@ -1796,14 +1796,6 @@
         "askpass"
       ]
     },
-    "packrat": {
-      "Package": "packrat",
-      "Version": "0.8.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "d84055adcb6bb1f4f0ce8c5f235bc328",
-      "Requirements": []
-    },
     "parallelly": {
       "Package": "parallelly",
       "Version": "1.33.0",
@@ -2113,30 +2105,6 @@
         "treemap",
         "wordcloud"
       ]
-    },
-    "rsconnect": {
-      "Package": "rsconnect",
-      "Version": "0.8.28",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "737312265e542d243f003b9625482e09",
-      "Requirements": [
-        "curl",
-        "digest",
-        "jsonlite",
-        "openssl",
-        "packrat",
-        "rstudioapi",
-        "yaml"
-      ]
-    },
-    "rstudioapi": {
-      "Package": "rstudioapi",
-      "Version": "0.14",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "690bd2acc42a9166ce34845884459320",
-      "Requirements": []
     },
     "sass": {
       "Package": "sass",
