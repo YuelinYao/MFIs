@@ -468,12 +468,12 @@ server <- function(input, output,session) {
       
       
       plot_size<-reactive({
-        width=length(unique(GO()$cluster))*6.61/2
+        width=length(unique(GO()$cluster))*6.61/2+3
         all_function<-GO() %>%
           group_by(cluster,class) %>%
           slice_max(n = 4,order_by = Count)%>%
           slice_head(n=4)
-        height=dim(all_function)[1]*6.22/25
+        height=dim(all_function)[1]*6.22/25+2
         size_lists<-list(width,height)
         names(size_lists)<-c("width","height")
         return(size_lists)
