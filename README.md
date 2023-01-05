@@ -167,8 +167,7 @@ Once all the packages have been installed,
 
 **Share as a web page:**
 
-1. shinyapps.io (Server is provided by Rstudio, but the memory for free is not enough.)
+1. shinyapps.io: https://yuelinyao120.shinyapps.io/MFIs-shinyapps/ (Server is provided by Rstudio, but the memory for free is not enough.)
 
-2. Shiny Server (We need to provide a server to host this application)
+2. Shiny Server (We need to provide a server to host this application, might consider put on: https://shiny.igc.ed.ac.uk/)
  
-3. RStudio Connect
