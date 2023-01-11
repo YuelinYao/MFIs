@@ -341,7 +341,7 @@ server <- function(input, output,session) {
       },
       content=function(heatmap1){
         width=dim(result1()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
-        height=dim(result1()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
+        height=dim(result1()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
         pdf(heatmap1,width =width,height = height)
         pheatmap::pheatmap(border_color = NA,result1()[["Data_mtrix_log"]],display_numbers = result1()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
@@ -385,7 +385,7 @@ server <- function(input, output,session) {
         },
         content=function(heatmap2){
           width=dim(result2()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
-          height=dim(result2()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
+          height=dim(result2()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
           pdf(heatmap2,width =width,height = height)
           pheatmap::pheatmap(border_color = NA,result2()[["Data_mtrix_log"]],display_numbers = result2()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
@@ -423,7 +423,7 @@ server <- function(input, output,session) {
         },
         content=function(heatmap3){
           width=dim(result()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
-          height=dim(result()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
+          height=dim(result()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
           pdf(heatmap3,width =width,height = height)
           pheatmap::pheatmap(border_color = NA,result()[["Data_mtrix_log"]],display_numbers = result()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
