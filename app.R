@@ -319,7 +319,7 @@ server <- function(input, output,session) {
     
     output$heatmap_celltypes <- renderPlot({
     pheatmap::pheatmap(border_color = NA,result1()[["Data_mtrix_log"]],display_numbers = result1()[["Mydata_raw_m"]],
-                           fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                           fontsize = 12,fontsize_number = 15,
                             main=result1()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
@@ -340,11 +340,11 @@ server <- function(input, output,session) {
         paste('Heatmap1-', Sys.Date(), '.pdf', sep='')
       },
       content=function(heatmap1){
-        width=dim(result1()[["Data_mtrix_log"]])[2]/188
-        height=dim(result1()[["Data_mtrix_log"]])[1]*4.5/12
-        pdf(heatmap1,width =25*width+5,height = height)
+        width=dim(result1()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
+        height=dim(result1()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
+        pdf(heatmap1,width =width,height = height)
         pheatmap::pheatmap(border_color = NA,result1()[["Data_mtrix_log"]],display_numbers = result1()[["Mydata_raw_m"]],
-                           fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                           fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                            main=result1()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
@@ -363,7 +363,7 @@ server <- function(input, output,session) {
     
       output$heatmap_cellstates <- renderPlot({
       pheatmap::pheatmap(border_color = NA,result2()[["Data_mtrix_log"]],display_numbers = result2()[["Mydata_raw_m"]],
-                         fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                         fontsize = 12,fontsize_number = 15,
                          main=result2()[["cutoff"]],
                          cluster_cols = T,cluster_rows = T,
                          color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
@@ -384,11 +384,11 @@ server <- function(input, output,session) {
           paste('Heatmap2-', Sys.Date(), '.pdf', sep='')
         },
         content=function(heatmap2){
-          width=dim(result2()[["Data_mtrix_log"]])[2]/188
-          height=dim(result2()[["Data_mtrix_log"]])[1]*4.5/12
-          pdf(heatmap2,width =25*width+5,height = height)
+          width=dim(result2()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
+          height=dim(result2()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
+          pdf(heatmap2,width =width,height = height)
           pheatmap::pheatmap(border_color = NA,result2()[["Data_mtrix_log"]],display_numbers = result2()[["Mydata_raw_m"]],
-                             fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                              main=result2()[["cutoff"]],
                              cluster_cols = T,cluster_rows = T,
                              color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
@@ -402,7 +402,7 @@ server <- function(input, output,session) {
       })
       output$cellstates_types <- renderPlot({
       pheatmap::pheatmap(border_color = NA,result()$Data_mtrix_log,display_numbers = result()$Mydata_raw_m,
-                           fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                           fontsize = 12,fontsize_number = 15,
                            cluster_cols = T,cluster_rows = T,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
       })
@@ -422,11 +422,11 @@ server <- function(input, output,session) {
           paste('Heatmap3-', Sys.Date(), '.pdf', sep='')
         },
         content=function(heatmap3){
-          width=dim(result()[["Data_mtrix_log"]])[2]/188
-          height=dim(result()[["Data_mtrix_log"]])[1]*4.5/12+1.1
-          pdf(heatmap3,width =25*width+5,height = height)
+          width=dim(result()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
+          height=dim(result()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*3.5/25.4+2
+          pdf(heatmap3,width =width,height = height)
           pheatmap::pheatmap(border_color = NA,result()[["Data_mtrix_log"]],display_numbers = result()[["Mydata_raw_m"]],
-                             fontsize = 12,fontsize_number = 15,fontsize_row = 15,
+                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                              cluster_cols = T,cluster_rows = T,
                              color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
           dev.off()
@@ -468,12 +468,12 @@ server <- function(input, output,session) {
       
       
       plot_size<-reactive({
-        width=length(unique(GO()$cluster))*6.61/2+4
+        width=length(unique(GO()$cluster))*1/25.4+max(nchar(GO()$Description))*1/24.5+6
         all_function<-GO() %>%
           group_by(cluster,class) %>%
           slice_max(n = 4,order_by = Count)%>%
           slice_head(n=4)
-        height=dim(all_function)[1]*6.22/25+2
+        height=dim(all_function)[1]*5/25.4+2
         size_lists<-list(width,height)
         names(size_lists)<-c("width","height")
         return(size_lists)

@@ -1,4 +1,4 @@
-source("renv/activate.R")
+#source("renv/activate.R")
 # This file configures the virtualenv and Python paths differently depending on
 # the environment the app is running in (local vs remote server).
 

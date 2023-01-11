@@ -280,8 +280,8 @@ Plot_enrichment<-function(GO){
   coord_flip()+
   theme_bw()+
   theme(axis.ticks.length=unit(-0.1, "cm"),
-        axis.text.x = element_text(margin=margin(5,5,0,5,"pt"),angle = 45, hjust = 1,size=10),
-        axis.text.y = element_text(margin=margin(5,5,5,5,"pt"),size=10),
+        axis.text.x = element_text(margin=margin(5,5,0,5,"pt"),angle = 45, hjust = 1,size=15),
+        axis.text.y = element_text(margin=margin(5,5,5,5,"pt"),size=15),
         axis.text = element_text(color = "black"),
         axis.title=element_blank())+
   #xlab("GO & KEGG functional enrichment")+
