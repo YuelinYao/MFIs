@@ -110,7 +110,10 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
       m=length(Cell)
       n=dim(Meta_data)[1]-m
       k=length(cell_types)
-      p_value<-phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE) #https://www.biostars.org/p/15548/
+      p_value<-phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      #https://www.biostars.org/p/15548/
+      #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
+      
       P_set[ct]=p_value
     }
     Data_mtrix[,i]<-P_set
