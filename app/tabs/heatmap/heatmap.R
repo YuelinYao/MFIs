@@ -131,8 +131,26 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
   
   breaksList = seq(0, 10, by = 1)
   dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
-  colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
+  
 
+  
+  df<-table(Meta_data$Cell_Types)
+  percentage=df/sum(df)
+  stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
+  names(stats)<-names(df)
+  stats<-stats[unique(Meta_data$Cell_Types)]
+  stats<-paste0(unique(Meta_data$Cell_Types),stats)
+  rownames(Data_mtrix_log)<-stats
+
+  
+  df<-lengths(List)
+  percentage=df/sum(df)
+  stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
+  names(stats)<-gsub("cluster_","",names(df))
+  stats<-stats[unique(Devstates$cluster)]
+  stats<-paste0(unique(Devstates$cluster),stats)
+  colnames(Data_mtrix_log)<-stats
+  colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
   
   result=list()
   result$Data_mtrix_log=Data_mtrix_log
@@ -199,6 +217,24 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
   
   breaksList = seq(0, 10, by = 1)
   dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
+  
+  
+  df<-table(Meta_data$Cell_State)
+  percentage=df/sum(df)
+  stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
+  names(stats)<-names(df)
+  stats<-stats[unique(Meta_data$Cell_State)]
+  stats<-paste0(unique(Meta_data$Cell_State),stats)
+  rownames(Data_mtrix_log)<-stats
+  
+  
+  df<-lengths(List)
+  percentage=df/sum(df)
+  stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
+  names(stats)<-gsub("cluster_","",names(df))
+  stats<-stats[unique(Devstates$cluster)]
+  stats<-paste0(unique(Devstates$cluster),stats)
+  colnames(Data_mtrix_log)<-stats
   colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
   
   result=list()
@@ -254,7 +290,22 @@ StateVsType<-function(Meta_data){
     
     breaksList = seq(0, 10, by = 1)
     dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
-    colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
+   
+    df<-table(Meta_data$Cell_Types)
+    percentage=df/sum(df)
+    stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
+    names(stats)<-names(df)
+    stats<-stats[unique(Meta_data$Cell_Types)]
+    stats<-paste0(unique(Meta_data$Cell_Types),stats)
+    colnames(Data_mtrix_log)<-stats
+    
+    df<-table(Meta_data$Cell_State)
+    percentage=df/sum(df)
+    stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
+    names(stats)<-names(df)
+    stats<-stats[unique(Meta_data$Cell_State)]
+    stats<-paste0(unique(Meta_data$Cell_State),stats)
+    rownames(Data_mtrix_log)<-stats
     
     result=list()
     result$Data_mtrix_log=Data_mtrix_log
