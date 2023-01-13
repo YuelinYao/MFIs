@@ -10,8 +10,8 @@ aboutUI <- function(){
 about <- function(){
   Text1 <- function(){
     text = tags$span(
-      tags$h3("Explore cell states by MFIs", style = "color: #337ab7;"),
-        tags$b("MFIs",style = "color: #337ab7;"),  "takes in scRNA-seq count matrix and estimate gene interactions. Here we show how to use these MFIs to explore cell states.",
+      tags$h3("Explore cell states by Stator", style = "color: #337ab7;"),
+        tags$b("Stator",style = "color: #337ab7;"),  "takes in scRNA-seq count matrix and estimate gene interactions. Here we show how to use results from Stator to explore cell states.",
         tags$br(),
       
       tags$h4("Data Visualization &  Analysis", style="color: #337ab7;"),
@@ -36,13 +36,13 @@ about <- function(){
 ## optionsTutorial UI:
 InformationUI <- function(){
   text = tags$span(
-    br("If you like MFIs and use it, please consider citing the related article:",
+    br("If you like Stator and use it, please consider citing the related article:",
        tags$br(),
        a("Higher-order interactions in statistical physics and machine learning: A model-independent solution to the inverse problem at equilibrium", href = "https://journals.aps.org/pre/abstract/10.1103/PhysRevE.102.053314", target="_blank", style = "color: steelblue;"),
        a("Sjoerd Viktor Beentjes and Ava Khamseh, Phys. Rev. E. 2020 Nov 102, 053314", href= "https://journals.aps.org/pre/abstract/10.1103/PhysRevE.102.053314", target="_blank", style = "color: grey;")),
     
     tags$br(),
-    tags$b("MFIs",style = "color: #337ab7;"), "application code is available through Github", a(icon("house"), href="https://github.com/AJnsm", target="_blank", style = "color: steelblue;"),
+    tags$b("Stator",style = "color: #337ab7;"), "application code is available through Github", a(icon("house"), href="https://github.com/AJnsm", target="_blank", style = "color: steelblue;"),
     tags$br(),
     br( "If you have any question, you can send an e-mail",a(icon("mail-bulk"), href="mailto: s1914230@ed.ac.uk",  style = "color: steelblue;")) 
   )

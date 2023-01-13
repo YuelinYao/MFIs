@@ -284,7 +284,7 @@ server <- function(input, output,session) {
     
     ## Table:  
     showText<-eventReactive(input$action_table, {
-      paste(dim(summaryTable())[1]," deviating MFIs in total, ",length(unique(summaryTable()$cluster)), "modules." )
+      paste(dim(summaryTable())[1]," deviating MFIs in total, ",length(unique(summaryTable()$cluster)), "clusters." )
     })
     
     output$textsummary <- renderText({
@@ -293,8 +293,8 @@ server <- function(input, output,session) {
     
     show_Table <- eventReactive(input$action_table, { 
       table<-summaryTable()
-      table$cluster<-paste0("Module:",table$cluster)
-      colnames(table)<-c("Genes","D-tuple","Dev","Pval","Module")
+      table$cluster<-paste0("Cluster:",table$cluster)
+      colnames(table)<-c("Genes","D-tuple","Dev","Pval","Cluster")
       table
     })
     
