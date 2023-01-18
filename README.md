@@ -170,4 +170,14 @@ Once all the packages have been installed,
 1. shinyapps.io: https://yuelinyao120.shinyapps.io/MFIs-shinyapps/ (Server is provided by Rstudio, but the memory for free is not enough.)
 
 2. Shiny Server (We need to provide a server to host this application, might consider put on: https://shiny.igc.ed.ac.uk/)
+
+
+## Notes
+KEGG reference genome: https://www.genome.jp/kegg/catalog/org_list.html
+
+GO reference genome: http://bioconductor.org/packages/release/BiocViews.html#___OrgDb
+
+ensembl dataset: see ./data/ensembl_dataset.csv
+
+
  
