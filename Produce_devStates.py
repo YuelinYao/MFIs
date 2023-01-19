@@ -9,18 +9,17 @@ trainDat_path = sys.argv[3]
 
 import pandas as pd
 import numpy as np
-import igraph as ig
-import argparse
-import sys
+#import igraph as ig
+#import argparse
 from scipy.cluster.hierarchy import dendrogram, linkage, fcluster, cut_tree
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from matplotlib.offsetbox import OffsetImage,AnnotationBbox
-import io
-from PIL import Image
-import seaborn as sns
-sns.set(style='white')
-sns.set_palette('colorblind')
+#import matplotlib.pyplot as plt
+#from matplotlib import cm
+#from matplotlib.offsetbox import OffsetImage,AnnotationBbox
+#import io
+#from PIL import Image
+#import seaborn as sns
+#sns.set(style='white')
+#sns.set_palette('colorblind')
 
 
 devStates = pd.read_csv(devStates_path, dtype=str, index_col=0)

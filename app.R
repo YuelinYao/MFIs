@@ -11,10 +11,25 @@
 # Some initial setup:
 #library(BiocManager)
 #options(repos = BiocManager::repositories())
+# Define any Python packages needed for the app in R:
+#PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
+#'matplotlib','Pillow','seaborn')
+PYTHON_DEPENDENCIES = c('numpy','pandas','scipy')
+
+# ------------------ App virtualenv setup (Do not edit) ------------------- #
+# VIRTUALENV_NAME and PYTHON_PATH are definded in .Rprofile
+virtualenv_dir = Sys.getenv('VIRTUALENV_NAME')
+python_path = Sys.getenv('PYTHON_PATH')
+
+
+# Create virtual env and install dependencies
+reticulate::virtualenv_create(envname = virtualenv_dir, python = python_path)
+reticulate::virtualenv_install(virtualenv_dir, packages = PYTHON_DEPENDENCIES, ignore_installed=TRUE)
+reticulate::use_virtualenv(virtualenv_dir, required = T)
+
 library(shiny)            
 library(shinythemes)      
 import::from(shinycssloaders, withSpinner) 
-#library(reticulate)
 reticulate::py_config()
 library(shinyBS)        
 library(shinyWidgets)     
