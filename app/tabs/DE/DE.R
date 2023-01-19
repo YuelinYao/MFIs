@@ -97,7 +97,11 @@ PlotDEheatmap<-function(selected_cluster,cutoff,DE,srt,List){
 
 
 DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
-
+  
+  if (!any(rownames(installed.packages()) == go_species)){
+    BiocManager::install(go_species,update = F)
+  }
+  library(go_species,character.only = T)
   selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
   selected_cluster<-paste0("cluster_C:",selected_cluster)
 

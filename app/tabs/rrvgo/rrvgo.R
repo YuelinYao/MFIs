@@ -29,6 +29,10 @@ rrvgo_tableUI<-function(){
 
 rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,GenesList,background_genes){
   
+  if (!any(rownames(installed.packages()) == go_species)){
+    BiocManager::install(go_species,update = F)
+  }
+  library(go_species,character.only = T)
   mart <- useMart("ENSEMBL_MART_ENSEMBL")
   mart <- useDataset(Mart, mart)
   
