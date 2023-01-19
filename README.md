@@ -138,7 +138,7 @@ Python:
 ```
 # Define any Python packages needed for the app in R:
 #PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
-                        'matplotlib','Pillow','seaborn')
+             #           'matplotlib','Pillow','seaborn')
 PYTHON_DEPENDENCIES = c('numpy','pandas','scipy')
 
 
