@@ -394,7 +394,7 @@ server <- function(input, output,session) {
     
     # Heatmap1(Tab):
     result1 <- eventReactive(input$action_heatmap,{
-      result1<-heatmap(input$cutoff,cutoff,input$RefSet,Genelist,N=10000)
+      result1<-heatmap(input$cutoff,usedMeta_data(),summaryTable(), List())
       result1$cutoff=input$cutoff
       result1
     } )
