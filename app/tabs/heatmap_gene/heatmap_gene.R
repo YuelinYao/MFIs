@@ -36,7 +36,7 @@ heatmapGenes <- function(cutoff,RefSet,Genelist,N=10000) {
       p_value<-phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE) 
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
-      print(p_value)
+      #print(p_value)
       P_set[ct]=p_value
     }
     Data_mtrix[,i]<-P_set
