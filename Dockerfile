@@ -10,8 +10,10 @@ RUN apt-get update && apt-get install -y \
     libcairo2-dev \
     libxt-dev \
     libssl-dev \
-    libssh2-1-dev 
-
+    libssh2-1-dev \
+    python3 \
+    python3-dev \
+    python3-venv
 
 
 # copy the app to the image
@@ -31,9 +33,9 @@ RUN Rscript -e 'install.packages("renv")'
 RUN Rscript -e 'renv::consent(provided = TRUE)'
 RUN Rscript -e 'renv::restore()'
 
-
-
-
+RUN Rscript -q -e 'reticulate::virtualenv_create(envname = Sys.getenv('VIRTUALENV_NAME'), python = Sys.getenv('PYTHON_PATH'))'
+RUN Rscript -q -e 'reticulate::virtualenv_install(Sys.getenv('VIRTUALENV_NAME'), packages = c('numpy','pandas','scipy'), ignore_installed=TRUE)'
+RUN Rscript -e 'reticulate::use_virtualenv(Sys.getenv('VIRTUALENV_NAME'), required = T)'
 
 
 
