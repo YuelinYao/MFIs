@@ -61,6 +61,49 @@ GetGenes<-function(cutoff,Devstates){
 
 
 
+## Gene_list list in each states with 0-state genes
+GetGenes2<-function(cutoff,Devstates){
+  print("Get genes in each state")
+  Geneset<-NULL
+  for (i in unique(Devstates$cluster)){
+    
+    cluster<-Devstates[Devstates$cluster==i,]
+    #print(paste0("Cluster: ",i))
+    Genes_set<-NULL
+    
+    for (c in 1:length(cluster$genes)){
+      #print(paste0("Cell states: ",cluster$genes[c]))
+      Genes<-cluster$genes[c]
+      Genes<-str_split(Genes, "_")[[1]]
+      
+      #print(length(Genes))
+      state<-cluster$state[c]
+      State<-as.numeric(strsplit(as.character(state),"")[[1]])
+      #print(State)
+      
+      Genes_state<-paste(Genes,State,sep = "_")
+      Genes_set<-c(Genes_set,Genes_state)
+      
+    }
+    
+    
+    Genes_set<-gsub("_1","",Genes_set)
+    Genes_set<-gsub("_0","",Genes_set)
+    Genes_set<-unique(Genes_set)
+    
+    list=list(Genes_set)
+    names(list)<-paste0("cluster_",i)
+    Geneset<-c(Geneset,list)
+    
+  }
+  
+  return(Geneset)
+  
+}
+
+
+
+
 FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,GenesList, background_genes){
 
   if (!any(rownames(installed.packages()) == go_species)){

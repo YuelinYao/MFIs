@@ -52,6 +52,7 @@ options(shiny.maxRequestSize = 5000*1024^2)
 source("./app/general/general.R") # conditionalPanel
 source("./app/tabs/about/about.R") # about
 source("./app/tabs/heatmap/heatmap.R") # heatmap
+source("./app/tabs/heatmap_gene/heatmap_gene.R") # heatmap-gene
 source("./app/tabs/GO_plot/GO_plot.R") # GOplot
 source("./app/tabs/upsetplot/upsetplot.R") 
 source("./app/tabs/table/table.R") 
@@ -143,9 +144,19 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                              ),
             
             ### submit button
+            conditionalPanel(condition= "input.tabs == 'heatmap_genes'",
+                             selectInput("CellStateGenes", "Cell state gene set:", choices=c("Cancer cell state (Barkley, D.et.al., 2022)"="CancerState","Cell cycle state (Tirosh et al, 2015)"="CellCycleState"), 
+                                         selected = "CancerState", multiple = FALSE),
+                             actionButton("action_heatmap_genes","Submit",icon("paper-plane"), 
+                                        style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+            
+            
+            ### submit button
             conditionalPanel(condition= "input.tabs == 'heatmap'",
                              actionButton("action_heatmap","Submit",icon("paper-plane"), 
-                                        style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
+            
+            
             
             ### submit button
             conditionalPanel(condition= "input.tabs == 'upset'",
@@ -165,7 +176,8 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             tabsetPanel(type = "pills", id = 'tabs',
                 tabPanel("About", icon = icon("circle-info"), value = 'about', aboutUI()),
                 tabPanel("Table", icon = icon("table"),value="table",TableUI()),
-                tabPanel("Heatmap",icon = icon("map"), value="heatmap",
+                tabPanel("Heatmap-Genes",icon = icon("map"), value="heatmap_genes",heatmapGenesUI(),downloadButton("downloadheatmap_genes","Download as .csv"),downloadButton("downloadheatmapgenes_plot","Download as .pdf")),
+                tabPanel("Heatmap-Cells",icon = icon("map"), value="heatmap",
                          heatmapUI(),downloadButton("downloadheatmap1","Download as .csv"),downloadButton("downloadheatmap_plot1","Download as .pdf"),
                          NMF_UI(),downloadButton("downloadheatmap2","Download as .csv"), downloadButton("downloadheatmap_plot2","Download as .pdf"),tags$br(),
                          NMF_CelltypeUI(),downloadButton("downloadheatmap3","Download as .csv"), downloadButton("downloadheatmap_plot3","Download as .pdf")),
@@ -298,6 +310,13 @@ server <- function(input, output,session) {
     })%>% bindCache(input$cutoff,usedTable(),usedTable2()) 
     
     
+    # Get gene list:
+    GetGenesList2<-reactive({
+      GetGenes2(input$cutoff,summaryTable())
+    })%>% bindCache(input$cutoff,usedTable(),usedTable2()) 
+    
+    
+    
     ## Table:  
     showText<-eventReactive(input$action_table, {
       paste(dim(summaryTable())[1]," deviating MFIs in total, ",length(unique(summaryTable()$cluster)), "clusters." )
@@ -327,9 +346,55 @@ server <- function(input, output,session) {
       }
     )
 
+    # Heatmap-genes:
+    result_genes <- eventReactive(input$action_heatmap_genes,{
+      result_genes<-heatmapGenes(input$cutoff,input$CellStateGenes,GetGenesList2(),N=10000)
+      result_genes$cutoff=input$cutoff
+      result_genes
+    } )
+    
+    output$heatmap_GeneSet <- renderPlot({
+      pheatmap::pheatmap(border_color = NA,result_genes()[["Data_mtrix_log"]],display_numbers = result_genes()[["Mydata_raw_m"]],
+                         fontsize = 12,fontsize_number = 15,
+                         main=result_genes()[["cutoff"]],
+                         cluster_cols = T,cluster_rows = T,
+                         color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+    })
+    
+    
+    output$downloadheatmap_genes<-downloadHandler(
+      filename = function(){
+        paste('HeatmapGenes-', Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(result_genes()[["Data_mtrix_log"]],heatmap1)
+      }
+    )
+    
+    output$downloadheatmapgenes_plot<-downloadHandler(
+      filename = function(){
+        paste('HeatmapGenes-', Sys.Date(), '.pdf', sep='')
+      },
+      content=function(heatmap1){
+        width=dim(result_genes()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result_genes()[["Data_mtrix_log"]])))*5/25.4+2
+        height=dim(result_genes()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result_genes()[["Data_mtrix_log"]])))*5/25.4+5
+        pdf(heatmap1,width =width,height = height)
+        pheatmap::pheatmap(border_color = NA,result_genes()[["Data_mtrix_log"]],display_numbers = result_genes()[["Mydata_raw_m"]],
+                           fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                           main=result_genes()[["cutoff"]],
+                           cluster_cols = T,cluster_rows = T,
+                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+        dev.off()
+        
+      } )
+    
+    
+    
+    
+    
     # Heatmap1(Tab):
     result1 <- eventReactive(input$action_heatmap,{
-      result1<-heatmap(input$cutoff,usedMeta_data(),summaryTable(), List())
+      result1<-heatmap(input$cutoff,cutoff,input$RefSet,Genelist,N=10000)
       result1$cutoff=input$cutoff
       result1
     } )

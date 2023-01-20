@@ -101,7 +101,7 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
   #print(paste0("Cluster: ",i))
   names<-paste0("cluster_",i)
   Cell<-List[[names]]
-  P_set=rep(NA,length(unique(unique(Meta_data$Cell_Types))))
+  P_set=rep(NA,length(unique(Meta_data$Cell_Types)))
   names(P_set)<-unique(Meta_data$Cell_Types)
     
     for (ct in unique(Meta_data$Cell_Types)){
@@ -188,7 +188,7 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
     names<-paste0("cluster_",i)
     Cell<-List[[names]]
     
-    P_set=rep(NA,length(unique(unique(Meta_data$Cell_State))))
+    P_set=rep(NA,length(unique(Meta_data$Cell_State)))
     names(P_set)<-unique(Meta_data$Cell_State)
     
     for (ct in unique(Meta_data$Cell_State)){
@@ -261,7 +261,7 @@ StateVsType<-function(Meta_data){
       Cell<-rownames(Meta_data)[which(Meta_data$Cell_Types==i)]
       Cell
       
-      P_set=rep(NA,length(unique(unique(Meta_data$Cell_State))))
+      P_set=rep(NA,length(unique(Meta_data$Cell_State)))
       names(P_set)<-unique(Meta_data$Cell_State)
       
       for (ct in unique(Meta_data$Cell_State)){
