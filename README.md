@@ -165,6 +165,22 @@ Once all the packages have been installed,
 
 2. Download and run locally: ```shiny::runApp()```
 
+3. Run with Docker:
+
+    i). Install docker on the local computer
+  
+    ii). Git clone the repository: 
+    ```
+    git clone https://github.com/YuelinYao/MFIs.git
+    ```
+    iii). Enter the repository:
+    
+     ```
+     docker build -t my-shiny-app .
+     docker run --rm -p 3838:3838 my-shiny-app
+     ```
+     For larger files go to Docker Desktop: Settings > Resources > Update the RAM to be more.
+
 **Share as a web page:**
 
 1. shinyapps.io: https://yuelinyao120.shinyapps.io/MFIs-shinyapps/ (Server is provided by Rstudio, but the memory for free is not enough.)
