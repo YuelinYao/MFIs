@@ -33,9 +33,9 @@ RUN Rscript -e 'install.packages("renv")'
 RUN Rscript -e 'renv::consent(provided = TRUE)'
 RUN Rscript -e 'renv::restore()'
 
-RUN Rscript -q -e 'reticulate::virtualenv_create(envname = Sys.getenv('VIRTUALENV_NAME'), python = Sys.getenv('PYTHON_PATH'))'
-RUN Rscript -q -e 'reticulate::virtualenv_install(Sys.getenv('VIRTUALENV_NAME'), packages = c('numpy','pandas','scipy'), ignore_installed=TRUE)'
-RUN Rscript -e 'reticulate::use_virtualenv(Sys.getenv('VIRTUALENV_NAME'), required = T)'
+RUN Rscript -e 'reticulate::virtualenv_create(envname = "example_env_name", python = "python3")'
+RUN Rscript -e 'reticulate::virtualenv_install("example_env_name", packages = c("numpy","pandas","scipy"), ignore_installed=TRUE)'
+RUN Rscript -e 'reticulate::use_virtualenv("example_env_name", required = T)'
 
 
 
