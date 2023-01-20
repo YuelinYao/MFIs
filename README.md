@@ -193,7 +193,7 @@ KEGG reference genome: https://www.genome.jp/kegg/catalog/org_list.html
 
 GO reference genome: http://bioconductor.org/packages/release/BiocViews.html#___OrgDb
 
-Ensembl dataset: see ./data/ensembl_dataset.csv
+Ensembl dataset for more details: see ./data/ensembl_dataset.csv
 
 
  
