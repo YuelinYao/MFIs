@@ -16,7 +16,8 @@ about <- function(){
       
       tags$h4("Data Visualization &  Analysis", style="color: #337ab7;"),
         tags$li("Table - A Summary statistics for deviating state", style="list-style-type: square;"),
-        tags$li("Heatmaps - Over-representation test for MFIs and other cell annotations", style="list-style-type: square;"),
+        tags$li("Heatmaps Genes - Over-representation test for cell state genes and gene annotations", style="list-style-type: square;"),
+        tags$li("Heatmaps Cells - Over-representation test for MFIs and other cell annotations", style="list-style-type: square;"),  
         tags$li("GO & KEGG for genes in each state", style="list-style-type: square;"),
         tags$li("rrvgo - Simplifying the redundance of GO sets", style="list-style-type: square;"),
         tags$li("Upset Plot", style="list-style-type: square;"),
