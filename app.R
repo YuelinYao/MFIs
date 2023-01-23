@@ -60,7 +60,7 @@ source("./app/tabs/DE/DE.R")
 source("./app/tabs/rrvgo/rrvgo.R") 
 
 
-# Define UI for application that draws a histogram
+# Define UI for application
 ui <- fluidPage(theme = shinytheme("spacelab"),
                 
                 # Application title
@@ -77,22 +77,22 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 headerPanel(                              ### add logos 
                   (img(src= "logo.png",height  = 120, width = 700)) ), ##class = "pull-left" 
                 
-                #Sidebar with a slider input for the cutoff
-                sidebarLayout(
-                  sidebarPanel(
+            #Sidebar with a slider input for the cutoff
+            sidebarLayout(
+            sidebarPanel(
             
-            readTableUI(), 
+            readTableUI(), #  Global conditional panel 
             
             conditionalPanel(
-                      condition="input.tabs == 'about'",
+                      condition="input.tabs == 'about'", # About-tab
                       InformationUI()),
             
-            conditionalPanel(condition= "input.tabs == 'upset'",
+            conditionalPanel(condition= "input.tabs == 'upset'",  # Upset Plot tab
                              textInput("selected_cluster_upset", "Input cluster(s):",value = "5,18,6,11,19")),
             
-            conditionalPanel(condition= "input.tabs == 'GO'",
+            conditionalPanel(condition= "input.tabs == 'GO'", # GO & KEGG Tab
                              textInput("selected_clusterGO", "Input cluster(s):",value = "5,18"),
-                             #switchInput(inputId = "genePresence",                            #switch button to upload your own data
+                             #switchInput(inputId = "genePresence",   
                               #           value = T,onLabel = "Genes" ),
                              selectInput("Mart", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
                              textInput("go_species", "GO OrgDb:",value = "org.Hs.eg.db"),
@@ -107,7 +107,7 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                              ),
                             
             
-            conditionalPanel(condition= "input.tabs == 'rrvgo'",
+            conditionalPanel(condition= "input.tabs == 'rrvgo'", # rrvgo Tab
                              textInput("selected_clusterrrvgo", "Input a cluster:",value = "5"),
                              selectInput("Mart_rrgvo", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
                              textInput("go_species_rrgvo", "GO OrgDb:",value = "org.Hs.eg.db"),
