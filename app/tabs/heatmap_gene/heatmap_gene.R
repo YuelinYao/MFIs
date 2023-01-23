@@ -6,10 +6,27 @@ heatmapGenesUI <- function(){
   )}
 
 
-### function
-heatmapGenes <- function(cutoff,RefSet,Genelist,N=10000) { 
+makeGeneSetList<-function(csvfile){
+  Cell_states<-read.csv(csvfile,row.names = 1)
+  List=NULL
+  for (i in 1:dim(Cell_states)[2]){
+    
+    cellstates<-Cell_states[,i]
+    cellstates<-cellstates[!is.na(cellstates)]
+    cellstates<-cellstates[!cellstates==""]
+    cellstates<-list(cellstates)
+    names(cellstates)<-colnames(Cell_states)[i]
+    List<-c(List,cellstates)
+    
+  }
+  return(List)
+}
 
-  load(paste0("./data/",RefSet,".Rdata"))
+### function
+#N=25678 the number of genes in whole human genome
+heatmapGenes <- function(cutoff,RefSet,Genelist,N=25678) { 
+
+  RefSet<-makeGeneSetList(RefSet)
   #print(head(RefSet))
   r=length(names(RefSet))
   col=length(names(Genelist))

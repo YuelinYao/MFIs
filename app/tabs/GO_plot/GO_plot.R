@@ -128,6 +128,9 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
       print(paste0("Cluster: ",i))
       names<-paste0("cluster_",i)
       Genes_set<-GenesList[[names]]
+      print(length(Genes_set))
+      if (length(Genes_set)>0) {
+        
       Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                        filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
       print(head(Genes_set))
@@ -199,8 +202,10 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
       cluster_GOMF$cluster<-i
       cluster_GOMF$class<-"GOMF"}
       
+      
       ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
-      AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
+      
+      AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  }
       
     }
     
@@ -217,6 +222,8 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
   print(paste0("Cluster: ",i))
   names<-paste0("cluster_",i)
   Genes_set<-GenesList[[names]]
+  print(length(Genes_set))
+  if (length(Genes_set)>0) {
   Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                    filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
   
@@ -287,7 +294,7 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
   
   ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
 
-  AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
+  AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  }
 
   }
 

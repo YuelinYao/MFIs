@@ -32,6 +32,7 @@ rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,Gen
   if (!any(rownames(installed.packages()) == go_species)){
     BiocManager::install(go_species,update = F)
   }
+  
   library(go_species,character.only = T)
   mart <- useMart("ENSEMBL_MART_ENSEMBL")
   mart <- useDataset(Mart, mart)
@@ -40,7 +41,9 @@ rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,Gen
   names<-paste0("cluster_",i)
   Genes_set<-GenesList[[names]]
   print(paste0("Cluster: ",i))
+  print(length(Genes_set))
   
+  if (length(Genes_set)>0) {
   Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                    filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
   
@@ -104,7 +107,7 @@ rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,Gen
   reducedTerms<-list(reducedTerms,simMatrix)
   names(reducedTerms)<-c("reducedTerms","simMatrix")
   return(reducedTerms)
-  
+  }
 }
 
 

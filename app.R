@@ -92,6 +92,8 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             
             conditionalPanel(condition= "input.tabs == 'GO'",
                              textInput("selected_clusterGO", "Input cluster(s):",value = "5,18"),
+                             #switchInput(inputId = "genePresence",                            #switch button to upload your own data
+                              #           value = T,onLabel = "Genes" ),
                              selectInput("Mart", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
                              textInput("go_species", "GO OrgDb:",value = "org.Hs.eg.db"),
                              textInput("kegg_species", "KEGG organism:",value = "hsa"),
@@ -145,8 +147,18 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             
             ### submit button
             conditionalPanel(condition= "input.tabs == 'heatmap_genes'",
-                             selectInput("CellStateGenes", "Cell state gene set:", choices=c("Cancer cell state (Barkley, D.et.al., 2022)"="CancerState","Cell cycle state (Tirosh et al, 2015)"="CellCycleState"), 
+                             selectInput("CellStateGenes", "Cell state gene set:", choices=c("Cancer cell state (Barkley, D.et.al., 2022)"="CancerState",
+                                                                                             "Cell cycle state (Tirosh et al, 2015)"="CellCycleState",
+                                                                                             "Upload state gene set" ="UploadState"), 
                                          selected = "CancerState", multiple = FALSE),
+                             
+                             # Only show this panel if the plot type is a histogram
+                             conditionalPanel(
+                               condition = "input.CellStateGenes == 'UploadState'",
+                               fileInput(inputId = "uploadCellStateGenes",label = NULL, multiple = FALSE,
+                                         accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
+                                         )),
+  
                              actionButton("action_heatmap_genes","Submit",icon("paper-plane"), 
                                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
             
@@ -346,9 +358,24 @@ server <- function(input, output,session) {
       }
     )
 
+    
     # Heatmap-genes:
+    usedCellStateGene <- reactive({
+      print(paste("Use CellStateGene: ",input$CellStateGenes))
+      if(!input$CellStateGenes=="UploadState"){
+        CellStateGenes_path<-paste0("./data/",input$CellStateGenes,".csv")
+      } else{
+        CellStateGenes_path<-input$uploadCellStateGenes
+        CellStateGenes_path<-CellStateGenes_path$datapath
+      }
+      return(CellStateGenes_path)
+    })  
+    
+    
+    
     result_genes <- eventReactive(input$action_heatmap_genes,{
-      result_genes<-heatmapGenes(input$cutoff,input$CellStateGenes,GetGenesList2(),N=10000)
+      result_genes<-heatmapGenes(input$cutoff,usedCellStateGene(),GetGenesList2(),N=25678)
+      #N=25678 the number of genes in whole human genome
       result_genes$cutoff=input$cutoff
       result_genes
     } )
