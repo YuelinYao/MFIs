@@ -147,6 +147,12 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             
             ### submit button
             conditionalPanel(condition= "input.tabs == 'heatmap_genes'",
+                             
+                             radioButtons(inputId = "colorHeatmapGene", "Colored by:",
+                                          choices = c("-log10FDR" = "Data_mtrix_log", "Enrichment" = "Enrichment"),
+                                          selected = "Data_mtrix_log", inline = TRUE),
+                             
+                             
                              selectInput("CellStateGenes", "Cell state gene set:", choices=c("Cancer cell state (Barkley, D.et.al., 2022)"="CancerState",
                                                                                              "Cell cycle state (Tirosh et al, 2015)"="CellCycleState",
                                                                                              "Upload state gene set" ="UploadState"), 
@@ -165,6 +171,11 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             
             ### submit button
             conditionalPanel(condition= "input.tabs == 'heatmap'",
+                             
+                             radioButtons(inputId = "colorHeatmapCells", "Colored by:",
+                                          choices = c("-log10FDR" = "Data_mtrix_log", "Enrichment" = "Enrichment"),
+                                          selected = "Data_mtrix_log", inline = TRUE),
+                             
                              actionButton("action_heatmap","Submit",icon("paper-plane"), 
                                           style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
             
@@ -188,11 +199,13 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             tabsetPanel(type = "pills", id = 'tabs',
                 tabPanel("About", icon = icon("circle-info"), value = 'about', aboutUI()),
                 tabPanel("Table", icon = icon("table"),value="table",TableUI()),
-                tabPanel("Heatmap-Genes",icon = icon("map"), value="heatmap_genes",heatmapGenesUI(),downloadButton("downloadheatmap_genes","Download as .csv"),downloadButton("downloadheatmapgenes_plot","Download as .pdf")),
+                tabPanel("Heatmap-Genes",icon = icon("map"), value="heatmap_genes",heatmapGenesUI(),downloadButton("downloadheatmap_genes","Download -log10FDR as .csv"),downloadButton("downloadheatmapgenes_plot","Download as .pdf"),downloadButton("downloadheatmap_genes_Enrichment","Download Enrichment as .csv"),tags$br(),
+                         stateGenesUI(),downloadButton("downloadheatmap_genes2","Download -log10FDR as .csv"),downloadButton("downloadheatmapgenes_plot2","Download as .pdf"),downloadButton("downloadheatmap_genes2_Enrichment","Download Enrichment as .csv")),
                 tabPanel("Heatmap-Cells",icon = icon("map"), value="heatmap",
-                         heatmapUI(),downloadButton("downloadheatmap1","Download as .csv"),downloadButton("downloadheatmap_plot1","Download as .pdf"),
-                         NMF_UI(),downloadButton("downloadheatmap2","Download as .csv"), downloadButton("downloadheatmap_plot2","Download as .pdf"),tags$br(),
-                         NMF_CelltypeUI(),downloadButton("downloadheatmap3","Download as .csv"), downloadButton("downloadheatmap_plot3","Download as .pdf")),
+                         heatmapUI(),downloadButton("downloadheatmap1","Download -log10FDR as .csv"),downloadButton("downloadheatmap_plot1","Download as .pdf"),downloadButton("downloadheatmap1_Enrichment","Download Enrichment as .csv"),
+                         NMF_UI(),downloadButton("downloadheatmap2","Download -log10FDR as .csv"), downloadButton("downloadheatmap_plot2","Download as .pdf"),downloadButton("downloadheatmap2_Enrichment","Download Enrichment as .csv"),tags$br(),
+                         NMF_CelltypeUI(),downloadButton("downloadheatmap3","Download -log10FDR as .csv"), downloadButton("downloadheatmap_plot3","Download as .pdf"),downloadButton("downloadheatmap3_Enrichment","Download Enrichment as .csv"),tags$br(),
+                         Test_CellstateUI(),downloadButton("downloadheatmap4","Download -log10FDR as .csv"), downloadButton("downloadheatmap_plot4","Download as .pdf"),downloadButton("downloadheatmap4_Enrichment","Download Enrichment as .csv")),
                 tabPanel("GO & KEGG", icon = icon("chart-line"),value="GO",FunctionUI(),downloadButton("downloadGOPlot","Download as .pdf"),tags$br(),
                          Function_tableUI(),downloadButton("downloadGO","Download as .csv")),
                 tabPanel("Using rrvgo", icon = icon("chart-line"),value="rrvgo",
@@ -372,6 +385,11 @@ server <- function(input, output,session) {
     })  
     
     
+    colorHeatmapGene<- eventReactive(input$action_heatmap_genes, { 
+      input$colorHeatmapGene
+    })
+    
+    
     
     result_genes <- eventReactive(input$action_heatmap_genes,{
       result_genes<-heatmapGenes(input$cutoff,usedCellStateGene(),GetGenesList2(),N=25678)
@@ -381,7 +399,7 @@ server <- function(input, output,session) {
     } )
     
     output$heatmap_GeneSet <- renderPlot({
-      pheatmap::pheatmap(border_color = NA,result_genes()[["Data_mtrix_log"]],display_numbers = result_genes()[["Mydata_raw_m"]],
+      pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
                          fontsize = 12,fontsize_number = 15,
                          main=result_genes()[["cutoff"]],
                          cluster_cols = T,cluster_rows = T,
@@ -398,6 +416,17 @@ server <- function(input, output,session) {
       }
     )
     
+    
+    output$downloadheatmap_genes_Enrichment<-downloadHandler(
+      filename = function(){
+        paste('HeatmapGenesEnrichment-', Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(result_genes()[["Enrichment"]],heatmap1)
+      }
+    )
+    
+    
     output$downloadheatmapgenes_plot<-downloadHandler(
       filename = function(){
         paste('HeatmapGenes-', Sys.Date(), '.pdf', sep='')
@@ -406,9 +435,60 @@ server <- function(input, output,session) {
         width=dim(result_genes()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result_genes()[["Data_mtrix_log"]])))*5/25.4+2
         height=dim(result_genes()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result_genes()[["Data_mtrix_log"]])))*5/25.4+5
         pdf(heatmap1,width =width,height = height)
-        pheatmap::pheatmap(border_color = NA,result_genes()[["Data_mtrix_log"]],display_numbers = result_genes()[["Mydata_raw_m"]],
+        pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                            main=result_genes()[["cutoff"]],
+                           cluster_cols = T,cluster_rows = T,
+                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+        dev.off()
+        
+      } )
+    
+    ### StateGenes:
+    StateGenes <- eventReactive(input$action_heatmap_genes,{
+      StateGenesResult<-ListTest(GetGenesList(),N=25678)
+      StateGenesResult$cutoff=input$cutoff
+      StateGenesResult
+    })
+    
+    output$heatmapStateGenes<- renderPlot({
+      pheatmap::pheatmap(border_color = NA,   StateGenes()[[colorHeatmapGene()]],display_numbers = StateGenes()$Mydata_raw_m,
+                         fontsize = 12,fontsize_number = 15,
+                         cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],
+                         color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+    })
+    
+    output$downloadheatmap_genes2<-downloadHandler(
+      filename = function(){
+        paste('HeatmapStateGenes-', Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(StateGenes()[["Data_mtrix_log"]],heatmap1)
+      }
+    )
+    
+    #downloadheatmap_genes2_Enrichment
+    output$downloadheatmap_genes2_Enrichment<-downloadHandler(
+      filename = function(){
+        paste('HeatmapStateGenesEnrichment-', Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(StateGenes()[["Enrichment"]],heatmap1)
+      }
+    )
+    
+    
+    output$downloadheatmapgenes_plot2<-downloadHandler(
+      filename = function(){
+        paste('HeatmapGenes-', Sys.Date(), '.pdf', sep='')
+      },
+      content=function(heatmap1){
+        width=dim( StateGenes()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames( StateGenes()[["Data_mtrix_log"]])))*5/25.4+2
+        height=dim( StateGenes()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames( StateGenes()[["Data_mtrix_log"]])))*5/25.4+5
+        pdf(heatmap1,width =width,height = height)
+        pheatmap::pheatmap(border_color = NA, StateGenes()[[colorHeatmapGene()]],display_numbers =  StateGenes()[["Mydata_raw_m"]],
+                           fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                           main= StateGenes()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
         dev.off()
@@ -420,6 +500,11 @@ server <- function(input, output,session) {
     
     
     # Heatmap1(Tab):
+    
+    colorHeatmapCells<- eventReactive(input$action_heatmap, { 
+      input$colorHeatmapCells
+    })
+    
     result1 <- eventReactive(input$action_heatmap,{
       result1<-heatmap(input$cutoff,usedMeta_data(),summaryTable(), List())
       result1$cutoff=input$cutoff
@@ -427,7 +512,7 @@ server <- function(input, output,session) {
     } )
     
     output$heatmap_celltypes <- renderPlot({
-    pheatmap::pheatmap(border_color = NA,result1()[["Data_mtrix_log"]],display_numbers = result1()[["Mydata_raw_m"]],
+    pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,
                             main=result1()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,
@@ -443,6 +528,15 @@ server <- function(input, output,session) {
         write.csv(result1()[["Data_mtrix_log"]],heatmap1)
       }
    )
+    
+    output$downloadheatmap1_Enrichment<-downloadHandler(
+      filename = function(){
+        paste('Heatmap1Enrichment-', Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(result1()[["Enrichment"]],heatmap1)
+      }
+    )
 
     output$downloadheatmap_plot1<-downloadHandler(
       filename = function(){
@@ -452,7 +546,7 @@ server <- function(input, output,session) {
         width=dim(result1()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*5/25.4+2
         height=dim(result1()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result1()[["Data_mtrix_log"]])))*5/25.4+5
         pdf(heatmap1,width =width,height = height)
-        pheatmap::pheatmap(border_color = NA,result1()[["Data_mtrix_log"]],display_numbers = result1()[["Mydata_raw_m"]],
+        pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                            main=result1()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,
@@ -471,7 +565,7 @@ server <- function(input, output,session) {
       result2  } )
     
       output$heatmap_cellstates <- renderPlot({
-      pheatmap::pheatmap(border_color = NA,result2()[["Data_mtrix_log"]],display_numbers = result2()[["Mydata_raw_m"]],
+      pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
                          fontsize = 12,fontsize_number = 15,
                          main=result2()[["cutoff"]],
                          cluster_cols = T,cluster_rows = T,
@@ -488,6 +582,16 @@ server <- function(input, output,session) {
         }
       )
       
+      #Enrichment
+      output$downloadheatmap2_Enrichment<-downloadHandler(
+        filename = function(){
+          paste('Heatmap2Enrichment-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap2){
+          write.csv(result2()[["Enrichment"]],heatmap2)
+        }
+      )
+      
       output$downloadheatmap_plot2<-downloadHandler(
         filename = function(){
           paste('Heatmap2-', Sys.Date(), '.pdf', sep='')
@@ -496,7 +600,7 @@ server <- function(input, output,session) {
           width=dim(result2()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result2()[["Data_mtrix_log"]])))*5/25.4+2
           height=dim(result2()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result2()[["Data_mtrix_log"]])))*5/25.4+5
           pdf(heatmap2,width =width,height = height)
-          pheatmap::pheatmap(border_color = NA,result2()[["Data_mtrix_log"]],display_numbers = result2()[["Mydata_raw_m"]],
+          pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                              main=result2()[["cutoff"]],
                              cluster_cols = T,cluster_rows = T,
@@ -510,7 +614,7 @@ server <- function(input, output,session) {
         StateVsType(usedMeta_data())
       })
       output$cellstates_types <- renderPlot({
-      pheatmap::pheatmap(border_color = NA,result()$Data_mtrix_log,display_numbers = result()$Mydata_raw_m,
+      pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
                            fontsize = 12,fontsize_number = 15,
                            cluster_cols = T,cluster_rows = T,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
@@ -526,6 +630,16 @@ server <- function(input, output,session) {
         }
       )
       
+      output$downloadheatmap3_Enrichment<-downloadHandler(
+        filename = function(){
+          paste('Heatmap3Enrichment-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap3){
+          write.csv(result()[["Enrichment"]],heatmap3)
+        }
+      )
+      
+      
       output$downloadheatmap_plot3<-downloadHandler(
         filename = function(){
           paste('Heatmap3-', Sys.Date(), '.pdf', sep='')
@@ -534,13 +648,71 @@ server <- function(input, output,session) {
           width=dim(result()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result()[["Data_mtrix_log"]])))*5/25.4+2
           height=dim(result()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result()[["Data_mtrix_log"]])))*5/25.4+5
           pdf(heatmap3,width =width,height = height)
-          pheatmap::pheatmap(border_color = NA,result()[["Data_mtrix_log"]],display_numbers = result()[["Mydata_raw_m"]],
+          pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                              cluster_cols = T,cluster_rows = T,
                              color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
           dev.off()
           
         } )
+      
+      
+      ##Heatmap-Tab4: cellStates
+      cellStates <- eventReactive(input$action_heatmap,{
+        testResult<-ListTest(List(),N=dim(usedMeta_data())[1])
+        testResult$cutoff=input$cutoff
+        testResult
+      })
+      
+      output$cellStates_cellStates<- renderPlot({
+        pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
+                           fontsize = 12,fontsize_number = 15,
+                           cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],
+                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+      })
+      
+      
+      output$downloadheatmap4<-downloadHandler(
+        filename = function(){
+          paste('Heatmap4-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap1){
+          write.csv(cellStates()[["Data_mtrix_log"]],heatmap1)
+        }
+      )
+      
+      
+      output$downloadheatmap4_Enrichment<-downloadHandler(
+        filename = function(){
+          paste('Heatmap4Enrichment-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap4){
+          write.csv(cellStates()[["Enrichment"]],heatmap4)
+        }
+      )
+      
+      
+      output$downloadheatmap_plot4<-downloadHandler(
+        filename = function(){
+          paste('Heatmap4-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(heatmap4){
+          width=dim(cellStates()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(cellStates()[["Data_mtrix_log"]])))*5/25.4+2
+          height=dim(cellStates()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(cellStates()[["Data_mtrix_log"]])))*5/25.4+5
+          pdf(heatmap4,width =width,height = height)
+          pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()[["Mydata_raw_m"]],
+                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                             main=cellStates()[["cutoff"]],
+                             cluster_cols = T,cluster_rows = T,
+                             color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+          dev.off()
+          
+        } )
+      
+      
+      
+      
+      
       
       
       

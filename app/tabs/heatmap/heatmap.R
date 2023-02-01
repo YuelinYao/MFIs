@@ -20,6 +20,16 @@ NMF_CelltypeUI<-function(){
   )
 }
 
+Test_CellstateUI<-function(){
+  tagList(
+    tags$h3("Heatmap: Cell states vs. Cell states", style = "color: steelblue;"),
+    plotOutput(outputId ="cellStates_cellStates", width = "80%") %>% withSpinner(color="#4682B4")
+  )
+}
+
+
+
+
 ####function
 ### Get List of cell
 GetCellList <- function(cutoff,count,summaryTable) { 
@@ -89,12 +99,15 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
   col=length(unique(Devstates$cluster))
 
   Data_mtrix<-array(data=NA,dim = c(r,col))
+  EnrichmentM<-array(data=NA,dim = c(r,col))
+  
   Devstates$cluster<-paste0("C:",(Devstates$cluster))
   
   colnames(Data_mtrix)<-unique(Devstates$cluster)
   rownames(Data_mtrix)<-unique(Meta_data$Cell_Types)
+  dimnames(EnrichmentM)<-dimnames(Data_mtrix)
 
-
+  
   for (i in unique(Devstates$cluster)){
   #print(i)
   cluster<-Devstates[Devstates$cluster==i,]
@@ -104,19 +117,25 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
   P_set=rep(NA,length(unique(Meta_data$Cell_Types)))
   names(P_set)<-unique(Meta_data$Cell_Types)
     
+  enrichment_set<-rep(NA,length(unique(Meta_data$Cell_Types)))
+  names(enrichment_set)<-unique(Meta_data$Cell_Types)
+  
     for (ct in unique(Meta_data$Cell_Types)){
       cell_types<-rownames(Meta_data)[which(Meta_data$Cell_Types==ct)]
-      q=length(intersect(Cell,cell_types))-1
+      q=length(intersect(Cell,cell_types))
       m=length(Cell)
-      n=dim(Meta_data)[1]-m
+      N=dim(Meta_data)[1]
+      n=N-m
       k=length(cell_types)
-      p_value<-phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
-      
       P_set[ct]=p_value
+      enrichment_set[ct]=(q*N)/(m*k)
+      
     }
     Data_mtrix[,i]<-P_set
+    EnrichmentM[,i]<-enrichment_set
     
   }
   
@@ -151,11 +170,13 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
   stats<-paste0(unique(Devstates$cluster),stats)
   colnames(Data_mtrix_log)<-stats
   colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
+  dimnames(EnrichmentM)<-dimnames(Data_mtrix_log)
   
   result=list()
   result$Data_mtrix_log=Data_mtrix_log
   result$Mydata_raw_m=Mydata_raw_m
-
+  result$Enrichment=EnrichmentM
+  
   print("done")
   
   return(result)
@@ -174,11 +195,15 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
   r=length(unique(Meta_data$Cell_State))
   col=length(unique(Devstates$cluster))
 
+  EnrichmentM<-array(data=NA,dim = c(r,col))
   Data_mtrix<-array(data=NA,dim = c(r,col))
+  
   Devstates$cluster<-paste0("C:",(Devstates$cluster))
   
   colnames(Data_mtrix)<-unique(Devstates$cluster)
   rownames(Data_mtrix)<-unique(Meta_data$Cell_State)
+  
+  dimnames(EnrichmentM)<-dimnames(Data_mtrix)
   
   for (i in unique(Devstates$cluster)){
     
@@ -191,19 +216,24 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
     P_set=rep(NA,length(unique(Meta_data$Cell_State)))
     names(P_set)<-unique(Meta_data$Cell_State)
     
+    enrichment_set<-rep(NA,length(unique(Meta_data$Cell_State)))
+    names(enrichment_set)<-unique(Meta_data$Cell_State)
+    
+    
     for (ct in unique(Meta_data$Cell_State)){
       cell_types<-rownames(Meta_data)[which(Meta_data$Cell_State==ct)]
-      q=length(intersect(Cell,cell_types))-1
+      q=length(intersect(Cell,cell_types))
       m=length(Cell)
-      n=dim(Meta_data)[1]-m
+      N=dim(Meta_data)[1]
+      n=N-m
       k=length(cell_types)
-      p_value<-phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE) #https://www.biostars.org/p/15548/
+      p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) #https://www.biostars.org/p/15548/
       P_set[ct]=p_value
-      
+      enrichment_set[ct]=(q*N)/(m*k)
     }
     
     Data_mtrix[,i]<-P_set
-    
+    EnrichmentM[,i]<-enrichment_set
   }
   
   Data_mtrix[Data_mtrix==0]<-2.2e-16
@@ -236,10 +266,12 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
   stats<-paste0(unique(Devstates$cluster),stats)
   colnames(Data_mtrix_log)<-stats
   colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
+  dimnames(EnrichmentM)<-dimnames(Data_mtrix_log)
   
   result=list()
   result$Data_mtrix_log=Data_mtrix_log
   result$Mydata_raw_m=Mydata_raw_m
+  result$Enrichment=EnrichmentM
   
   return(result)
   
@@ -252,10 +284,13 @@ StateVsType<-function(Meta_data){
     col=length(unique(Meta_data$Cell_Types))
     
     Data_mtrix<-array(data=NA,dim = c(r,col))
+    EnrichmentM<-array(data=NA,dim = c(r,col))
+    
     colnames(Data_mtrix)<-unique(Meta_data$Cell_Types)
     rownames(Data_mtrix)<-unique(Meta_data$Cell_State)
 
-  
+    dimnames(EnrichmentM)<-dimnames(Data_mtrix)
+    
     for (i in unique(Meta_data$Cell_Types)){
       #print(i)
       Cell<-rownames(Meta_data)[which(Meta_data$Cell_Types==i)]
@@ -264,19 +299,26 @@ StateVsType<-function(Meta_data){
       P_set=rep(NA,length(unique(Meta_data$Cell_State)))
       names(P_set)<-unique(Meta_data$Cell_State)
       
+      
+      enrichment_set<-rep(NA,length(unique(Meta_data$Cell_State)))
+      names(enrichment_set)<-unique(Meta_data$Cell_State)
+      
       for (ct in unique(Meta_data$Cell_State)){
         
         #print(ct)
         cell_types<-rownames(Meta_data)[which(Meta_data$Cell_State==ct)]
-        q=length(intersect(Cell,cell_types))-1
+        q=length(intersect(Cell,cell_types))
         m=length(Cell)
-        n=dim(Meta_data)[1]-m
+        N=dim(Meta_data)[1]
+        n=N-m
         k=length(cell_types)
-        p_value<-phyper(q, m, n, k, lower.tail = FALSE, log.p = FALSE) #https://www.biostars.org/p/15548/
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) #https://www.biostars.org/p/15548/
         P_set[ct]=p_value
+        enrichment_set[ct]=(q*N)/(m*k)
         
       }
       Data_mtrix[,i]<-P_set
+      EnrichmentM[,i]<-enrichment_set
     }
   
     Data_mtrix[Data_mtrix==0]<-2.2e-16
@@ -307,10 +349,112 @@ StateVsType<-function(Meta_data){
     stats<-paste0(unique(Meta_data$Cell_State),stats)
     rownames(Data_mtrix_log)<-stats
     
+    dimnames(EnrichmentM)<-dimnames(Data_mtrix_log)
+    
+    
     result=list()
     result$Data_mtrix_log=Data_mtrix_log
     result$Mydata_raw_m=Mydata_raw_m
+    result$Enrichment=EnrichmentM
     
     return(result)
   
 }
+
+
+ListTest <- function(list,N) { 
+  
+  print("Over-representation test between states")
+  #print(head(list))
+  r=length(names(list))
+  col=length(names(list))
+  
+  Data_mtrix<-array(data=NA,dim = c(r,col))
+  colnames(Data_mtrix)<-names(list)
+  rownames(Data_mtrix)<-names(list)
+  
+  EnrichmentM<-array(data=NA,dim = c(r,col))
+  dimnames(EnrichmentM)<-dimnames(Data_mtrix)
+  
+  for (i in names(list)){
+    #print(i)
+    Lists<-list[[i]]
+    P_set=rep(NA,length(names(list)))
+    names(P_set)<-names(list)
+   
+    
+    enrichment_set<-rep(NA,length(names(list)))
+    names(enrichment_set)<-names(list)
+    
+    
+    for (ct in names(list)){
+      #print(ct)
+      List_types<-list[[ct]]
+      q=length(intersect(Lists,List_types))
+      #print(q)
+      m=length(Lists)
+      n=N-m
+      k=length(List_types)
+      p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      #https://www.biostars.org/p/15548/
+      #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
+      #print(p_value)
+      P_set[ct]=p_value
+      enrichment_set[ct]=(q*N)/(m*k)
+    }
+    Data_mtrix[,i]<-P_set
+    EnrichmentM[,i]<-enrichment_set
+    
+  }
+  
+  Data_mtrix[Data_mtrix==0]<-2.2e-16
+  Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
+  Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
+  Data_mtrix_log<--log10(Mydata_raw_m)
+
+  Mydata_raw_FDR[Mydata_raw_FDR<=0.05] <- "*"
+  Mydata_raw_FDR[Mydata_raw_FDR>0.05] <- " "
+  Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
+  
+  breaksList = seq(0, 10, by = 1)
+  dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
+  
+  df<-lengths(list)
+  percentage=df/sum(df)
+  stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
+  names(stats)<-names(df)
+  stats<-stats[names(list)]
+  stats<-paste0(names(list),stats)
+  rownames(Data_mtrix_log)<-stats
+  
+  df<-lengths(list)
+  percentage=df/sum(df)
+  stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
+  names(stats)<-names(df)
+  stats<-stats[names(list)]
+  stats<-paste0(names(list),stats)
+  colnames(Data_mtrix_log)<-stats
+  colnames(Data_mtrix_log)<-gsub(pattern = "cluster_","",colnames(Data_mtrix_log))
+  rownames(Data_mtrix_log)<-gsub(pattern = "cluster_","",colnames(Data_mtrix_log))
+  
+  colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
+  rownames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
+  
+  
+  dimnames(EnrichmentM)<-dimnames(Data_mtrix_log)
+  
+  result=list()
+  result$Data_mtrix_log=Data_mtrix_log
+  result$Mydata_raw_m=Mydata_raw_m
+  result$Enrichment=EnrichmentM
+  print("done")
+  #print(result)
+  return(result)
+  
+}
+
+
+
+
+
+
