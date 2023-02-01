@@ -6,6 +6,7 @@
 2. **Meta_data.csv**: cell type annotations from other tools (e.g., clustering, NMFs, two coloum csv, file, example in ./data folder), is only used in the overrepresentation test heatmap (heatmap-cell tabs), if you don't want to plot this heatmap, you can skip this file.
 3. **topDeviatingHOIstates.csv**: located in the output from Abel's pipeline (HOIsummaries folder)
 4. **trainingData_.csv**, which is also in the output from Abel's pipeline (output folder)
+5. **GeneAnnotationSet.csv** (optional), which is used in heatmap-genes, over-representation test between gene list. Example file format see ./data/CancerState.csv 
 
 ## Libarary:
 R:
