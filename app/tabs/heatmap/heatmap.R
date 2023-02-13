@@ -139,7 +139,7 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
     
   }
   
-  Data_mtrix[Data_mtrix==0]<-2.2e-16
+  Data_mtrix<-Data_mtrix+2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
   Data_mtrix_log<--log10(Mydata_raw_m)
@@ -236,7 +236,7 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
     EnrichmentM[,i]<-enrichment_set
   }
   
-  Data_mtrix[Data_mtrix==0]<-2.2e-16
+  Data_mtrix<-Data_mtrix+2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
   Data_mtrix_log<--log10(Mydata_raw_m)
@@ -321,7 +321,7 @@ StateVsType<-function(Meta_data){
       EnrichmentM[,i]<-enrichment_set
     }
   
-    Data_mtrix[Data_mtrix==0]<-2.2e-16
+    Data_mtrix<-Data_mtrix+2.2e-16
     Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
     Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
     Data_mtrix_log<--log10(Mydata_raw_m)
@@ -407,7 +407,7 @@ ListTest <- function(list,N) {
     
   }
   
-  Data_mtrix[Data_mtrix==0]<-2.2e-16
+  Data_mtrix<-Data_mtrix+2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
   Data_mtrix_log<--log10(Mydata_raw_m)

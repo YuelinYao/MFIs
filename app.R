@@ -402,7 +402,7 @@ server <- function(input, output,session) {
       pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
                          fontsize = 12,fontsize_number = 15,
                          main=result_genes()[["cutoff"]],
-                         cluster_cols = T,cluster_rows = T,
+                         cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                          color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
     
@@ -438,7 +438,7 @@ server <- function(input, output,session) {
         pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                            main=result_genes()[["cutoff"]],
-                           cluster_cols = T,cluster_rows = T,
+                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
         dev.off()
         
@@ -454,7 +454,7 @@ server <- function(input, output,session) {
     output$heatmapStateGenes<- renderPlot({
       pheatmap::pheatmap(border_color = NA,   StateGenes()[[colorHeatmapGene()]],display_numbers = StateGenes()$Mydata_raw_m,
                          fontsize = 12,fontsize_number = 15,
-                         cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],
+                         cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                          color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
     
@@ -489,7 +489,7 @@ server <- function(input, output,session) {
         pheatmap::pheatmap(border_color = NA, StateGenes()[[colorHeatmapGene()]],display_numbers =  StateGenes()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                            main= StateGenes()[["cutoff"]],
-                           cluster_cols = T,cluster_rows = T,
+                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
         dev.off()
         
@@ -515,7 +515,7 @@ server <- function(input, output,session) {
     pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,
                             main=result1()[["cutoff"]],
-                           cluster_cols = T,cluster_rows = T,
+                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
     
@@ -549,7 +549,7 @@ server <- function(input, output,session) {
         pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                            main=result1()[["cutoff"]],
-                           cluster_cols = T,cluster_rows = T,
+                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
         dev.off()
 
@@ -568,7 +568,7 @@ server <- function(input, output,session) {
       pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
                          fontsize = 12,fontsize_number = 15,
                          main=result2()[["cutoff"]],
-                         cluster_cols = T,cluster_rows = T,
+                         cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                          color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
     
@@ -603,7 +603,7 @@ server <- function(input, output,session) {
           pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                              main=result2()[["cutoff"]],
-                             cluster_cols = T,cluster_rows = T,
+                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                              color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
           dev.off()
         } )
@@ -616,7 +616,7 @@ server <- function(input, output,session) {
       output$cellstates_types <- renderPlot({
       pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
                            fontsize = 12,fontsize_number = 15,
-                           cluster_cols = T,cluster_rows = T,
+                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
       })
     
@@ -650,7 +650,7 @@ server <- function(input, output,session) {
           pdf(heatmap3,width =width,height = height)
           pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
-                             cluster_cols = T,cluster_rows = T,
+                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                              color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
           dev.off()
           
@@ -667,7 +667,7 @@ server <- function(input, output,session) {
       output$cellStates_cellStates<- renderPlot({
         pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
                            fontsize = 12,fontsize_number = 15,
-                           cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],
+                           cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
       })
       
@@ -703,7 +703,7 @@ server <- function(input, output,session) {
           pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                              main=cellStates()[["cutoff"]],
-                             cluster_cols = T,cluster_rows = T,
+                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                              color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
           dev.off()
           
