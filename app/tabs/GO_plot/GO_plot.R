@@ -46,7 +46,7 @@ GetGenes<-function(cutoff,Devstates){
     }
     
     Genes_set<-unique(Genes_set)
-    Genes_set<- Genes_set[!grepl("_0", Genes_set)]
+    Genes_set<- Genes_set[!grepl("_0", Genes_set)] # remove 0-state genes
     Genes_set<-gsub("_1","",Genes_set)
   
     list=list(Genes_set)

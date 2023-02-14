@@ -158,6 +158,9 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                                                                                              "Upload state gene set" ="UploadState"), 
                                          selected = "CancerState", multiple = FALSE),
                              
+                             textInput(inputId="NO.background", "The number of background genes", value = 25678),
+                             #N=25678
+                             
                              # Only show this panel if the plot type is a histogram
                              conditionalPanel(
                                condition = "input.CellStateGenes == 'UploadState'",
@@ -199,13 +202,16 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             tabsetPanel(type = "pills", id = 'tabs',
                 tabPanel("About", icon = icon("circle-info"), value = 'about', aboutUI()),
                 tabPanel("Table", icon = icon("table"),value="table",TableUI()),
-                tabPanel("Heatmap-Genes",icon = icon("map"), value="heatmap_genes",heatmapGenesUI(),downloadButton("downloadheatmap_genes","Download -log10FDR as .csv"),downloadButton("downloadheatmapgenes_plot","Download as .pdf"),downloadButton("downloadheatmap_genes_Enrichment","Download Enrichment as .csv"),tags$br(),
-                         stateGenesUI(),downloadButton("downloadheatmap_genes2","Download -log10FDR as .csv"),downloadButton("downloadheatmapgenes_plot2","Download as .pdf"),downloadButton("downloadheatmap_genes2_Enrichment","Download Enrichment as .csv")),
+                
                 tabPanel("Heatmap-Cells",icon = icon("map"), value="heatmap",
-                         heatmapUI(),downloadButton("downloadheatmap1","Download -log10FDR as .csv"),downloadButton("downloadheatmap_plot1","Download as .pdf"),downloadButton("downloadheatmap1_Enrichment","Download Enrichment as .csv"),
-                         NMF_UI(),downloadButton("downloadheatmap2","Download -log10FDR as .csv"), downloadButton("downloadheatmap_plot2","Download as .pdf"),downloadButton("downloadheatmap2_Enrichment","Download Enrichment as .csv"),tags$br(),
-                         NMF_CelltypeUI(),downloadButton("downloadheatmap3","Download -log10FDR as .csv"), downloadButton("downloadheatmap_plot3","Download as .pdf"),downloadButton("downloadheatmap3_Enrichment","Download Enrichment as .csv"),tags$br(),
-                         Test_CellstateUI(),downloadButton("downloadheatmap4","Download -log10FDR as .csv"), downloadButton("downloadheatmap_plot4","Download as .pdf"),downloadButton("downloadheatmap4_Enrichment","Download Enrichment as .csv")),
+                         heatmapUI(),downloadButton("downloadheatmap1","Download as .csv"),downloadButton("downloadheatmap_plot1","Download as .pdf"),
+                         NMF_UI(),downloadButton("downloadheatmap2","Download as .csv"), downloadButton("downloadheatmap_plot2","Download as .pdf"),tags$br(),
+                         NMF_CelltypeUI(),downloadButton("downloadheatmap3","Download as .csv"), downloadButton("downloadheatmap_plot3","Download as .pdf"),tags$br(),
+                         Test_CellstateUI(),downloadButton("downloadheatmap4","Download as .csv"), downloadButton("downloadheatmap_plot4","Download as .pdf")),
+                
+                tabPanel("Heatmap-Genes",icon = icon("map"), value="heatmap_genes",heatmapGenesUI(),downloadButton("downloadheatmap_genes","Download as .csv"),downloadButton("downloadheatmapgenes_plot","Download as .pdf"),tags$br(),
+                         stateGenesUI(),downloadButton("downloadheatmap_genes2","Download as .csv"),downloadButton("downloadheatmapgenes_plot2","Download as .pdf")),
+            
                 tabPanel("GO & KEGG", icon = icon("chart-line"),value="GO",FunctionUI(),downloadButton("downloadGOPlot","Download as .pdf"),tags$br(),
                          Function_tableUI(),downloadButton("downloadGO","Download as .csv")),
                 tabPanel("Using rrvgo", icon = icon("chart-line"),value="rrvgo",
@@ -259,7 +265,6 @@ server <- function(input, output,session) {
       file_trainDat<-input$trainingData_matrix
       data_path<-list(file_devStates$datapath,file_trainDat$datapath)
       names(data_path)<-c("devStates","trainDat")
-      #print(data_path)
       return(data_path)
     }
   })  
@@ -313,7 +318,7 @@ server <- function(input, output,session) {
   })
   
   
-  # About:
+    # About:
     Text1 <- about()
     aboutOutput(output,Text1)
 
@@ -335,7 +340,7 @@ server <- function(input, output,session) {
     })%>% bindCache(input$cutoff,usedTable(),usedTable2()) 
     
     
-    # Get gene list:
+    # Get gene list, this gene list consist all the genes:
     GetGenesList2<-reactive({
       GetGenes2(input$cutoff,summaryTable())
     })%>% bindCache(input$cutoff,usedTable(),usedTable2()) 
@@ -392,7 +397,7 @@ server <- function(input, output,session) {
     
     
     result_genes <- eventReactive(input$action_heatmap_genes,{
-      result_genes<-heatmapGenes(input$cutoff,usedCellStateGene(),GetGenesList2(),N=25678)
+      result_genes<-heatmapGenes(input$cutoff,usedCellStateGene(),GetGenesList2(),N=as.integer(input$NO.background))
       #N=25678 the number of genes in whole human genome
       result_genes$cutoff=input$cutoff
       result_genes
@@ -412,19 +417,12 @@ server <- function(input, output,session) {
         paste('HeatmapGenes-', Sys.Date(), '.csv', sep='')
       },
       content=function(heatmap1){
-        write.csv(result_genes()[["Data_mtrix_log"]],heatmap1)
+        write.csv(esult_genes()[[colorHeatmapGene()]],heatmap1)
       }
     )
     
     
-    output$downloadheatmap_genes_Enrichment<-downloadHandler(
-      filename = function(){
-        paste('HeatmapGenesEnrichment-', Sys.Date(), '.csv', sep='')
-      },
-      content=function(heatmap1){
-        write.csv(result_genes()[["Enrichment"]],heatmap1)
-      }
-    )
+
     
     
     output$downloadheatmapgenes_plot<-downloadHandler(
@@ -446,7 +444,7 @@ server <- function(input, output,session) {
     
     ### StateGenes:
     StateGenes <- eventReactive(input$action_heatmap_genes,{
-      StateGenesResult<-ListTest(GetGenesList(),N=25678)
+      StateGenesResult<-ListTest(GetGenesList(),as.integer(input$NO.background))
       StateGenesResult$cutoff=input$cutoff
       StateGenesResult
     })
@@ -463,19 +461,11 @@ server <- function(input, output,session) {
         paste('HeatmapStateGenes-', Sys.Date(), '.csv', sep='')
       },
       content=function(heatmap1){
-        write.csv(StateGenes()[["Data_mtrix_log"]],heatmap1)
+        write.csv(StateGenes()[[colorHeatmapGene()]],heatmap1)
       }
     )
     
-    #downloadheatmap_genes2_Enrichment
-    output$downloadheatmap_genes2_Enrichment<-downloadHandler(
-      filename = function(){
-        paste('HeatmapStateGenesEnrichment-', Sys.Date(), '.csv', sep='')
-      },
-      content=function(heatmap1){
-        write.csv(StateGenes()[["Enrichment"]],heatmap1)
-      }
-    )
+
     
     
     output$downloadheatmapgenes_plot2<-downloadHandler(
@@ -525,18 +515,10 @@ server <- function(input, output,session) {
         paste('Heatmap1-', Sys.Date(), '.csv', sep='')
       },
       content=function(heatmap1){
-        write.csv(result1()[["Data_mtrix_log"]],heatmap1)
+        write.csv(result1()[[colorHeatmapCells()]],heatmap1)
       }
    )
     
-    output$downloadheatmap1_Enrichment<-downloadHandler(
-      filename = function(){
-        paste('Heatmap1Enrichment-', Sys.Date(), '.csv', sep='')
-      },
-      content=function(heatmap1){
-        write.csv(result1()[["Enrichment"]],heatmap1)
-      }
-    )
 
     output$downloadheatmap_plot1<-downloadHandler(
       filename = function(){
@@ -578,19 +560,11 @@ server <- function(input, output,session) {
           paste('Heatmap2-', Sys.Date(), '.csv', sep='')
         },
         content=function(heatmap2){
-          write.csv(result2()[["Data_mtrix_log"]],heatmap2)
+          write.csv(result2()[[colorHeatmapCells()]],heatmap2)
         }
       )
       
-      #Enrichment
-      output$downloadheatmap2_Enrichment<-downloadHandler(
-        filename = function(){
-          paste('Heatmap2Enrichment-', Sys.Date(), '.csv', sep='')
-        },
-        content=function(heatmap2){
-          write.csv(result2()[["Enrichment"]],heatmap2)
-        }
-      )
+
       
       output$downloadheatmap_plot2<-downloadHandler(
         filename = function(){
@@ -626,18 +600,10 @@ server <- function(input, output,session) {
           paste('Heatmap3-', Sys.Date(), '.csv', sep='')
         },
         content=function(heatmap3){
-          write.csv(result()[["Data_mtrix_log"]],heatmap3)
+          write.csv(result()[[colorHeatmapCells()]],heatmap3)
         }
       )
       
-      output$downloadheatmap3_Enrichment<-downloadHandler(
-        filename = function(){
-          paste('Heatmap3Enrichment-', Sys.Date(), '.csv', sep='')
-        },
-        content=function(heatmap3){
-          write.csv(result()[["Enrichment"]],heatmap3)
-        }
-      )
       
       
       output$downloadheatmap_plot3<-downloadHandler(
@@ -677,19 +643,10 @@ server <- function(input, output,session) {
           paste('Heatmap4-', Sys.Date(), '.csv', sep='')
         },
         content=function(heatmap1){
-          write.csv(cellStates()[["Data_mtrix_log"]],heatmap1)
+          write.csv(cellStates()[[colorHeatmapCells()]],heatmap1)
         }
       )
       
-      
-      output$downloadheatmap4_Enrichment<-downloadHandler(
-        filename = function(){
-          paste('Heatmap4Enrichment-', Sys.Date(), '.csv', sep='')
-        },
-        content=function(heatmap4){
-          write.csv(cellStates()[["Enrichment"]],heatmap4)
-        }
-      )
       
       
       output$downloadheatmap_plot4<-downloadHandler(
@@ -715,7 +672,7 @@ server <- function(input, output,session) {
       
       
       
-      
+
       ##GO Tab
       #http://www.genome.jp/kegg/catalog/org_list.html
       GO <- reactive({

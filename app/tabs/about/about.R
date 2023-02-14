@@ -11,20 +11,21 @@ about <- function(){
   Text1 <- function(){
     text = tags$span(
       tags$h3("Explore cell states by Stator", style = "color: #337ab7;"),
-        tags$b("Stator",style = "color: #337ab7;"),  "takes in scRNA-seq count matrix and estimate gene interactions. Here we show how to use results from Stator to explore cell states.",
+        tags$b("Stator",style = "color: #337ab7;"),  "takes in scRNA-seq count matrix, estimates higher-order gene interactions and defines cell states. Here we show how to use results from Stator to explore cell states.",
         tags$br(),
       
       tags$h4("Data Visualization &  Analysis", style="color: #337ab7;"),
         tags$li("Table - A Summary statistics for deviating state", style="list-style-type: square;"),
-        tags$li("Heatmaps Genes - Over-representation test for cell state genes and gene annotations", style="list-style-type: square;"),
         tags$li("Heatmaps Cells - Over-representation test for MFIs and other cell annotations", style="list-style-type: square;"),  
+        tags$li("Heatmaps Genes - Over-representation test for cell state genes and gene annotations", style="list-style-type: square;"),
         tags$li("GO & KEGG for genes in each state", style="list-style-type: square;"),
         tags$li("rrvgo - Simplifying the redundance of GO sets", style="list-style-type: square;"),
         tags$li("Upset Plot", style="list-style-type: square;"),
         tags$li("DE analysis for mutually exclusive states", style="list-style-type: square;"),
         tags$br(),
       
-      tags$h4("Tutorial", style="color: #337ab7;"),
+        ##Tutorial
+        tags$h4("Tutorial", style="color: #337ab7;"),
         tags$br(),
         tags$br(),
       

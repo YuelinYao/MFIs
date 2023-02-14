@@ -20,7 +20,6 @@ Table_cluster<-function(cutoff,data_path){
   system(command)
   Devstates<-read.csv(paste0('./',cutoff,'_devStates.csv'),colClasses = c("character"))
   file.remove(paste0('./',cutoff,'_devStates.csv'))
-  #Devstates$state<-paste0("[",Devstates$state,"]")
   Devstates$dev<-as.numeric(Devstates$dev)
   Devstates$cluster<-as.numeric(Devstates$cluster)
   Devstates$pval<-as.numeric(Devstates$pval)
