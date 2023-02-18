@@ -2,14 +2,16 @@
 DE_UI <- function(){
   tagList(
     tags$h3(paste0("DE analysis for two states"), style = "color: steelblue;"),
-    plotOutput(outputId ="DE_heatmap", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="DE_heatmap", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("GeneHeatmap","Download as .pdf")
   )}
 
 
 DE_TableUI <- function(){
   tagList(
     tags$h3(paste0("DEGs result table"), style = "color: steelblue;"),
-    DTOutput(outputId ="DEGtable", width = "90%") %>% withSpinner(color="#4682B4")
+    DTOutput(outputId ="DEGtable", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("DegTable","Download as .csv")
   )}
 
 
@@ -17,7 +19,8 @@ DE_TableUI <- function(){
 DEGO_UI<- function(){
   tagList(
     tags$h3(paste0("GO & KEGG for DEGs"), style = "color: steelblue;"),
-    plotOutput(outputId ="DEG_enrichment", width = "80%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="DEG_enrichment", width = "80%") %>% withSpinner(color="#4682B4"),
+    downloadButton("DegAnnotationPlot","Download as .pdf")
   )}
 
 
@@ -25,8 +28,36 @@ DEGO_UI<- function(){
 DEGOtable_UI<- function(){
   tagList(
     tags$h3(paste0("GO & KEGG for DEGs table"), style = "color: steelblue;"),
-    DTOutput(outputId ="DEG_enrichmentTable", width = "80%") %>% withSpinner(color="#4682B4")
+    DTOutput(outputId ="DEG_enrichmentTable", width = "80%") %>% withSpinner(color="#4682B4"),
+    downloadButton("DegAnnotationTable","Download as .csv")
   )}
+
+
+
+### Input function
+DEInput<- function(){
+  tagList( 
+    textInput("selected_clusterDE", "Select cluster(s)",value = "6,19"),
+    selectInput("Mart_DE", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
+    textInput("go_species_DE", "GO OrgDb:",value = "org.Hs.eg.db"),
+    textInput("kegg_species_DE", "KEGG organism:",value = "hsa"),
+    textInput("logfc", "logFC:",value = 0.25),
+    sliderInput("Pvalue_DE",
+                "Adjusted p value:",
+                min = 0,
+                max = 1,
+                value = 0.05),
+    textAreaInput("background_genesDE", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
+    actionButton(inputId = "bg_Liver2",                                       #action button to display background genes
+                 label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
+    bsTooltip("bg_Liver2","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
+              options = NULL),
+    actionButton("action_DE","Submit",icon("paper-plane"), 
+                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+  )
+}
+
+
 
 
 

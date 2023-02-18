@@ -1,5 +1,5 @@
 ## general UI ####
-readTableUI <- function(){
+UploadFilesUI <- function(){
   tagList(
     conditionalPanel(condition="input.tabs != 'about'",           #conditional panel: if the tab Tutorial is selected
                      br("Here we use scRNA-seq HCC dataset. \nTo upload your data, click the box:"),
@@ -82,7 +82,6 @@ processe_srt<-function(Count_matrix){
   return(srt)
   
 }
-
 
 
 

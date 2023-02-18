@@ -2,13 +2,15 @@
 heatmapUI <- function(){
   tagList(
     tags$h3(paste0("Heatmap: Cell types (clustering + singleR)"), style = "color: steelblue;"),
-    plotOutput(outputId ="heatmap_celltypes", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="heatmap_celltypes", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("downloadheatmap1","Download as .csv"),downloadButton("downloadheatmap_plot1","Download as .pdf")
   )}
 
 NMF_UI <- function(){
   tagList(
     tags$h3("Heatmap: Cell states (NMF)", style = "color: steelblue;"),
-    plotOutput(outputId ="heatmap_cellstates", width = "80%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="heatmap_cellstates", width = "80%") %>% withSpinner(color="#4682B4"),
+    downloadButton("downloadheatmap2","Download as .csv"), downloadButton("downloadheatmap_plot2","Download as .pdf")
   )
 }
 
@@ -16,24 +18,40 @@ NMF_UI <- function(){
 NMF_CelltypeUI<-function(){
   tagList(
     tags$h3("Heatmap: Cell states vs. Cell types", style = "color: steelblue;"),
-    plotOutput(outputId ="cellstates_types", width = "80%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="cellstates_types", width = "80%") %>% withSpinner(color="#4682B4"),
+    downloadButton("downloadheatmap3","Download as .csv"), downloadButton("downloadheatmap_plot3","Download as .pdf")
   )
 }
 
 Test_CellstateUI<-function(){
   tagList(
     tags$h3("Heatmap: Cell states vs. Cell states", style = "color: steelblue;"),
-    plotOutput(outputId ="cellStates_cellStates", width = "80%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="cellStates_cellStates", width = "80%") %>% withSpinner(color="#4682B4"),
+    downloadButton("downloadheatmap4","Download as .csv"), downloadButton("downloadheatmap_plot4","Download as .pdf")
+  )
+}
+
+
+
+### Input function
+HeatmapInput<- function(){
+  tagList( 
+    radioButtons(inputId = "colorHeatmapCells", "Colored by:",
+                 choices = c("-log10FDR" = "log10FDR", "Enrichment" = "Enrichment"),
+                 selected = "log10FDR", inline = TRUE),
+    actionButton("action_heatmap","Submit",icon("paper-plane"), 
+                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
   )
 }
 
 
 
 
+
 ####function
 ### Get List of cell
-GetCellList <- function(cutoff,count,summaryTable) { 
-  
+GetCellList <- function(count,summaryTable) { 
+  #cutoff,count
   print("Get cells in each state")
   Devstates<-summaryTable
   Devstates$cluster<-paste0("C:",(Devstates$cluster))
@@ -89,7 +107,7 @@ GetCellList <- function(cutoff,count,summaryTable) {
 
 
 ### function
-heatmap <- function(cutoff,Meta_data,summaryTable,List) { 
+heatmap <- function(Meta_data,summaryTable,List) { 
   
   print("Over-representation test with cell type")
   Devstates<-summaryTable
@@ -142,14 +160,14 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
   Data_mtrix<-Data_mtrix+2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
-  Data_mtrix_log<--log10(Mydata_raw_m)
+  log10FDR<--log10(Mydata_raw_m)
   
   Mydata_raw_FDR[Mydata_raw_FDR<=0.05] <- "*"
   Mydata_raw_FDR[Mydata_raw_FDR>0.05] <- " "
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
   
-  breaksList = seq(0, 10, by = 1)
-  dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
+  #breaksList = seq(0, 10, by = 1)
+  dimnames(log10FDR)<-dimnames(Data_mtrix)
   
 
   
@@ -159,7 +177,7 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
   names(stats)<-names(df)
   stats<-stats[unique(Meta_data$Cell_Types)]
   stats<-paste0(unique(Meta_data$Cell_Types),stats)
-  rownames(Data_mtrix_log)<-stats
+  rownames(log10FDR)<-stats
 
   
   df<-lengths(List)
@@ -168,12 +186,12 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
   names(stats)<-gsub("cluster_","",names(df))
   stats<-stats[unique(Devstates$cluster)]
   stats<-paste0(unique(Devstates$cluster),stats)
-  colnames(Data_mtrix_log)<-stats
-  colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
-  dimnames(EnrichmentM)<-dimnames(Data_mtrix_log)
+  colnames(log10FDR)<-stats
+  colnames(log10FDR)<-gsub(pattern = "C:","",colnames(log10FDR))
+  dimnames(EnrichmentM)<-dimnames(log10FDR)
   
   result=list()
-  result$Data_mtrix_log=Data_mtrix_log
+  result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
   result$Enrichment=EnrichmentM
   
@@ -185,7 +203,7 @@ heatmap <- function(cutoff,Meta_data,summaryTable,List) {
 
 
 
-NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
+NMF_heatmap<-function(Meta_data,summaryTable,List){
   
   print("Over-representation test with NMFs")
   Devstates<-summaryTable
@@ -239,14 +257,14 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
   Data_mtrix<-Data_mtrix+2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
-  Data_mtrix_log<--log10(Mydata_raw_m)
+  log10FDR<--log10(Mydata_raw_m)
   
   Mydata_raw_FDR[Mydata_raw_FDR<=0.05] <- "*"
   Mydata_raw_FDR[Mydata_raw_FDR>0.05] <- " "
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
   
-  breaksList = seq(0, 10, by = 1)
-  dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
+  #breaksList = seq(0, 10, by = 1)
+  dimnames(log10FDR)<-dimnames(Data_mtrix)
   
   
   df<-table(Meta_data$Cell_State)
@@ -255,7 +273,7 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
   names(stats)<-names(df)
   stats<-stats[unique(Meta_data$Cell_State)]
   stats<-paste0(unique(Meta_data$Cell_State),stats)
-  rownames(Data_mtrix_log)<-stats
+  rownames(log10FDR)<-stats
   
   
   df<-lengths(List)
@@ -264,12 +282,12 @@ NMF_heatmap<-function(cutoff,Meta_data,summaryTable,List){
   names(stats)<-gsub("cluster_","",names(df))
   stats<-stats[unique(Devstates$cluster)]
   stats<-paste0(unique(Devstates$cluster),stats)
-  colnames(Data_mtrix_log)<-stats
-  colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
-  dimnames(EnrichmentM)<-dimnames(Data_mtrix_log)
+  colnames(log10FDR)<-stats
+  colnames(log10FDR)<-gsub(pattern = "C:","",colnames(log10FDR))
+  dimnames(EnrichmentM)<-dimnames(log10FDR)
   
   result=list()
-  result$Data_mtrix_log=Data_mtrix_log
+  result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
   result$Enrichment=EnrichmentM
   
@@ -324,14 +342,14 @@ StateVsType<-function(Meta_data){
     Data_mtrix<-Data_mtrix+2.2e-16
     Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
     Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
-    Data_mtrix_log<--log10(Mydata_raw_m)
+    log10FDR<--log10(Mydata_raw_m)
     
     Mydata_raw_FDR[Mydata_raw_FDR<=0.05] <- "*"
     Mydata_raw_FDR[Mydata_raw_FDR>0.05] <- " "
     Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
     
-    breaksList = seq(0, 10, by = 1)
-    dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
+    #breaksList = seq(0, 10, by = 1)
+    dimnames(log10FDR)<-dimnames(Data_mtrix)
    
     df<-table(Meta_data$Cell_Types)
     percentage=df/sum(df)
@@ -339,7 +357,7 @@ StateVsType<-function(Meta_data){
     names(stats)<-names(df)
     stats<-stats[unique(Meta_data$Cell_Types)]
     stats<-paste0(unique(Meta_data$Cell_Types),stats)
-    colnames(Data_mtrix_log)<-stats
+    colnames(log10FDR)<-stats
     
     df<-table(Meta_data$Cell_State)
     percentage=df/sum(df)
@@ -347,13 +365,13 @@ StateVsType<-function(Meta_data){
     names(stats)<-names(df)
     stats<-stats[unique(Meta_data$Cell_State)]
     stats<-paste0(unique(Meta_data$Cell_State),stats)
-    rownames(Data_mtrix_log)<-stats
+    rownames(log10FDR)<-stats
     
-    dimnames(EnrichmentM)<-dimnames(Data_mtrix_log)
+    dimnames(EnrichmentM)<-dimnames(log10FDR)
     
     
     result=list()
-    result$Data_mtrix_log=Data_mtrix_log
+    result$log10FDR=log10FDR
     result$Mydata_raw_m=Mydata_raw_m
     result$Enrichment=EnrichmentM
     
@@ -410,14 +428,14 @@ ListTest <- function(list,N) {
   Data_mtrix<-Data_mtrix+2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
-  Data_mtrix_log<--log10(Mydata_raw_m)
+  log10FDR<--log10(Mydata_raw_m)
 
   Mydata_raw_FDR[Mydata_raw_FDR<=0.05] <- "*"
   Mydata_raw_FDR[Mydata_raw_FDR>0.05] <- " "
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
   
-  breaksList = seq(0, 10, by = 1)
-  dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
+  #breaksList = seq(0, 10, by = 1)
+  dimnames(log10FDR)<-dimnames(Data_mtrix)
   
   df<-lengths(list)
   percentage=df/sum(df)
@@ -425,7 +443,7 @@ ListTest <- function(list,N) {
   names(stats)<-names(df)
   stats<-stats[names(list)]
   stats<-paste0(names(list),stats)
-  rownames(Data_mtrix_log)<-stats
+  rownames(log10FDR)<-stats
   
   df<-lengths(list)
   percentage=df/sum(df)
@@ -433,18 +451,18 @@ ListTest <- function(list,N) {
   names(stats)<-names(df)
   stats<-stats[names(list)]
   stats<-paste0(names(list),stats)
-  colnames(Data_mtrix_log)<-stats
-  colnames(Data_mtrix_log)<-gsub(pattern = "cluster_","",colnames(Data_mtrix_log))
-  rownames(Data_mtrix_log)<-gsub(pattern = "cluster_","",colnames(Data_mtrix_log))
+  colnames(log10FDR)<-stats
+  colnames(log10FDR)<-gsub(pattern = "cluster_","",colnames(log10FDR))
+  rownames(log10FDR)<-gsub(pattern = "cluster_","",colnames(log10FDR))
   
-  colnames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
-  rownames(Data_mtrix_log)<-gsub(pattern = "C:","",colnames(Data_mtrix_log))
+  colnames(log10FDR)<-gsub(pattern = "C:","",colnames(log10FDR))
+  rownames(log10FDR)<-gsub(pattern = "C:","",colnames(log10FDR))
   
   
-  dimnames(EnrichmentM)<-dimnames(Data_mtrix_log)
+  dimnames(EnrichmentM)<-dimnames(log10FDR)
   
   result=list()
-  result$Data_mtrix_log=Data_mtrix_log
+  result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
   result$Enrichment=EnrichmentM
   print("done")

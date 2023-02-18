@@ -2,15 +2,42 @@
 heatmapGenesUI <- function(){
   tagList(
     tags$h3(paste0("Heatmap: Gene set"), style = "color: steelblue;"),
-    plotOutput(outputId ="heatmap_GeneSet", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="heatmap_GeneSet", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("downloadheatmap_genes","Download as .csv"),downloadButton("downloadheatmapgenes_plot","Download as .pdf")
   )}
 
 
 stateGenesUI <- function(){
   tagList(
     tags$h3(paste0("Heatmap: State genes"), style = "color: steelblue;"),
-    plotOutput(outputId ="heatmapStateGenes", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="heatmapStateGenes", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("downloadheatmap_genes2","Download as .csv"),downloadButton("downloadheatmapgenes_plot2","Download as .pdf")
   )}
+
+
+### Input function
+HeatmapGenesInput<- function(){
+  tagList( 
+    radioButtons(inputId = "colorHeatmapGene", "Colored by:",
+                 choices = c("-log10FDR" = "log10FDR", "Enrichment" = "Enrichment"),
+                 selected = "log10FDR", inline = TRUE),
+    selectInput("CellStateGenes", "Cell state gene set:", choices=c("Cancer cell state (Barkley, D.et.al., 2022)"="CancerState",
+                                                                    "Cell cycle state (Tirosh et al, 2015)"="CellCycleState",
+                                                                    "Upload state gene set" ="UploadState"), 
+                selected = "CancerState", multiple = FALSE),
+    textInput(inputId="NO.background", "The number of background genes", value = 25678),
+    #N=25678
+    conditionalPanel(
+      condition = "input.CellStateGenes == 'UploadState'",
+      fileInput(inputId = "uploadCellStateGenes",label = NULL, multiple = FALSE,
+                accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
+      )),
+    actionButton("action_heatmap_genes","Submit",icon("paper-plane"), 
+                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+  )
+}
+
+
 
 
 makeGeneSetList<-function(csvfile){
@@ -31,7 +58,7 @@ makeGeneSetList<-function(csvfile){
 
 ### function
 #N=25678 the number of genes in whole human genome
-heatmapGenes <- function(cutoff,RefSet,Genelist,N=25678) { 
+heatmapGenes <- function(RefSet,Genelist,N=25678) { 
 
   RefSet<-makeGeneSetList(RefSet)
   #print(head(RefSet))
@@ -74,19 +101,20 @@ heatmapGenes <- function(cutoff,RefSet,Genelist,N=25678) {
     EnrichmentM[,i]<-enrichment_set
   }
   
-  Data_mtrix[Data_mtrix==0]<-2.2e-16
+  #Data_mtrix[Data_mtrix==0]<-2.2e-16
+  Data_mtrix<-Data_mtrix+2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
-  Data_mtrix_log<--log10(Mydata_raw_m)
+  log10FDR<--log10(Mydata_raw_m)
   
-  #print(Data_mtrix_log)
+  #print(log10FDR)
   Mydata_raw_FDR[Mydata_raw_FDR<=0.05] <- "*"
   Mydata_raw_FDR[Mydata_raw_FDR>0.05] <- " "
   
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
   
-  breaksList = seq(0, 10, by = 1)
-  dimnames(Data_mtrix_log)<-dimnames(Data_mtrix)
+  #breaksList = seq(0, 10, by = 1)
+  dimnames(log10FDR)<-dimnames(Data_mtrix)
   
   df<-lengths(RefSet)
   percentage=df/sum(df)
@@ -94,7 +122,7 @@ heatmapGenes <- function(cutoff,RefSet,Genelist,N=25678) {
   names(stats)<-names(df)
   stats<-stats[names(RefSet)]
   stats<-paste0(names(RefSet),stats)
-  rownames(Data_mtrix_log)<-stats
+  rownames(log10FDR)<-stats
   
   df<-lengths(Genelist)
   percentage=df/sum(df)
@@ -102,13 +130,13 @@ heatmapGenes <- function(cutoff,RefSet,Genelist,N=25678) {
   names(stats)<-names(df)
   stats<-stats[names(Genelist)]
   stats<-paste0(names(Genelist),stats)
-  colnames(Data_mtrix_log)<-stats
-  colnames(Data_mtrix_log)<-gsub(pattern = "cluster_","",colnames(Data_mtrix_log))
+  colnames(log10FDR)<-stats
+  colnames(log10FDR)<-gsub(pattern = "cluster_","",colnames(log10FDR))
   
-  dimnames(EnrichmentM)<-dimnames(Data_mtrix_log)
+  dimnames(EnrichmentM)<-dimnames(log10FDR)
   
   result=list()
-  result$Data_mtrix_log=Data_mtrix_log
+  result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
   result$Enrichment=EnrichmentM
   #print(result)

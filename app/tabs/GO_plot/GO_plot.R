@@ -2,15 +2,38 @@
 FunctionUI <- function(){
   tagList(
     tags$h3(paste0("Functional enrichment"), style = "color: steelblue;"),
-    plotOutput(outputId ="Functional_enrichment", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="Functional_enrichment", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("downloadGOPlot","Download as .pdf")
   )}
 
 
 Function_tableUI<-function(){
   tagList(
     tags$h3(paste0("Functional enrichment table"), style = "color: steelblue;"),
-    DTOutput(outputId ="Functional_table", width = "80%") %>% withSpinner(color="#4682B4")
+    DTOutput(outputId ="Functional_table", width = "80%") %>% withSpinner(color="#4682B4"),
+    downloadButton("downloadGO","Download as .csv")
   )}
+
+
+## Input function
+GOInput<- function(){
+  tagList( 
+    textInput("selected_clusterGO", "Input cluster(s):",value = "5,18"),
+    selectInput("Mart", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
+    textInput("go_species", "GO OrgDb:",value = "org.Hs.eg.db"),
+    textInput("kegg_species", "KEGG organism:",value = "hsa"),
+    textAreaInput("background_genes", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
+    actionButton(inputId = "bg_Liver0",                                       #action button to display background genes
+                 label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
+    bsTooltip("bg_Liver0","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
+              options = NULL),
+    actionButton("action_GO","Submit",icon("paper-plane"), 
+                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+  )
+}
+
+
+
 
 
 ## show all the reference set from ENSEMBL
@@ -21,52 +44,12 @@ names(datasets_list)<-listDatasets(mart)$dataset
 
 
 ## Gene_list list in each states
-GetGenes<-function(cutoff,Devstates){
+GetGenes<-function(Devstates,Remove){
+
   print("Get genes in each state")
   Geneset<-NULL
   for (i in unique(Devstates$cluster)){
 
-    cluster<-Devstates[Devstates$cluster==i,]
-    print(paste0("Cluster: ",i))
-    Genes_set<-NULL
-    
-    for (c in 1:length(cluster$genes)){
-      #print(paste0("Cell states: ",cluster$genes[c]))
-      Genes<-cluster$genes[c]
-      Genes<-str_split(Genes, "_")[[1]]
-      
-      #print(length(Genes))
-      state<-cluster$state[c]
-      State<-as.numeric(strsplit(as.character(state),"")[[1]])
-      #print(State)
-      
-      Genes_state<-paste(Genes,State,sep = "_")
-      Genes_set<-c(Genes_set,Genes_state)
-      
-    }
-    
-    Genes_set<-unique(Genes_set)
-    Genes_set<- Genes_set[!grepl("_0", Genes_set)] # remove 0-state genes
-    Genes_set<-gsub("_1","",Genes_set)
-  
-    list=list(Genes_set)
-    names(list)<-paste0("cluster_",i)
-    Geneset<-c(Geneset,list)
-      
-  }
-  
-  return(Geneset)
-  
-}
-
-
-
-## Gene_list list in each states with 0-state genes
-GetGenes2<-function(cutoff,Devstates){
-  print("Get genes in each state")
-  Geneset<-NULL
-  for (i in unique(Devstates$cluster)){
-    
     cluster<-Devstates[Devstates$cluster==i,]
     #print(paste0("Cluster: ",i))
     Genes_set<-NULL
@@ -86,6 +69,10 @@ GetGenes2<-function(cutoff,Devstates){
       
     }
     
+  
+    if (Remove==T){
+    Genes_set<- Genes_set[!grepl("_0", Genes_set)] # remove 0-state genes
+    } 
     
     Genes_set<-gsub("_1","",Genes_set)
     Genes_set<-gsub("_0","",Genes_set)
@@ -94,13 +81,12 @@ GetGenes2<-function(cutoff,Devstates){
     list=list(Genes_set)
     names(list)<-paste0("cluster_",i)
     Geneset<-c(Geneset,list)
-    
+      
   }
-  
+  print('done')
   return(Geneset)
   
 }
-
 
 
 

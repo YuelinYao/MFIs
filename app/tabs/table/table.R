@@ -14,6 +14,16 @@ TableUI <- function(){
 
 
 
+### Input function
+TableInput<- function(){
+  tagList( 
+    actionButton("action_table","Submit",icon("paper-plane"), 
+                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+  )
+}
+
+
+
 Table_cluster<-function(cutoff,data_path){
   
   command=paste("python ./Produce_devStates.py", cutoff,data_path$devStates,data_path$trainDat,sep = " ")
@@ -29,4 +39,7 @@ Table_cluster<-function(cutoff,data_path){
   return(Devstates)
   
 }
+
+
+
 

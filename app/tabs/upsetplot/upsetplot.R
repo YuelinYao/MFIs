@@ -2,8 +2,20 @@
 UPsetUI <- function(){
   tagList(
     tags$h3(paste0("Upset Plot"), style = "color: steelblue;"),
-    plotOutput(outputId ="UPsetPlot", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="UPsetPlot", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("upset_plot","Download as .pdf")
   )}
+
+
+### Input function
+UPsetInput<- function(){
+  tagList( 
+    textInput("selected_cluster_upset", "Input cluster(s):",value = "5,18,6,11,19"),
+    actionButton("action_upset","Submit",icon("paper-plane"), 
+                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+  )
+}
+
 
 
 

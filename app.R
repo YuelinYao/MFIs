@@ -62,7 +62,6 @@ source("./app/tabs/rrvgo/rrvgo.R")
 
 # Define UI for application
 ui <- fluidPage(theme = shinytheme("spacelab"),
-                
                 # Application title
                 titlePanel("",windowTitle = "MFIs project"),
                 tags$head(
@@ -73,128 +72,46 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                           }")
                   )
                 ),
-                
                 headerPanel(                              ### add logos 
                   (img(src= "logo.png",height  = 120, width = 700)) ), ##class = "pull-left" 
                 
-            #Sidebar with a slider input for the cutoff
+  #Sidebar with a slider input for the cutoff
             sidebarLayout(
             sidebarPanel(
-            
-            readTableUI(), #  Global conditional panel 
-            
+ 
+ ## Global conditional panel for read table 
+            UploadFilesUI(),  
+ ## About            
             conditionalPanel(
-                      condition="input.tabs == 'about'", # About-tab
+                      condition="input.tabs == 'about'",
                       InformationUI()),
-            
-            conditionalPanel(condition= "input.tabs == 'upset'",  # Upset Plot tab
-                             textInput("selected_cluster_upset", "Input cluster(s):",value = "5,18,6,11,19")),
-            
-            conditionalPanel(condition= "input.tabs == 'GO'", # GO & KEGG Tab
-                             textInput("selected_clusterGO", "Input cluster(s):",value = "5,18"),
-                             #switchInput(inputId = "genePresence",   
-                              #           value = T,onLabel = "Genes" ),
-                             selectInput("Mart", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
-                             textInput("go_species", "GO OrgDb:",value = "org.Hs.eg.db"),
-                             textInput("kegg_species", "KEGG organism:",value = "hsa"),
-                             textAreaInput("background_genes", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
-                             actionButton(inputId = "bg_Liver0",                                       #action button to display background genes
-                                          label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-                             bsTooltip("bg_Liver0","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
-                                       options = NULL),
-                             actionButton("action_GO","Submit",icon("paper-plane"), 
-                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
-                             ),
-                            
-            
-            conditionalPanel(condition= "input.tabs == 'rrvgo'", # rrvgo Tab
-                             textInput("selected_clusterrrvgo", "Input a cluster:",value = "5"),
-                             selectInput("Mart_rrgvo", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
-                             textInput("go_species_rrgvo", "GO OrgDb:",value = "org.Hs.eg.db"),
-                             radioButtons("subOntology", "Select sub-ontology:",
-                                                c("Biological Process" = "BP",
-                                                  "Cellular Component" = "CC",
-                                                  "Molecular Function" = "MF"),selected = "BP" ),
-                             textAreaInput("background_genesrrgvo", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
-                             actionButton(inputId = "bg_Liver",                                       #action button to display background genes
-                                          label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-                             bsTooltip("bg_Liver","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
-                                       options = NULL),
-                             actionButton("action_rrvgo","Submit",icon("paper-plane"),       # submit button
-                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
-                             ),
-                    
-
-            conditionalPanel(condition= "input.tabs == 'DE'",
-                             textInput("selected_clusterDE", "Select cluster(s)",value = "6,19"),
-                             selectInput("Mart_DE", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
-                             textInput("go_species_DE", "GO OrgDb:",value = "org.Hs.eg.db"),
-                             textInput("kegg_species_DE", "KEGG organism:",value = "hsa"),
-                             textInput("logfc", "logFC:",value = 0.25),
-                             sliderInput("Pvalue_DE",
-                                         "Adjusted p value:",
-                                         min = 0,
-                                         max = 1,
-                                         value = 0.05),
-                             textAreaInput("background_genesDE", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
-                             actionButton(inputId = "bg_Liver2",                                       #action button to display background genes
-                                          label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-                             bsTooltip("bg_Liver2","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
-                                       options = NULL),
-                             actionButton("action_DE","Submit",icon("paper-plane"), 
-                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
-                             ),
-            
-            ### submit button
-            conditionalPanel(condition= "input.tabs == 'heatmap_genes'",
-                             
-                             radioButtons(inputId = "colorHeatmapGene", "Colored by:",
-                                          choices = c("-log10FDR" = "Data_mtrix_log", "Enrichment" = "Enrichment"),
-                                          selected = "Data_mtrix_log", inline = TRUE),
-                             
-                             
-                             selectInput("CellStateGenes", "Cell state gene set:", choices=c("Cancer cell state (Barkley, D.et.al., 2022)"="CancerState",
-                                                                                             "Cell cycle state (Tirosh et al, 2015)"="CellCycleState",
-                                                                                             "Upload state gene set" ="UploadState"), 
-                                         selected = "CancerState", multiple = FALSE),
-                             
-                             textInput(inputId="NO.background", "The number of background genes", value = 25678),
-                             #N=25678
-                             
-                             # Only show this panel if the plot type is a histogram
-                             conditionalPanel(
-                               condition = "input.CellStateGenes == 'UploadState'",
-                               fileInput(inputId = "uploadCellStateGenes",label = NULL, multiple = FALSE,
-                                         accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
-                                         )),
-  
-                             actionButton("action_heatmap_genes","Submit",icon("paper-plane"), 
-                                        style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-            
-            
-            ### submit button
-            conditionalPanel(condition= "input.tabs == 'heatmap'",
-                             
-                             radioButtons(inputId = "colorHeatmapCells", "Colored by:",
-                                          choices = c("-log10FDR" = "Data_mtrix_log", "Enrichment" = "Enrichment"),
-                                          selected = "Data_mtrix_log", inline = TRUE),
-                             
-                             actionButton("action_heatmap","Submit",icon("paper-plane"), 
-                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-            
-            
-            
-            ### submit button
-            conditionalPanel(condition= "input.tabs == 'upset'",
-                             actionButton("action_upset","Submit",icon("paper-plane"), 
-                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4")),
-            
-            ### table
-            ### submit button
+ 
+ ## table
             conditionalPanel(condition= "input.tabs == 'table'",
-                             actionButton("action_table","Submit",icon("paper-plane"), 
-                                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4"))
+                  TableInput()),
+ 
+ ## heatmap
+            conditionalPanel(condition= "input.tabs == 'heatmap'",
+                  HeatmapInput()),
+ 
+ ## heatmap_genes
+            conditionalPanel(condition= "input.tabs == 'heatmap_genes'",
+                  HeatmapGenesInput()), 
+ 
 
+ ## GO enrichment        
+            conditionalPanel(condition= "input.tabs == 'GO'", # GO & KEGG Tab
+                             GOInput()),
+                            
+ ## rrvgo Tab   
+            conditionalPanel(condition= "input.tabs == 'rrvgo'",
+                             rrvgoInput()),
+ ## Upset          
+            conditionalPanel(condition= "input.tabs == 'upset'",  
+                  UPsetInput()),                    
+ ## DE Tab 
+            conditionalPanel(condition= "input.tabs == 'DE'",
+                             DEInput())
         ),
         
         
@@ -202,39 +119,39 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             tabsetPanel(type = "pills", id = 'tabs',
                 tabPanel("About", icon = icon("circle-info"), value = 'about', aboutUI()),
                 tabPanel("Table", icon = icon("table"),value="table",TableUI()),
-                
                 tabPanel("Heatmap-Cells",icon = icon("map"), value="heatmap",
-                         heatmapUI(),downloadButton("downloadheatmap1","Download as .csv"),downloadButton("downloadheatmap_plot1","Download as .pdf"),
-                         NMF_UI(),downloadButton("downloadheatmap2","Download as .csv"), downloadButton("downloadheatmap_plot2","Download as .pdf"),tags$br(),
-                         NMF_CelltypeUI(),downloadButton("downloadheatmap3","Download as .csv"), downloadButton("downloadheatmap_plot3","Download as .pdf"),tags$br(),
-                         Test_CellstateUI(),downloadButton("downloadheatmap4","Download as .csv"), downloadButton("downloadheatmap_plot4","Download as .pdf")),
-                
-                tabPanel("Heatmap-Genes",icon = icon("map"), value="heatmap_genes",heatmapGenesUI(),downloadButton("downloadheatmap_genes","Download as .csv"),downloadButton("downloadheatmapgenes_plot","Download as .pdf"),tags$br(),
-                         stateGenesUI(),downloadButton("downloadheatmap_genes2","Download as .csv"),downloadButton("downloadheatmapgenes_plot2","Download as .pdf")),
-            
-                tabPanel("GO & KEGG", icon = icon("chart-line"),value="GO",FunctionUI(),downloadButton("downloadGOPlot","Download as .pdf"),tags$br(),
-                         Function_tableUI(),downloadButton("downloadGO","Download as .csv")),
+                         heatmapUI(),
+                         NMF_UI(),
+                         NMF_CelltypeUI(),
+                         Test_CellstateUI()),
+                tabPanel("Heatmap-Genes",icon = icon("map"), value="heatmap_genes",
+                         heatmapGenesUI(),
+                         stateGenesUI()),
+                tabPanel("GO & KEGG", icon = icon("chart-line"),value="GO",
+                         FunctionUI(),
+                         Function_tableUI()),
                 tabPanel("Using rrvgo", icon = icon("chart-line"),value="rrvgo",
-                         rrvgoUI(),downloadButton("rrvgo_plot1","Download as .pdf"),tags$br(),
-                         rrvgo2UI(),downloadButton("rrvgo_plot2","Download as .pdf"),tags$br(),
-                         rrvgo3UI() ,downloadButton("rrvgo_plot3","Download as .pdf"),tags$br(), 
-                         rrvgo_tableUI(),downloadButton("rrvgo_table","Download as .csv")),
-                tabPanel("Upset Plot",icon = icon("signal"),value="upset",UPsetUI(),
-                         downloadButton("upset_plot","Download as .pdf")),
-                tabPanel("DE analysis",icon = icon("random"),value="DE",DE_UI(),downloadButton("GeneHeatmap","Download as .pdf"),tags$br(),
-                         DE_TableUI(),downloadButton("DegTable","Download as .csv"),tags$br(),
-                         DEGO_UI(),downloadButton("DegAnnotationPlot","Download as .pdf"),tags$br(),
-                         DEGOtable_UI(),downloadButton("DegAnnotationTable","Download as .csv"),tags$br())
+                         rrvgoUI(),
+                         rrvgo2UI(),
+                         rrvgo3UI(),
+                         rrvgo_tableUI()),
+                tabPanel("Upset Plot",icon = icon("signal"),value="upset",
+                         UPsetUI()),
+                tabPanel("DE analysis",icon = icon("random"),value="DE",
+                         DE_UI(),
+                         DE_TableUI(),
+                         DEGO_UI(),
+                         DEGOtable_UI())
         ))   )
 
 )
 
 
 
-# Define server logic required to draw a histogram
+# Define server 
 server <- function(input, output,session) {
 
-  # Load example data or read uploaded data
+  ## Load example data or read uploaded data: count matrix
   usedTable <- reactive({
     if(input$TestTable){
       load("./data/Example.Rdata")
@@ -249,7 +166,7 @@ server <- function(input, output,session) {
     }
   })  
   
-  
+  ## Load example data or read uploaded data: topDeviatingHOIstates.csv and trainingData_.csv
   usedTable2 <- reactive({
     print(paste("Use HCC cancer data: ",input$TestTable))
     if(input$TestTable){
@@ -269,7 +186,7 @@ server <- function(input, output,session) {
     }
   })  
   
-  
+  ## Load example data or read uploaded data: Meta data
   usedMeta_data <- reactive({
     print(paste("Use HCC cancer data: ",input$TestTable))
     if(input$TestTable){
@@ -285,6 +202,8 @@ server <- function(input, output,session) {
     
   })  
   
+  
+  ## Show example background genes for functional analysis
   # Background genes:
   BackgroundGenes<-reactive({
     background<-strsplit(input$background_genes, "\n")[[1]]
@@ -317,37 +236,37 @@ server <- function(input, output,session) {
     }
   })
   
-  
-    # About:
-    Text1 <- about()
-    aboutOutput(output,Text1)
 
-    # setup:
-    #summary Table
+  ## Set up:
+  # Summary Table
     summaryTable<-reactive({
       Table_cluster(input$cutoff,usedTable2())
     }) %>% bindCache(input$cutoff,usedTable2())
     
-    # Get cell list
+    # Get cell list, function in heatmap.R
     List<-reactive({
-      GetCellList(input$cutoff,usedTable()$count,summaryTable())
+      GetCellList(usedTable()$count,summaryTable())#input$cutoff,usedTable()$count,
     })%>% bindCache(input$cutoff,usedTable(),usedTable2()) 
     
     
-    # Get gene list:
+    # Get gene list: function in GO_plot.R
     GetGenesList<-reactive({
-      GetGenes(input$cutoff,summaryTable())
+      GetGenes(summaryTable(),Remove=T)
     })%>% bindCache(input$cutoff,usedTable(),usedTable2()) 
     
     
-    # Get gene list, this gene list consist all the genes:
-    GetGenesList2<-reactive({
-      GetGenes2(input$cutoff,summaryTable())
+    # Get gene list, this gene list consist all the genes, function in GO_plot.R
+    GetGenesList_All<-reactive({
+      GetGenes(summaryTable(),Remove=F)
     })%>% bindCache(input$cutoff,usedTable(),usedTable2()) 
     
     
+    # About: include overview and tutorial
+    Text1 <- about()
+    aboutOutput(output,Text1)
     
-    ## Table:  
+    
+    ## Table:
     showText<-eventReactive(input$action_table, {
       paste(dim(summaryTable())[1]," deviating MFIs in total, ",length(unique(summaryTable()$cluster)), "clusters." )
     })
@@ -369,7 +288,7 @@ server <- function(input, output,session) {
     
     output$downloadtable<-downloadHandler(
       filename=function(){
-        paste0("State_Table ",Sys.Date(), '.csv')
+        paste0("State_Table-",Sys.Date(), '.csv')
       },
       content = function(file){
         write.csv(show_Table(),file)
@@ -377,7 +296,7 @@ server <- function(input, output,session) {
     )
 
     
-    # Heatmap-genes:
+    ## Heatmap-genes:
     usedCellStateGene <- reactive({
       print(paste("Use CellStateGene: ",input$CellStateGenes))
       if(!input$CellStateGenes=="UploadState"){
@@ -389,15 +308,13 @@ server <- function(input, output,session) {
       return(CellStateGenes_path)
     })  
     
-    
+    # color by -log10FDR or enrichment fold
     colorHeatmapGene<- eventReactive(input$action_heatmap_genes, { 
       input$colorHeatmapGene
     })
     
-    
-    
     result_genes <- eventReactive(input$action_heatmap_genes,{
-      result_genes<-heatmapGenes(input$cutoff,usedCellStateGene(),GetGenesList2(),N=as.integer(input$NO.background))
+      result_genes<-heatmapGenes(usedCellStateGene(),GetGenesList_All(),N=as.integer(input$NO.background))
       #N=25678 the number of genes in whole human genome
       result_genes$cutoff=input$cutoff
       result_genes
@@ -411,27 +328,24 @@ server <- function(input, output,session) {
                          color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
     
-    
+   ## Download csv
     output$downloadheatmap_genes<-downloadHandler(
       filename = function(){
-        paste('HeatmapGenes-', Sys.Date(), '.csv', sep='')
+        paste('HeatmapGenes-', colorHeatmapGene(),"-",Sys.Date(), '.csv', sep='')
       },
       content=function(heatmap1){
-        write.csv(esult_genes()[[colorHeatmapGene()]],heatmap1)
+        write.csv(result_genes()[[colorHeatmapGene()]],heatmap1)
       }
     )
     
-    
-
-    
-    
+    ## Download heatmap pdf
     output$downloadheatmapgenes_plot<-downloadHandler(
       filename = function(){
-        paste('HeatmapGenes-', Sys.Date(), '.pdf', sep='')
+        paste('HeatmapGenes-',colorHeatmapGene(),"-",Sys.Date(), '.pdf', sep='')
       },
       content=function(heatmap1){
-        width=dim(result_genes()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result_genes()[["Data_mtrix_log"]])))*5/25.4+2
-        height=dim(result_genes()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result_genes()[["Data_mtrix_log"]])))*5/25.4+5
+        width=dim(result_genes()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(result_genes()[["log10FDR"]])))*5/25.4+2
+        height=dim(result_genes()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(result_genes()[["log10FDR"]])))*5/25.4+5
         pdf(heatmap1,width =width,height = height)
         pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
@@ -444,7 +358,7 @@ server <- function(input, output,session) {
     
     ### StateGenes:
     StateGenes <- eventReactive(input$action_heatmap_genes,{
-      StateGenesResult<-ListTest(GetGenesList(),as.integer(input$NO.background))
+      StateGenesResult<-ListTest(GetGenesList_All(),as.integer(input$NO.background))
       StateGenesResult$cutoff=input$cutoff
       StateGenesResult
     })
@@ -455,26 +369,24 @@ server <- function(input, output,session) {
                          cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                          color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
-    
+    ## Download csv
     output$downloadheatmap_genes2<-downloadHandler(
       filename = function(){
-        paste('HeatmapStateGenes-', Sys.Date(), '.csv', sep='')
+        paste('HeatmapStateGenes-', colorHeatmapGene(),"-",Sys.Date(), '.csv', sep='')
       },
       content=function(heatmap1){
         write.csv(StateGenes()[[colorHeatmapGene()]],heatmap1)
       }
     )
     
-
-    
-    
+    ## Download pdf
     output$downloadheatmapgenes_plot2<-downloadHandler(
       filename = function(){
-        paste('HeatmapGenes-', Sys.Date(), '.pdf', sep='')
+        paste('HeatmapGenes-', colorHeatmapGene(),"-",Sys.Date(), '.pdf', sep='')
       },
       content=function(heatmap1){
-        width=dim( StateGenes()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames( StateGenes()[["Data_mtrix_log"]])))*5/25.4+2
-        height=dim( StateGenes()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames( StateGenes()[["Data_mtrix_log"]])))*5/25.4+5
+        width=dim( StateGenes()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames( StateGenes()[["log10FDR"]])))*5/25.4+2
+        height=dim( StateGenes()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames( StateGenes()[["log10FDR"]])))*5/25.4+5
         pdf(heatmap1,width =width,height = height)
         pheatmap::pheatmap(border_color = NA, StateGenes()[[colorHeatmapGene()]],display_numbers =  StateGenes()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
@@ -485,18 +397,15 @@ server <- function(input, output,session) {
         
       } )
     
+  
     
-    
-    
-    
-    # Heatmap1(Tab):
-    
+    ## Heatmap for cells(Tab)
     colorHeatmapCells<- eventReactive(input$action_heatmap, { 
       input$colorHeatmapCells
     })
     
     result1 <- eventReactive(input$action_heatmap,{
-      result1<-heatmap(input$cutoff,usedMeta_data(),summaryTable(), List())
+      result1<-heatmap(usedMeta_data(),summaryTable(), List())
       result1$cutoff=input$cutoff
       result1
     } )
@@ -509,24 +418,23 @@ server <- function(input, output,session) {
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
     
-    
+    ## Download csv
     output$downloadheatmap1<-downloadHandler(
       filename = function(){
-        paste('Heatmap1-', Sys.Date(), '.csv', sep='')
+        paste('Heatmap1-', colorHeatmapCells(),"-",Sys.Date(), '.csv', sep='')
       },
       content=function(heatmap1){
         write.csv(result1()[[colorHeatmapCells()]],heatmap1)
       }
    )
-    
-
+    ## Download pdf
     output$downloadheatmap_plot1<-downloadHandler(
       filename = function(){
-        paste('Heatmap1-', Sys.Date(), '.pdf', sep='')
+        paste('Heatmap1-',colorHeatmapCells(),"-",Sys.Date(), '.pdf', sep='')
       },
       content=function(heatmap1){
-        width=dim(result1()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result1()[["Data_mtrix_log"]])))*5/25.4+2
-        height=dim(result1()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result1()[["Data_mtrix_log"]])))*5/25.4+5
+        width=dim(result1()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(result1()[["log10FDR"]])))*5/25.4+2
+        height=dim(result1()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(result1()[["log10FDR"]])))*5/25.4+5
         pdf(heatmap1,width =width,height = height)
         pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
@@ -538,11 +446,9 @@ server <- function(input, output,session) {
      } )
     
     
-  
-    # Heatmap2(Tab):
-    #main = input$cutoff,
+    # Heatmap2 (Tab)
     result2 <- eventReactive(input$action_heatmap,{  
-      result2<-NMF_heatmap(input$cutoff,usedMeta_data(),summaryTable(),List())
+      result2<-NMF_heatmap(usedMeta_data(),summaryTable(),List())
       result2$cutoff=input$cutoff
       result2  } )
     
@@ -553,26 +459,23 @@ server <- function(input, output,session) {
                          cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                          color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
     })
-    
-      
+      ## download csv
       output$downloadheatmap2<-downloadHandler(
         filename = function(){
-          paste('Heatmap2-', Sys.Date(), '.csv', sep='')
+          paste('Heatmap2-', colorHeatmapCells(),"-",Sys.Date(), '.csv', sep='')
         },
         content=function(heatmap2){
           write.csv(result2()[[colorHeatmapCells()]],heatmap2)
         }
       )
-      
-
-      
+      ## download pdf
       output$downloadheatmap_plot2<-downloadHandler(
         filename = function(){
-          paste('Heatmap2-', Sys.Date(), '.pdf', sep='')
+          paste('Heatmap2-', colorHeatmapCells(),"-",Sys.Date(), '.pdf', sep='')
         },
         content=function(heatmap2){
-          width=dim(result2()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result2()[["Data_mtrix_log"]])))*5/25.4+2
-          height=dim(result2()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result2()[["Data_mtrix_log"]])))*5/25.4+5
+          width=dim(result2()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(result2()[["log10FDR"]])))*5/25.4+2
+          height=dim(result2()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(result2()[["log10FDR"]])))*5/25.4+5
           pdf(heatmap2,width =width,height = height)
           pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
@@ -593,26 +496,23 @@ server <- function(input, output,session) {
                            cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
       })
-    
-      
+      ## download csv
       output$downloadheatmap3<-downloadHandler(
         filename = function(){
-          paste('Heatmap3-', Sys.Date(), '.csv', sep='')
+          paste('Heatmap3-', colorHeatmapCells(),"-",Sys.Date(), '.csv', sep='')
         },
         content=function(heatmap3){
           write.csv(result()[[colorHeatmapCells()]],heatmap3)
         }
       )
-      
-      
-      
+      ## download pdf
       output$downloadheatmap_plot3<-downloadHandler(
         filename = function(){
-          paste('Heatmap3-', Sys.Date(), '.pdf', sep='')
+          paste('Heatmap3-', colorHeatmapCells(),"-",Sys.Date(), '.pdf', sep='')
         },
         content=function(heatmap3){
-          width=dim(result()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(result()[["Data_mtrix_log"]])))*5/25.4+2
-          height=dim(result()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(result()[["Data_mtrix_log"]])))*5/25.4+5
+          width=dim(result()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(result()[["log10FDR"]])))*5/25.4+2
+          height=dim(result()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(result()[["log10FDR"]])))*5/25.4+5
           pdf(heatmap3,width =width,height = height)
           pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
@@ -629,7 +529,6 @@ server <- function(input, output,session) {
         testResult$cutoff=input$cutoff
         testResult
       })
-      
       output$cellStates_cellStates<- renderPlot({
         pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
                            fontsize = 12,fontsize_number = 15,
@@ -637,25 +536,23 @@ server <- function(input, output,session) {
                            color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
       })
       
-      
+      ## download csv
       output$downloadheatmap4<-downloadHandler(
         filename = function(){
-          paste('Heatmap4-', Sys.Date(), '.csv', sep='')
+          paste('Heatmap4-', colorHeatmapCells(),"-",Sys.Date(), '.csv', sep='')
         },
         content=function(heatmap1){
           write.csv(cellStates()[[colorHeatmapCells()]],heatmap1)
         }
       )
-      
-      
-      
+      ## download pdf
       output$downloadheatmap_plot4<-downloadHandler(
         filename = function(){
-          paste('Heatmap4-', Sys.Date(), '.pdf', sep='')
+          paste('Heatmap4-', colorHeatmapCells(),"-",Sys.Date(), '.pdf', sep='')
         },
         content=function(heatmap4){
-          width=dim(cellStates()[["Data_mtrix_log"]])[2]*5/25.4+max(nchar(rownames(cellStates()[["Data_mtrix_log"]])))*5/25.4+2
-          height=dim(cellStates()[["Data_mtrix_log"]])[1]*5/25.4+max(nchar(colnames(cellStates()[["Data_mtrix_log"]])))*5/25.4+5
+          width=dim(cellStates()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(cellStates()[["log10FDR"]])))*5/25.4+2
+          height=dim(cellStates()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(cellStates()[["log10FDR"]])))*5/25.4+5
           pdf(heatmap4,width =width,height = height)
           pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
@@ -667,12 +564,6 @@ server <- function(input, output,session) {
         } )
       
       
-      
-      
-      
-      
-      
-
       ##GO Tab
       #http://www.genome.jp/kegg/catalog/org_list.html
       GO <- reactive({

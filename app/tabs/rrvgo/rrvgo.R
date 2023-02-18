@@ -2,29 +2,59 @@
 rrvgoUI <- function(){
   tagList(
     tags$h3(paste0("Word cloud"), style = "color: steelblue;"),
-    plotOutput(outputId ="SimplifyingGO_wordcloud", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="SimplifyingGO_wordcloud", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("rrvgo_plot1","Download as .pdf")
   )}
 
 
 rrvgo2UI <- function(){
   tagList(
     tags$h3(paste0("Treemap plot"), style = "color: steelblue;"),
-    plotOutput(outputId ="SimplifyingGO_treemap", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="SimplifyingGO_treemap", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("rrvgo_plot2","Download as .pdf")
   )}
 
 
 rrvgo3UI <- function(){
   tagList(
     tags$h3(paste0("Scatter plot"), style = "color: steelblue;"),
-    plotOutput(outputId ="SimplifyingGO_Scatter", width = "90%") %>% withSpinner(color="#4682B4")
+    plotOutput(outputId ="SimplifyingGO_Scatter", width = "90%") %>% withSpinner(color="#4682B4"),
+    downloadButton("rrvgo_plot3","Download as .pdf")
   )}
-
 
 rrvgo_tableUI<-function(){
   tagList(
     tags$h3(paste0("Reduced Terms"), style = "color: steelblue;"),
-    DTOutput(outputId ="Reduced_Terms", width = "80%") %>% withSpinner(color="#4682B4")
+    DTOutput(outputId ="Reduced_Terms", width = "80%") %>% withSpinner(color="#4682B4"),
+    downloadButton("rrvgo_table","Download as .csv")
   )}
+
+
+
+## Input function
+rrvgoInput<- function(){
+  tagList( 
+    textInput("selected_clusterrrvgo", "Input a cluster:",value = "5"),
+    selectInput("Mart_rrgvo", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
+    textInput("go_species_rrgvo", "GO OrgDb:",value = "org.Hs.eg.db"),
+    radioButtons("subOntology", "Select sub-ontology:",
+                 c("Biological Process" = "BP",
+                   "Cellular Component" = "CC",
+                   "Molecular Function" = "MF"),selected = "BP" ),
+    textAreaInput("background_genesrrgvo", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
+    actionButton(inputId = "bg_Liver",                                       #action button to display background genes
+                 label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
+    bsTooltip("bg_Liver","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
+              options = NULL),
+    actionButton("action_rrvgo","Submit",icon("paper-plane"),       # submit button
+                 style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
+  )
+}
+
+
+
+
+
 
 
 rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,GenesList,background_genes){
