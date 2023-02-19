@@ -30,12 +30,21 @@ UploadFilesUI <- function(){
                 fileInput(inputId = "trainingData_matrix",label = NULL, multiple = FALSE,
                                   accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
                                           style="display:inline-block;vertical-align:top;width:70%;"
-                                        )
+                                        ),
+             
+             tags$div(
+               br("MCMCgraph_*.csv"),
+               fileInput(inputId = "MCMCgraph",label = NULL, multiple = FALSE,
+                         accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
+               style="display:inline-block;vertical-align:top;width:70%;"
+             ),
+             
+             
                                       )
                      )
     ),
     
-    conditionalPanel(condition= "input.tabs != 'about'",
+    conditionalPanel(condition= "input.tabs != 'about' & input.tabs != 'mb'" ,
                      sliderInput("cutoff",
                                  "Dice distance:",
                                  min = 0,

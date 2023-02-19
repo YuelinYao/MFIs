@@ -45,6 +45,7 @@ library(clusterProfiler)
 library(data.table)
 library(biomaRt)
 library(ggplot2)
+library(igraph)
 #library(org.Hs.eg.db)
 #library(org.Mm.eg.db)
 options(shiny.maxRequestSize = 5000*1024^2)
@@ -58,7 +59,7 @@ source("./app/tabs/upsetplot/upsetplot.R")
 source("./app/tabs/table/table.R") 
 source("./app/tabs/DE/DE.R") 
 source("./app/tabs/rrvgo/rrvgo.R") 
-
+source("./app/tabs/markovBlanket/markovBlanket.R") 
 
 # Define UI for application
 ui <- fluidPage(theme = shinytheme("spacelab"),
@@ -111,7 +112,12 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                   UPsetInput()),                    
  ## DE Tab 
             conditionalPanel(condition= "input.tabs == 'DE'",
-                             DEInput())
+                             DEInput()),
+
+ ## MB Tab
+            conditionalPanel(condition= "input.tabs == 'mb'",
+                             MBInput()),
+ 
         ),
         
         
@@ -141,7 +147,9 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                          DE_UI(),
                          DE_TableUI(),
                          DEGO_UI(),
-                         DEGOtable_UI())
+                         DEGOtable_UI()),
+                tabPanel("Markov Blanket",icon = icon("circle-nodes"),value="mb",
+                         MBUI()),
         ))   )
 
 )
@@ -201,6 +209,25 @@ server <- function(input, output,session) {
       return(Meta_data)
     
   })  
+  
+  
+  ## Load example data or read uploaded data: Meta data
+  usedMCMCGraph <- reactive({
+    print(paste("Use HCC cancer data: ",input$TestTable))
+    if(input$TestTable){
+      MCMCGraph_path<-"./data/MCMCgraph_CL01_14698Cells_1000Genes.csv"
+      MCMCGraph<-read.csv(MCMCGraph_path,header=T,row.names = 1,colClasses = "character")
+   
+    } else{
+      MCMCGraph_path<-input$MCMCgraph
+      MCMCGraph<-read.csv(MCMCGraph_path$datapath,header=T,row.names = 1,colClasses = "character")
+    }
+    
+    MCMCGraph<-graph_from_adjacency_matrix(as(MCMCGraph, 'matrix'), mode="directed")
+    return(MCMCGraph)
+  })  
+  
+  
   
   
   ## Show example background genes for functional analysis
@@ -822,6 +849,49 @@ server <- function(input, output,session) {
       
         }
       )
+      
+      # Get markov blanket:
+      NodeGene<-reactive({
+        Gene<-strsplit(input$NodeGene, ",\\s*")[[1]]
+        Gene
+      })
+      
+      Markov_blanket<-reactive({
+        MB<-mb(usedMCMCGraph(),NodeGene())
+        MB
+      })%>% bindCache(input$NodeGene,usedMCMCGraph()) 
+      
+      
+      
+      Subgraph <- eventReactive(input$action_mb, { 
+        subgraph<-subgraph(usedMCMCGraph(), unique(c(unlist(Markov_blanket()),NodeGene())))
+        V(subgraph)$color<-"Navy"
+        V(subgraph)$color[V(subgraph)$name%in%NodeGene()]<-"red"
+        subgraph
+      })
+      
+      output$MarkovBlanket <- renderPlot({
+        plot(Subgraph(),layout=layout_with_kk(Subgraph()),edge.arrow.size = 0.3,vertex.label.color=V( Subgraph())$color,vertex.shape="none",vertex.label.font=0.4)
+        
+      })
+      
+      
+      
+      
+      output$MarkovBlanket_plot<-downloadHandler(
+        filename = function(){
+          paste('MarkovBlanket-',NodeGene(),"-",Sys.Date(), '.pdf', sep='')
+        },
+        content=function(mbPlot){
+          pdf(mbPlot)
+          plot(Subgraph(),layout=layout_with_kk(Subgraph()),edge.arrow.size = 0.3,vertex.label.color=V( Subgraph())$color,vertex.shape="none",vertex.label.font=0.4)
+          dev.off()
+        } )
+      
+      
+      
+      
+      
       }
 
 # Run the application 
