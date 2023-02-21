@@ -33,7 +33,7 @@ about <- function(){
         tags$li("Meta_data.csv: cell type annotations from other tools (e.g., clustering, NMFs, two coloum csv file, example in ./data folder), is only used in the overrepresentation test heatmap (heatmap-cell tabs), if you don't want to plot this heatmap, you can skip this file", style="list-style-type: square;"),
         tags$li("topDeviatingHOIstates.csv: located in the output from stator pipeline (HOIsummaries folder)", style="list-style-type: square;"),
         tags$li("trainingData_.csv: which is also in the output from stator pipeline (output folder)", style="list-style-type: square;"),
-        tags$li("GeneAnnotationSet.csv (optional): which is also in the output from stator pipeline (output folder)", style="list-style-type: square;"),
+        tags$li("GeneAnnotationSet.csv (optional): which is used in heatmap-genes, over-representation test between gene list. Example file format see ./data/CancerState.csv", style="list-style-type: square;"),
         "The example of file can be found at: ",a(icon("house"), href="https://github.com/YuelinYao/MFIs/tree/main/data", target="_blank", style = "color: steelblue;"),
       
       tags$br(),
