@@ -103,6 +103,61 @@ GetCellList <- function(count,summaryTable) {
   return(List)
 }
 
+##GetCell in each d-tuple:
+### Get List of cell
+GetCellList_d <- function(count,summaryTable) { 
+  #cutoff,count
+  print("Get cells in each d-tuple")
+  Devstates<-summaryTable
+  Devstates$cluster<-paste(Devstates$genes,Devstates$state)
+  
+  List=NULL
+  for (i in unique(Devstates$cluster)){
+    
+    cluster<-Devstates[Devstates$cluster==i,]
+    Cell<-NULL
+    for (c in 1:length(cluster$genes)){
+      #print(paste0("Cell states: ",cluster$genes[c]))
+      Genes<-cluster$genes[c]
+      Genes<-str_split(Genes, "_")[[1]]
+      
+      state<-cluster$state[c]
+      State<-as.numeric(strsplit(as.character(state),"")[[1]])
+      
+      
+      if ( length(Genes)==3 ) {
+        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]),]
+      } else if ( length(Genes)==4) {
+        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]),]
+      } else if ( length(Genes)==5) {
+        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]),]
+      } else if ( length(Genes)==6){
+        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]),]
+      } else if ( length(Genes)==7) {
+        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]),]
+      } else if ( length(Genes)==8) {
+        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]),]
+      } else if ( length(Genes)==9) {
+        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9]),]
+      } else {
+        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9]&count[,Genes[10]]==State[10]),]
+      }
+      
+      
+      cellnames<-rownames(c1)
+      Cell<-c(Cell,cellnames)
+    }  
+    
+    Cell<-unique(Cell)
+    list=list(Cell)
+    #names(list)<-paste0("cluster_",i)
+    List<-c(List,list)
+    
+  }
+  return(List)
+}
+
+
 
 
 
