@@ -74,7 +74,8 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                   )
                 ),
                 headerPanel(                              ### add logos 
-                  (img(src= "logo.png",height  = 120, width = 700)) ), ##class = "pull-left" 
+                 img(src= "logo.png",height  = 120, width = 700))
+                      , ##class = "pull-left" 
                 
   #Sidebar with a slider input for the cutoff
             sidebarLayout(
@@ -432,7 +433,7 @@ server <- function(input, output,session) {
     })
     
     result1 <- eventReactive(input$action_heatmap,{
-      result1<-heatmap(usedMeta_data(),summaryTable(), List())
+      result1<-heatmap(usedMeta_data(),summaryTable(), List(),N=dim(usedTable()$count)[1])
       result1$cutoff=input$cutoff
       result1
     } )
@@ -475,7 +476,7 @@ server <- function(input, output,session) {
     
     # Heatmap2 (Tab)
     result2 <- eventReactive(input$action_heatmap,{  
-      result2<-NMF_heatmap(usedMeta_data(),summaryTable(),List())
+      result2<-NMF_heatmap(usedMeta_data(),summaryTable(),List(),N=dim(usedTable()$count)[1])
       result2$cutoff=input$cutoff
       result2  } )
     
@@ -515,7 +516,7 @@ server <- function(input, output,session) {
       
       #Heatmap3(Tab):
       result <- eventReactive(input$action_heatmap,{
-        StateVsType(usedMeta_data())
+        StateVsType(usedMeta_data(),N=dim(usedTable()$count)[1])
       })
       output$cellstates_types <- renderPlot({
       pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
@@ -552,7 +553,7 @@ server <- function(input, output,session) {
       
       ##Heatmap-Tab4: cellStates
       cellStates <- eventReactive(input$action_heatmap,{
-        testResult<-ListTest(List(),N=dim(usedMeta_data())[1])
+        testResult<-ListTest(List(),N=dim(usedTable()$count)[1])
         testResult$cutoff=input$cutoff
         testResult
       })

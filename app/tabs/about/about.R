@@ -22,6 +22,7 @@ about <- function(){
         tags$li("rrvgo - Simplifying the redundance of GO sets.", style="list-style-type: square;"),
         tags$li("Upset Plot - Visualisation of how many cells sharing among states.", style="list-style-type: square;"),
         tags$li("DE analysis - Differential expression analysis for two mutually exclusive states.", style="list-style-type: square;"),
+        tags$li("Markov Blanket - Visualisation of Markov Blanket for given gene(s).", style="list-style-type: square;"),
         tags$br(),
       
         ##Tutorial

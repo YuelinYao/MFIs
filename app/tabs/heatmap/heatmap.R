@@ -162,7 +162,7 @@ GetCellList_d <- function(count,summaryTable) {
 
 
 ### function
-heatmap <- function(Meta_data,summaryTable,List) { 
+heatmap <- function(Meta_data,summaryTable,List,N) { 
   
   print("Over-representation test with cell type")
   Devstates<-summaryTable
@@ -197,7 +197,7 @@ heatmap <- function(Meta_data,summaryTable,List) {
       cell_types<-rownames(Meta_data)[which(Meta_data$Cell_Types==ct)]
       q=length(intersect(Cell,cell_types))
       m=length(Cell)
-      N=dim(Meta_data)[1]
+      #N=dim(Meta_data)[1]
       n=N-m
       k=length(cell_types)
       p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
@@ -258,7 +258,7 @@ heatmap <- function(Meta_data,summaryTable,List) {
 
 
 
-NMF_heatmap<-function(Meta_data,summaryTable,List){
+NMF_heatmap<-function(Meta_data,summaryTable,List,N){
   
   print("Over-representation test with NMFs")
   Devstates<-summaryTable
@@ -297,7 +297,7 @@ NMF_heatmap<-function(Meta_data,summaryTable,List){
       cell_types<-rownames(Meta_data)[which(Meta_data$Cell_State==ct)]
       q=length(intersect(Cell,cell_types))
       m=length(Cell)
-      N=dim(Meta_data)[1]
+      #N=dim(Meta_data)[1]
       n=N-m
       k=length(cell_types)
       p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) #https://www.biostars.org/p/15548/
@@ -350,7 +350,7 @@ NMF_heatmap<-function(Meta_data,summaryTable,List){
   
 }
 
-StateVsType<-function(Meta_data){
+StateVsType<-function(Meta_data,N){
 
     print("Over-representation test cell types with NMFs")
     r=length(unique(Meta_data$Cell_State))
@@ -382,7 +382,7 @@ StateVsType<-function(Meta_data){
         cell_types<-rownames(Meta_data)[which(Meta_data$Cell_State==ct)]
         q=length(intersect(Cell,cell_types))
         m=length(Cell)
-        N=dim(Meta_data)[1]
+        #N=dim(Meta_data)[1]
         n=N-m
         k=length(cell_types)
         p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) #https://www.biostars.org/p/15548/
