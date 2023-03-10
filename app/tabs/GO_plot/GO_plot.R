@@ -279,7 +279,6 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
   cluster_GOMF$class<-"GOMF"}
   
   ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
-
   AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  }
 
   }

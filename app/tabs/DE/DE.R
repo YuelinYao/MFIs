@@ -146,12 +146,11 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
   if (length(background_genes)==0){
     
     for (cluster in unique(DE$cluster)){
-      
+
       marker<-DE$gene[DE$cluster==cluster]
-      
       Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                        filter="external_gene_name", values= marker, uniqueRows=TRUE)
-      
+      print(head(Genes_set))
       cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
                                  pAdjustMethod = "BH",
                                  minGSSize = 1,
@@ -159,12 +158,12 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
                                  qvalueCutoff = 0.05)
       
       
-      if (dim(cluster_kegg)[1]==0) {
+      if (is.null(cluster_kegg)) {
         print("no result")
-      } 
+      } else{
       cluster_kegg<-cluster_kegg@result
       cluster_kegg$cluster<-cluster
-      cluster_kegg$class<-"KEGG"
+      cluster_kegg$class<-"KEGG"}
       
       
       cluster_GOBP <- enrichGO(gene = Genes_set$entrezgene_id,
@@ -176,14 +175,14 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
                                qvalueCutoff = 0.05,
                                readable = TRUE)
       
-      if (dim(cluster_GOBP)[1]==0) {
+      if (is.null(cluster_GOBP)) {
         print("no result")
-      } 
+      } else{
       
       
       cluster_GOBP<-cluster_GOBP@result
       cluster_GOBP$cluster<-cluster
-      cluster_GOBP$class<-"GOBP"
+      cluster_GOBP$class<-"GOBP"}
       
       
       cluster_GOCC <- enrichGO(gene = Genes_set$entrezgene_id,
@@ -195,15 +194,15 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
                                qvalueCutoff = 0.05,
                                readable = TRUE)
       
-      if (dim(cluster_GOCC)[1]==0) {
+      if (is.null(cluster_GOCC)) {
         print("no result")
-      } 
+      } else{
       
       
       
       cluster_GOCC<-cluster_GOCC@result
       cluster_GOCC$cluster<-cluster
-      cluster_GOCC$class<-"GOCC"
+      cluster_GOCC$class<-"GOCC"}
       
       cluster_GOMF <- enrichGO(gene = Genes_set$entrezgene_id,
                                OrgDb= go_species,
@@ -214,18 +213,18 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
                                qvalueCutoff = 0.05,
                                readable = TRUE)
       
-      if (dim(cluster_GOMF)[1]==0) {
+      if (is.null(cluster_GOMF)) {
         print("no result")
-      } 
+      } else{
       
       cluster_GOMF<-cluster_GOMF@result
       cluster_GOMF$cluster<-cluster
-      cluster_GOMF$class<-"GOMF"
+      cluster_GOMF$class<-"GOMF"}
       
       ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
       
       AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
-      
+      #print(AllEnrichment)
     }
     
     
@@ -237,6 +236,7 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
     background_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                          filter="external_gene_name", values=background_genes, uniqueRows=TRUE)
   
+    #print(head(background_genes))
   for (cluster in unique(DE$cluster)){
   
   marker<-DE$gene[DE$cluster==cluster]
@@ -244,7 +244,7 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
   Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                    filter="external_gene_name", values= marker, uniqueRows=TRUE)
   
-  
+  #print(head(Genes_set))
   
   cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
                              pAdjustMethod = "BH",universe = as.character(background_genes$entrezgene_id),
@@ -252,13 +252,14 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
                              pvalueCutoff = 0.05,
                              qvalueCutoff = 0.05)
   
-  
-  if (dim(cluster_kegg)[1]==0) {
+  print(cluster_kegg)
+  if (is.null(cluster_kegg)) {
     print("no result")
-  } 
+  } else{
+  
   cluster_kegg<-cluster_kegg@result
   cluster_kegg$cluster<-cluster
-  cluster_kegg$class<-"KEGG"
+  cluster_kegg$class<-"KEGG"}
   
   
   cluster_GOBP <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
@@ -270,14 +271,14 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
                            qvalueCutoff = 0.05,
                            readable = TRUE)
   
-  if (dim(cluster_GOBP)[1]==0) {
+  if (is.null(cluster_GOBP)) {
     print("no result")
-  } 
+  } else{
   
   
   cluster_GOBP<-cluster_GOBP@result
   cluster_GOBP$cluster<-cluster
-  cluster_GOBP$class<-"GOBP"
+  cluster_GOBP$class<-"GOBP"}
   
   
   cluster_GOCC <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
@@ -289,15 +290,15 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
                            qvalueCutoff = 0.05,
                            readable = TRUE)
   
-  if (dim(cluster_GOCC)[1]==0) {
+  if (is.null(cluster_GOCC)) {
     print("no result")
-  } 
+  } else{
   
   
   
   cluster_GOCC<-cluster_GOCC@result
   cluster_GOCC$cluster<-cluster
-  cluster_GOCC$class<-"GOCC"
+  cluster_GOCC$class<-"GOCC"}
   
   cluster_GOMF <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
                            OrgDb= go_species,
@@ -308,22 +309,23 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
                            qvalueCutoff = 0.05,
                            readable = TRUE)
   
-  if (dim(cluster_GOMF)[1]==0) {
+  if (is.null(cluster_GOMF)) {
     print("no result")
-  } 
+  } else{
   
   cluster_GOMF<-cluster_GOMF@result
   cluster_GOMF$cluster<-cluster
-  cluster_GOMF$class<-"GOMF"
+  cluster_GOMF$class<-"GOMF"}
   
   ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
   AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
-  
+  #print(AllEnrichment)
   }
   
   }
   
   DE_Enrichment<-AllEnrichment[AllEnrichment$p.adjust<0.05,]
+  #print(DE_Enrichment)
   return(DE_Enrichment)
   
 }
@@ -332,6 +334,7 @@ DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pva
 Plot_DE_enrichment<-function(DE_Enrichment){
   
   print("Plot DEG GO & KEGG")
+  print(DE_Enrichment)
   all_function<-DE_Enrichment %>%
   group_by(cluster,class) %>%
   slice_max(n = 3, order_by = Count) %>%

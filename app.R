@@ -46,6 +46,7 @@ library(data.table)
 library(biomaRt)
 library(ggplot2)
 library(igraph)
+library(ggrepel)
 #library(org.Hs.eg.db)
 #library(org.Mm.eg.db)
 options(shiny.maxRequestSize = 5000*1024^2)
@@ -58,6 +59,7 @@ source("./app/tabs/GO_plot/GO_plot.R") # GOplot
 source("./app/tabs/upsetplot/upsetplot.R") 
 source("./app/tabs/table/table.R") 
 source("./app/tabs/DE/DE.R") 
+source("./app/tabs/marker/marker.R") 
 source("./app/tabs/rrvgo/rrvgo.R") 
 source("./app/tabs/markovBlanket/markovBlanket.R") 
 
@@ -115,6 +117,11 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             conditionalPanel(condition= "input.tabs == 'DE'",
                              DEInput()),
 
+ 
+ ## Find Marker Tab
+            conditionalPanel(condition= "input.tabs == 'Marker'",
+                             MarkerInput()),
+          
  ## MB Tab
             conditionalPanel(condition= "input.tabs == 'mb'",
                              MBInput()),
@@ -149,6 +156,14 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                          DE_TableUI(),
                          DEGO_UI(),
                          DEGOtable_UI()),
+                
+                tabPanel("Find Markers",icon = icon("random"),value="Marker",
+                         Marker_UI(),
+                         Marker_TableUI(),
+                         MarkerGO_UI(),
+                         MarkerGOtable_UI()),
+                
+                
                 tabPanel("Markov Blanket",icon = icon("circle-nodes"),value="mb",
                          MBUI()),
         ))   )
@@ -245,6 +260,12 @@ server <- function(input, output,session) {
     background<-strsplit(input$background_genesDE, "\n")[[1]]
   }) 
   
+  
+  BackgroundGenes4<-reactive({
+    background<-strsplit(input$background_genesMarker, "\n")[[1]]
+  }) 
+  
+  
   # Load background genes
   observe({
     if (input$bg_Liver0) {
@@ -261,6 +282,13 @@ server <- function(input, output,session) {
   observe({
     if (input$bg_Liver2) {
       updateTextInput(session, "background_genesDE", value = background)
+    }
+  })
+  
+  
+  observe({
+    if (input$bg_Liver3) {
+      updateTextInput(session, "background_genesMarker", value = background)
     }
   })
   
@@ -761,7 +789,7 @@ server <- function(input, output,session) {
         } else{ 
        processe_srt(usedTable()$Count_matrix)
           }
-      })%>%bindEvent(input$action_DE)
+      })
       
       
       p <- reactive({
@@ -820,7 +848,7 @@ server <- function(input, output,session) {
         bindEvent(input$action_DE)
       
       output$DEG_enrichment<- renderPlot({
-        Plot_DE_enrichment( p_plot())
+        Plot_DE_enrichment(p_plot())
       })
       
       
@@ -829,7 +857,7 @@ server <- function(input, output,session) {
           paste('DegAnnotationPlot-', Sys.Date(), '.pdf', sep='')
         },
         content=function(DegAnoPlot){
-          p_DegAnoPlot<- Plot_DE_enrichment( p_plot())
+          p_DegAnoPlot<- Plot_DE_enrichment(p_plot())
           ggsave(p_DegAnoPlot,filename = DegAnoPlot)
           
         }
@@ -850,6 +878,89 @@ server <- function(input, output,session) {
       
         }
       )
+      
+      ## Cell state marker
+      Marker <- reactive({
+        Marker_set(input$selected_clusterMarker,input$cutoff,usedTable()$count,srt(),input$logfcMarker,input$Pvalue_Marker,List())
+      }) %>%  #selected_cluster,cutoff,count,srt,logfc,Pvalue,List
+        bindCache(input$selected_clusterMarker,input$cutoff,input$logfcMarker,input$Pvalue_Marker,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) %>%
+        bindEvent(input$action_Marker)
+      
+      #selected_cluster,cutoff,Marker,srt,List
+      Marker_plot <- eventReactive(input$action_Marker, { 
+       PlotVolcano(input$selected_clusterMarker,input$cutoff, Marker(),srt(),List())
+      })
+      
+      
+      output$VolcanoPlot<- renderPlot({
+        print(Marker_plot())
+      })
+      
+      output$VolcanoPlot_Download<-downloadHandler(
+        filename = function(){
+          paste('VolcanoPlot-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(VolcanoPlot){
+          Volco<-Marker_plot()
+          ggsave(Volco,filename = VolcanoPlot,width = 5,height =4)
+        }
+      )
+      
+      output$MarkerTable <- renderDT({
+        Marker()[,-1]
+      })
+      
+      output$MarkerTable_Downloaded<-downloadHandler(
+        filename = function(){
+          paste('MarkerTable-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(MarkerTable){
+          write.csv(Marker(),MarkerTable)
+          
+        }
+      )
+      
+      marker_plot<- reactive({ #Marker,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes
+        MarkerGO(Marker(),input$selected_clusterMarker,input$cutoff,input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4())
+      }) %>%
+        bindCache(Marker(),input$selected_clusterMarker,input$cutoff,input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) %>%
+        bindEvent(input$action_Marker)
+      
+      output$Marker_enrichment<- renderPlot({
+        Plot_Marker_enrichment(marker_plot())
+      })
+      
+      
+      
+      output$MarkerAnnotationPlot<-downloadHandler(
+        filename = function(){
+          paste('MarkersAnnotationPlot-', Sys.Date(), '.pdf', sep='')
+        },
+        content=function(MarkersAnoPlot){
+          p_Markers<-  Plot_Marker_enrichment(marker_plot())
+          ggsave(p_Markers,filename = MarkersAnoPlot)
+          
+        }
+      )
+      
+      
+      output$Marker_enrichmentTable <- renderDT({
+        marker_plot()[,-c(1,5,7)]
+      })
+      
+      
+      output$MarkerAnnotationTable<-downloadHandler(
+        filename = function(){
+          paste('MarkersAnnotationTable-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(MarkersAnoTable){
+          write.csv(marker_plot(),MarkersAnoTable)
+          
+        }
+      )
+      
+      
+      
       
       # Get markov blanket:
       NodeGene<-reactive({
