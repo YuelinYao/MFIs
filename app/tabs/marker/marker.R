@@ -67,7 +67,7 @@ Marker_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
   selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
   selected_cluster<-paste0("cluster_C:",selected_cluster)
   selected_1<-List[[selected_cluster[1]]]
-  print(length(selected_1))
+  #print(length(selected_1)) The number of cells
 
   Marker<-FindMarkers(object = srt,ident.1 = selected_1,logfc.threshold = logfc)
   print("done")
