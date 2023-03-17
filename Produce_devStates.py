@@ -39,9 +39,9 @@ if len(devStates)==1:
     print('Only one deviation state, terminating...')
     sys.exit()
 
-devStates.columns = ['genes', 'state', 'dev', 'pval']
-devStates['dev']=pd.to_numeric(devStates['dev'])
-devStates = devStates[devStates["dev"] > float(minStateDeviation)]
+devStates.columns = ['genes', 'state', 'enrichment', 'pval_corrected']
+devStates['enrichment']=pd.to_numeric(devStates['enrichment'])
+devStates = devStates[devStates["enrichment"] > float(minStateDeviation)]
 
 
 

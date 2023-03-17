@@ -30,9 +30,9 @@ Table_cluster<-function(cutoff,data_path,minStateDeviation,minNoCells){
   system(command)
   Devstates<-read.csv(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,'_devStates.csv'),colClasses = c("character"))
   file.remove(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,'_devStates.csv'))
-  Devstates$dev<-as.numeric(Devstates$dev)
+  Devstates$enrichment<-as.numeric(Devstates$enrichment)
   Devstates$cluster<-as.numeric(Devstates$cluster)
-  Devstates$pval<-as.numeric(Devstates$pval)
+  Devstates$pval_corrected<-as.numeric(Devstates$pval_corrected)
   Devstates$No.Cells<-as.numeric(Devstates$No.Cells)
   Devstates<-Devstates[order(Devstates$cluster),]
   Devstates<-Devstates[,-1]
