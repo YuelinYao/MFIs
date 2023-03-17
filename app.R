@@ -66,7 +66,7 @@ source("./app/tabs/markovBlanket/markovBlanket.R")
 # Define UI for application
 ui <- fluidPage(theme = shinytheme("spacelab"),
                 # Application title
-                titlePanel("",windowTitle = "MFIs project"),
+                titlePanel("",windowTitle = "Stator project"),
                 tags$head(
                   tags$style(
                     HTML("@import url('//fonts.googleapis.com/css?family=Righteous|');"),
