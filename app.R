@@ -194,8 +194,8 @@ server <- function(input, output,session) {
   usedTable2 <- reactive({
     print(paste("Use HCC cancer data: ",input$TestTable))
     if(input$TestTable){
-      devStates="./data/topDeviatingHOIstates.csv"
-      trainDat="./data/trainingData_CL01_14698Cells_1000Genes.csv"
+      devStates="./data/all_DTuples.csv"
+      trainDat="./data/trainingData_14698Cells_1000Genes.csv"
       data_path<-list(devStates,trainDat)
       names(data_path)<-c("devStates","trainDat")
       return(data_path)
@@ -206,6 +206,7 @@ server <- function(input, output,session) {
       file_trainDat<-input$trainingData_matrix
       data_path<-list(file_devStates$datapath,file_trainDat$datapath)
       names(data_path)<-c("devStates","trainDat")
+      #print(data_path)
       return(data_path)
     }
   })  
@@ -231,7 +232,7 @@ server <- function(input, output,session) {
   usedMCMCGraph <- reactive({
     print(paste("Use HCC cancer data: ",input$TestTable))
     if(input$TestTable){
-      MCMCGraph_path<-"./data/MCMCgraph_CL01_14698Cells_1000Genes.csv"
+      MCMCGraph_path<-"./data/MCMCgraph_14698Cells_1000Genes.csv"
       MCMCGraph<-read.csv(MCMCGraph_path,header=T,row.names = 1,colClasses = "character")
    
     } else{
@@ -296,25 +297,25 @@ server <- function(input, output,session) {
   ## Set up:
   # Summary Table
     summaryTable<-reactive({
-      Table_cluster(input$cutoff,usedTable2(),input$minStateDeviation,input$minNoCells)
-    }) %>% bindCache(input$cutoff,usedTable2(),input$minStateDeviation,input$minNoCells)
+      Table_cluster(input$cutoff,usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha)
+    }) %>% bindCache(input$cutoff,usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha)
     
     # Get cell list, function in heatmap.R
     List<-reactive({
       GetCellList(usedTable()$count,summaryTable())#input$cutoff,usedTable()$count,
-    })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) 
+    })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) 
     
     
     # Get gene list: function in GO_plot.R
     GetGenesList<-reactive({
       GetGenes(summaryTable(),Remove=T)
-    })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) 
+    })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) 
     
     
     # Get gene list, this gene list consist all the genes, function in GO_plot.R
     GetGenesList_All<-reactive({
       GetGenes(summaryTable(),Remove=F)
-    })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) 
+    })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) 
     
     
     # About: include overview and tutorial
@@ -626,7 +627,7 @@ server <- function(input, output,session) {
       GO <- reactive({
         FunctionE(input$cutoff,input$selected_clusterGO,input$Mart,input$kegg_species,input$go_species,GetGenesList(),BackgroundGenes())
       }) %>%
-        bindCache(input$cutoff,input$selected_clusterGO,input$Mart,input$kegg_species,input$go_species,BackgroundGenes(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) %>%
+        bindCache(input$cutoff,input$selected_clusterGO,input$Mart,input$kegg_species,input$go_species,BackgroundGenes(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_GO)
       
       
@@ -680,7 +681,7 @@ server <- function(input, output,session) {
       rrvGO<- reactive({
         rrvgo_FunctionE(input$cutoff,input$selected_clusterrrvgo,input$subOntology,input$go_species_rrgvo,input$Mart_rrgvo,GetGenesList(),BackgroundGenes2())
       }) %>%
-        bindCache(input$cutoff,input$selected_clusterrrvgo,input$subOntology,input$go_species_rrgvo,input$Mart_rrgvo,BackgroundGenes2(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) %>%
+        bindCache(input$cutoff,input$selected_clusterrrvgo,input$subOntology,input$go_species_rrgvo,input$Mart_rrgvo,BackgroundGenes2(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_rrvgo)
       
       ###rrvgo wordcloudPlot:
@@ -758,7 +759,7 @@ server <- function(input, output,session) {
       m <- reactive({
         Up_set(input$selected_cluster_upset,input$cutoff,List())
       }) %>%
-        bindCache(input$selected_cluster_upset,input$cutoff,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) %>%
+        bindCache(input$selected_cluster_upset,input$cutoff,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_upset)
       
       cutoff<- eventReactive(input$action_upset, { 
@@ -796,7 +797,7 @@ server <- function(input, output,session) {
       p <- reactive({
         DE_set(input$selected_clusterDE,input$cutoff,usedTable()$count,srt(),input$logfc,input$Pvalue_DE,List())
       }) %>%
-        bindCache(input$selected_clusterDE,input$cutoff,input$logfc,input$Pvalue_DE,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) %>%
+        bindCache(input$selected_clusterDE,input$cutoff,input$logfc,input$Pvalue_DE,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_DE)
       
       
@@ -845,7 +846,7 @@ server <- function(input, output,session) {
       p_plot<- reactive({
         DEGO(p(),input$selected_clusterDE,input$cutoff,input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3())
       }) %>%
-        bindCache(p(),input$selected_clusterDE,input$cutoff,input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) %>%
+        bindCache(p(),input$selected_clusterDE,input$cutoff,input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_DE)
       
       output$DEG_enrichment<- renderPlot({
@@ -884,7 +885,7 @@ server <- function(input, output,session) {
       Marker <- reactive({
         Marker_set(input$selected_clusterMarker,input$cutoff,usedTable()$count,srt(),input$logfcMarker,input$Pvalue_Marker,List())
       }) %>%  #selected_cluster,cutoff,count,srt,logfc,Pvalue,List
-        bindCache(input$selected_clusterMarker,input$cutoff,input$logfcMarker,input$Pvalue_Marker,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) %>%
+        bindCache(input$selected_clusterMarker,input$cutoff,input$logfcMarker,input$Pvalue_Marker,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_Marker)
       
       #selected_cluster,cutoff,Marker,srt,List
@@ -924,7 +925,7 @@ server <- function(input, output,session) {
       marker_plot<- reactive({ #Marker,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes
         MarkerGO(Marker(),input$selected_clusterMarker,input$cutoff,input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4())
       }) %>%
-        bindCache(Marker(),input$selected_clusterMarker,input$cutoff,input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells) %>%
+        bindCache(Marker(),input$selected_clusterMarker,input$cutoff,input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_Marker)
       
       output$Marker_enrichment<- renderPlot({

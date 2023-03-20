@@ -24,12 +24,12 @@ TableInput<- function(){
 
 
 
-Table_cluster<-function(cutoff,data_path,minStateDeviation,minNoCells){
+Table_cluster<-function(cutoff,data_path,minStateDeviation,minNoCells,stateDevAlpha){
   
-  command=paste("python ./Produce_devStates.py", cutoff,data_path$devStates,data_path$trainDat,minStateDeviation,minNoCells,sep = " ")
+  command=paste("python ./Produce_devStates.py", cutoff,data_path$devStates,data_path$trainDat,minStateDeviation,minNoCells,stateDevAlpha,sep = " ")
   system(command)
-  Devstates<-read.csv(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,'_devStates.csv'),colClasses = c("character"))
-  file.remove(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,'_devStates.csv'))
+  Devstates<-read.csv(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,"_",stateDevAlpha,'_devStates.csv'),colClasses = c("character"))
+  file.remove(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,"_",stateDevAlpha,'_devStates.csv'))
   Devstates$enrichment<-as.numeric(Devstates$enrichment)
   Devstates$cluster<-as.numeric(Devstates$cluster)
   Devstates$pval_corrected<-as.numeric(Devstates$pval_corrected)

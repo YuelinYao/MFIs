@@ -7,6 +7,8 @@ devStates_path = sys.argv[2]
 trainDat_path = sys.argv[3]
 minStateDeviation = sys.argv[4]
 minNoCells = sys.argv[5]
+stateDevAlpha=sys.argv[6]
+
 #print(type(minStateDeviation))
 
 import pandas as pd
@@ -39,9 +41,12 @@ if len(devStates)==1:
     print('Only one deviation state, terminating...')
     sys.exit()
 
-devStates.columns = ['genes', 'state', 'enrichment', 'pval_corrected']
+devStates = devStates[['genes', 'state', 'enrichment', 'pval_corrected']]
+#devStates.columns = ['genes', 'state', 'enrichment', 'pval_corrected']
 devStates['enrichment']=pd.to_numeric(devStates['enrichment'])
+devStates['pval_corrected']=pd.to_numeric(devStates['pval_corrected'])
 devStates = devStates[devStates["enrichment"] > float(minStateDeviation)]
+devStates = devStates[devStates["pval_corrected"] < float(stateDevAlpha)]
 
 
 
@@ -70,7 +75,7 @@ print(linked_full.shape)
 devStates['cluster'] = fcluster(linked_full, diffCutoff, criterion = 'distance')
 #devStates['cluster'] = fcluster(linked_full, diffCutoff, criterion = 'distance')
 
-path='./'+str(diffCutoff)+"_"+str(minStateDeviation)+'_'+str(minNoCells)+'_devStates.csv'
+path='./'+str(diffCutoff)+"_"+str(minStateDeviation)+'_'+str(minNoCells)+'_'+str(stateDevAlpha)+'_devStates.csv'
 pd.DataFrame(devStates).to_csv(path)
 
 #print(devStates['cluster'].shape)
