@@ -213,6 +213,7 @@ FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,Genes
   Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
                    filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
   
+  print(Genes_set)
   cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
                            pAdjustMethod = "BH",universe = as.character(background_genes$entrezgene_id),
                            minGSSize = 1,
