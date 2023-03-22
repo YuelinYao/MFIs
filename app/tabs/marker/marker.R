@@ -37,7 +37,7 @@ MarkerGOtable_UI<- function(){
 ### Input function
 MarkerInput<- function(){
   tagList( 
-    textInput("selected_clusterMarker", "Select cluster(s)",value = "19"),
+    textInput("selected_clusterMarker", "Select cluster:",value = "23"),
     selectInput("Mart_Marker", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
     textInput("go_species_Marker", "GO OrgDb:",value = "org.Hs.eg.db"),
     textInput("kegg_species_Marker", "KEGG organism:",value = "hsa"),
@@ -84,7 +84,7 @@ Marker_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
 
 
 
-PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List){
+PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List,GetGenesList_All){
   
   print("Plot VolcanoPlot")
   selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
@@ -97,12 +97,19 @@ PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List){
   top20<-Marker[order(Marker$avg_log2FC),]
   top20<-c(head(top20$gene,10),tail(top20$gene,10))
   top20
- 
+  #shape = Ingroup
+  Marker$Ingroup<-"Out"
+  names<-gsub("cluster_C:","cluster_",selected_cluster)
+  cluster_genes<-GetGenesList_All[[names]]
+  Marker$Ingroup<-1
+  Marker$Ingroup[Marker$gene%in%cluster_genes]<-"In"
+  
+  #label
   Marker$label<-NA
   Marker$label[Marker$gene%in%top20]<-Marker$gene[Marker$gene%in%top20]
-  p<-ggplot(data=Marker, aes(x=avg_log2FC, y=log10padj, col=diff_pct,label=label)) + 
-    geom_point() + labs(x="log2FC",y="-log10(p-adjust)")+
-    theme_bw() +scale_color_gradientn(name="Diff_pct",colors = rev(brewer.pal(11 ,"RdBu"))) +  geom_text_repel(max.overlaps = 100)
+  p<-ggplot(data=Marker, aes(x=avg_log2FC, y=log10padj, col=diff_pct,label=label,shape = Ingroup)) + 
+    geom_point() + labs(x="log2FC",y="-log10(p-adjust)")+guides(shape = FALSE)+
+    theme_bw() +scale_color_gradient2(name="Diff_pct",midpoint=0,low="#053061",mid = "white",high = "#67001f") +  geom_text_repel(max.overlaps = 100)
   #scale_color_gradientn(name="Diff_pct",colors = rev(brewer.pal(11 ,"RdBu")))
   #scale_color_gradient2(name="Diff_pct",midpoint=0,low="#053061",mid = "white",high = "#67001f")
   return(p)

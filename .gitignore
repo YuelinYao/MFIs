@@ -1,2 +1,4 @@
 # ignore the .Rhistory
 .Rhistory
+app/tabs/marker/.Rapp.history
+app/.DS_Store

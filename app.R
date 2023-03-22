@@ -891,7 +891,7 @@ server <- function(input, output,session) {
       
       #selected_cluster,cutoff,Marker,srt,List
       Marker_plot <- eventReactive(input$action_Marker, { 
-       PlotVolcano(input$selected_clusterMarker,input$cutoff, Marker(),srt(),List())
+       PlotVolcano(input$selected_clusterMarker,input$cutoff, Marker(),srt(),List(),GetGenesList_All())
       })
       
       
