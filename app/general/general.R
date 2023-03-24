@@ -20,7 +20,7 @@ UploadFilesUI <- function(){
                                           style="display:inline-block;vertical-align:top;width:70%;"
                                         ),
                 tags$div(
-                br("topDeviatingHOIstates.csv"),
+                br("all_DTuples.csv"),
                 fileInput(inputId = "topDeviatingHOIstates",label = NULL, multiple = FALSE,
                            accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv") ),
                                           style="display:inline-block;vertical-align:top;width:70%;"
