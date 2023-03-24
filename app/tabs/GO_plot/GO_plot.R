@@ -18,7 +18,7 @@ Function_tableUI<-function(){
 ## Input function
 GOInput<- function(){
   tagList( 
-    textInput("selected_clusterGO", "Input cluster(s):",value = "5,18"),
+    textInput("selected_clusterGO", "Input cluster(s):",value = "1,3,8"),
     selectInput("Mart", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
     textInput("go_species", "GO OrgDb:",value = "org.Hs.eg.db"),
     textInput("kegg_species", "KEGG organism:",value = "hsa"),
