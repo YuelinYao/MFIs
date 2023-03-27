@@ -40,6 +40,14 @@ UploadFilesUI <- function(){
              ),
              
              
+             tags$div(
+               br("UMAP_coords.csv"),
+               fileInput(inputId = "UMAP_coords",label = NULL, multiple = FALSE,
+                         accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
+               style="display:inline-block;vertical-align:top;width:70%;"
+             ),
+             
+             
                                       )
                      )
     ),

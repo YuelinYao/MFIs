@@ -63,7 +63,7 @@ source("./app/tabs/DE/DE.R")
 source("./app/tabs/marker/marker.R") 
 source("./app/tabs/rrvgo/rrvgo.R") 
 source("./app/tabs/markovBlanket/markovBlanket.R") 
-
+source("./app/tabs/umap/umap.R") 
 # Define UI for application
 ui <- fluidPage(theme = shinytheme("spacelab"),
                 # Application title
@@ -127,6 +127,12 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             conditionalPanel(condition= "input.tabs == 'mb'",
                              MBInput()),
  
+ 
+    conditionalPanel(condition= "input.tabs == 'umap'",
+                   UMAPInput()),
+ 
+
+ 
         ),
         
         
@@ -167,6 +173,12 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 
                 tabPanel("Markov Blanket",icon = icon("circle-nodes"),value="mb",
                          MBUI()),
+                
+                
+                tabPanel("UMAP Plot",icon = icon("magnet"),value="umap",
+                         umapUI()),
+                
+                
         ))   )
 
 )
@@ -229,7 +241,7 @@ server <- function(input, output,session) {
   })  
   
   
-  ## Load example data or read uploaded data: Meta data
+  ## Load example data or read uploaded data: MCMCgraph
   usedMCMCGraph <- reactive({
     print(paste("Use HCC cancer data: ",input$TestTable))
     if(input$TestTable){
@@ -243,6 +255,22 @@ server <- function(input, output,session) {
     
     MCMCGraph<-graph_from_adjacency_matrix(as(MCMCGraph, 'matrix'), mode="directed")
     return(MCMCGraph)
+  })  
+  
+  
+  ## Load example data or read uploaded data: 
+  usedUMAP_coords <- reactive({
+    print(paste("Use HCC cancer data: ",input$TestTable))
+    if(input$TestTable){
+      UMAP_coords_path<-"./data/UMAP_coords.csv"
+      UMAP_coords<-read.csv(UMAP_coords_path,header=T,row.names = 1)
+      
+    } else{
+      UMAP_coords_path<-input$UMAP_coords
+      UMAP_coords<-read.csv(UMAP_coords_path$datapath,header=T,row.names = 1)
+    }
+    
+    return(UMAP_coords)
   })  
   
   
@@ -990,8 +1018,7 @@ server <- function(input, output,session) {
         
       })
       
-      
-      
+    
       
       output$MarkovBlanket_plot<-downloadHandler(
         filename = function(){
@@ -1003,6 +1030,25 @@ server <- function(input, output,session) {
           dev.off()
         } )
       
+      
+      ### Plot umap
+      
+      StateUMAPs <- eventReactive(input$action_umap, { 
+        cluster_umap(input$selected_umap,usedUMAP_coords(),srt(),List())
+      })
+      
+      
+      output$umap_plot <- renderPlot({
+        StateUMAPs()
+      })
+      
+      output$downloadumap_plot<-downloadHandler(
+        filename = function(){
+          paste('UMAP-',input$selected_umap,"-",Sys.Date(), '.pdf', sep='')
+        },
+        content=function(uPlot){
+          ggsave(StateUMAPs(),filename = uPlot,width = 5,height = 3.8)
+        } )
       
       
       
