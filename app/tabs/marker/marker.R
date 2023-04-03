@@ -208,15 +208,16 @@ MarkerGO<-function(Marker,selected_cluster,cutoff,Mart,kegg_species,go_species,l
       
       if (is.null(cluster_GOMF)) {
         print("no result")
-      } 
-      
+      } else{
       cluster_GOMF<-cluster_GOMF@result
       cluster_GOMF$cluster<-cluster
       cluster_GOMF$class<-"GOMF" }
       
-      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
       
-      AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
+      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
+      AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  }
+      
+     
       
     }
     
@@ -297,20 +298,17 @@ MarkerGO<-function(Marker,selected_cluster,cutoff,Mart,kegg_species,go_species,l
       if (is.null(cluster_GOMF)){
         print("no result")
       } else {
-      
       cluster_GOMF<-cluster_GOMF@result
       cluster_GOMF$cluster<-cluster
       cluster_GOMF$class<-"GOMF" }
-      
+   
       ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
       AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
-      
     }
-    
+   
   }
   
   Marker_Enrichment<-AllEnrichment[AllEnrichment$p.adjust<0.05,]
-  
   return(Marker_Enrichment)
   
 }
