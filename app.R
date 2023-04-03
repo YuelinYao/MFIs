@@ -889,7 +889,7 @@ server <- function(input, output,session) {
         },
         content=function(DegAnoPlot){
           p_DegAnoPlot<- Plot_DE_enrichment(p_plot())
-          ggsave(p_DegAnoPlot,filename = DegAnoPlot)
+          ggsave(p_DegAnoPlot,filename = DegAnoPlot,width = 8,height = 7)
           
         }
       )
