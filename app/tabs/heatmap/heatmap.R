@@ -3,7 +3,9 @@ heatmapUI <- function(){
   tagList(
     tags$h3(paste0("Heatmap: Cell types (clustering + singleR)"), style = "color: steelblue;"),
     plotOutput(outputId ="heatmap_celltypes", width = "90%") %>% withSpinner(color="#4682B4"),
-    downloadButton("downloadheatmap1","Download as .csv"),downloadButton("downloadheatmap_plot1","Download as .pdf")
+    downloadButton("downloadheatmap1","Download as .csv"),
+    downloadButton("downloadheatmap_plot1","Download as .pdf"),
+    downloadButton("downloadCellList","Download Cell List as .csv"),
   )}
 
 NMF_UI <- function(){

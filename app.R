@@ -514,6 +514,24 @@ server <- function(input, output,session) {
         write.csv(result1()[[colorHeatmapCells()]],heatmap1)
       }
    )
+    
+    
+    
+    ## Download cell list csv
+    output$downloadCellList<-downloadHandler(
+      filename = function(){
+        paste('CellList-',Sys.Date(), '.csv', sep='')
+      },
+      content=function(celllist){
+        cellstates<-data.frame(State=NA,CellID=NA)
+        for(i in 1:length(List())){
+          cellstates[i,]<-c(names(List())[i],paste0(List()[[i]],collapse=','))
+        }
+        write.csv(cellstates,celllist)
+      }
+    )
+    
+    
     ## Download pdf
     output$downloadheatmap_plot1<-downloadHandler(
       filename = function(){

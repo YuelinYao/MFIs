@@ -53,7 +53,7 @@ UploadFilesUI <- function(){
     ),
     
     conditionalPanel(condition= "input.tabs != 'about' & input.tabs != 'mb'" ,
-                     textInput("minStateDeviation", "Minimum enrichment factor:",value = 3),
+                     textInput("minStateDeviation", "Minimum enrichment factor (Log2 transformed):",value = 3),
                      textInput("minNoCells", "Minimum number of cells in each D-tuple:",value = 0),
                      textInput("stateDevAlpha", "Min. enrichment significance (corrected):",value = 0.05),
                      sliderInput("cutoff",
