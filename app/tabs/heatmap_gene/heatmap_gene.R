@@ -18,8 +18,11 @@ stateGenesUI <- function(){
 ### Input function
 HeatmapGenesInput<- function(){
   tagList( 
+    radioButtons(inputId = "TestGenes", "Test:",
+                 choices = c("Enrichment" = "Over_representation", "Depletion" = "Under_representation"), 
+                 selected = "Over_representation", inline = TRUE),
     radioButtons(inputId = "colorHeatmapGene", "Colored by:",
-                 choices = c("-log10FDR" = "log10FDR", "Enrichment" = "Enrichment"),
+                 choices = c("-log10FDR" = "log10FDR", "Fold" = "Fold"),
                  selected = "log10FDR", inline = TRUE),
     selectInput("CellStateGenes", "Cell state gene set:", choices=c("Cancer cell state (Barkley, D.et.al., 2022)"="CancerState",
                                                                     "Cell cycle state (Tirosh et al, 2015)"="CellCycleState",
@@ -58,20 +61,20 @@ makeGeneSetList<-function(csvfile){
 
 ### function
 #N=25678 the number of genes in whole human genome
-heatmapGenes <- function(RefSet,Genelist,N=25678) { 
+heatmapGenes <- function(RefSet,Genelist,N=25678,test) { 
 
   RefSet<-makeGeneSetList(RefSet)
   #print(head(RefSet))
   r=length(names(RefSet))
   col=length(names(Genelist))
   
-  EnrichmentM<-array(data=NA,dim = c(r,col))
+  Fold<-array(data=NA,dim = c(r,col))
   Data_mtrix<-array(data=NA,dim = c(r,col))
   
   colnames(Data_mtrix)<-names(Genelist)
   rownames(Data_mtrix)<-names(RefSet)
   
-  dimnames(EnrichmentM)<-dimnames(Data_mtrix)
+  dimnames(Fold)<-dimnames(Data_mtrix)
   
   for (i in names(Genelist)){
     #print(i)
@@ -90,7 +93,12 @@ heatmapGenes <- function(RefSet,Genelist,N=25678) {
       m=length(Genes)
       n=N-m
       k=length(Gene_types)
-      p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      if (test=="Over_representation") {
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      } else{
+        #print("Under representation test")
+        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+      }
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
       #print(p_value)
@@ -98,7 +106,7 @@ heatmapGenes <- function(RefSet,Genelist,N=25678) {
       enrichment_set[ct]=(q*N)/(m*k)
     }
     Data_mtrix[,i]<-P_set
-    EnrichmentM[,i]<-enrichment_set
+    Fold[,i]<-enrichment_set
   }
   
   #Data_mtrix[Data_mtrix==0]<-2.2e-16
@@ -133,12 +141,12 @@ heatmapGenes <- function(RefSet,Genelist,N=25678) {
   colnames(log10FDR)<-stats
   colnames(log10FDR)<-gsub(pattern = "cluster_","",colnames(log10FDR))
   
-  dimnames(EnrichmentM)<-dimnames(log10FDR)
+  dimnames(Fold)<-dimnames(log10FDR)
   
   result=list()
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
-  result$Enrichment=EnrichmentM
+  result$Fold=Fold
   #print(result)
   print("done")
   

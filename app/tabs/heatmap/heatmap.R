@@ -38,9 +38,12 @@ Test_CellstateUI<-function(){
 ### Input function
 HeatmapInput<- function(){
   tagList( 
-    radioButtons(inputId = "colorHeatmapCells", "Colored by:",
-                 choices = c("-log10FDR" = "log10FDR", "Enrichment" = "Enrichment"),
-                 selected = "log10FDR", inline = TRUE),
+    radioButtons(inputId = "TestCells", "Test:",
+                 choices = c("Enrichment" = "Over_representation", "Depletion" = "Under_representation"), 
+                 selected = "Over_representation", inline = TRUE),
+  radioButtons(inputId = "colorHeatmapCells", "Colored by:",
+                choices = c("-log10FDR" = "log10FDR", "Fold" = "Fold"),
+                selected = "log10FDR", inline = TRUE),
     actionButton("action_heatmap","Submit",icon("paper-plane"), 
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
   )
@@ -164,9 +167,9 @@ GetCellList_d <- function(count,summaryTable) {
 
 
 ### function
-heatmap <- function(Meta_data,summaryTable,List,N) { 
+heatmap <- function(Meta_data,summaryTable,List,N,test) { 
   
-  print("Over-representation test with cell type")
+  print(test)
   Devstates<-summaryTable
   #print(paste0("The number of clusters: ",length(unique(Devstates$cluster))))
   
@@ -174,13 +177,13 @@ heatmap <- function(Meta_data,summaryTable,List,N) {
   col=length(unique(Devstates$cluster))
 
   Data_mtrix<-array(data=NA,dim = c(r,col))
-  EnrichmentM<-array(data=NA,dim = c(r,col))
+  Fold<-array(data=NA,dim = c(r,col))
   
   Devstates$cluster<-paste0("C:",(Devstates$cluster))
   
   colnames(Data_mtrix)<-unique(Devstates$cluster)
   rownames(Data_mtrix)<-unique(Meta_data$Cell_Types)
-  dimnames(EnrichmentM)<-dimnames(Data_mtrix)
+  dimnames(Fold)<-dimnames(Data_mtrix)
 
   
   for (i in unique(Devstates$cluster)){
@@ -192,8 +195,8 @@ heatmap <- function(Meta_data,summaryTable,List,N) {
   P_set=rep(NA,length(unique(Meta_data$Cell_Types)))
   names(P_set)<-unique(Meta_data$Cell_Types)
     
-  enrichment_set<-rep(NA,length(unique(Meta_data$Cell_Types)))
-  names(enrichment_set)<-unique(Meta_data$Cell_Types)
+  fold_set<-rep(NA,length(unique(Meta_data$Cell_Types)))
+  names(fold_set)<-unique(Meta_data$Cell_Types)
   
     for (ct in unique(Meta_data$Cell_Types)){
       cell_types<-rownames(Meta_data)[which(Meta_data$Cell_Types==ct)]
@@ -202,15 +205,22 @@ heatmap <- function(Meta_data,summaryTable,List,N) {
       #N=dim(Meta_data)[1]
       n=N-m
       k=length(cell_types)
-      p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      
+      if (test=="Over_representation") {
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      } else{
+        #print("Under representation test")
+        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+      }
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
+      #https://seqqc.wordpress.com/2019/07/25/how-to-use-phyper-in-r/
       P_set[ct]=p_value
-      enrichment_set[ct]=(q*N)/(m*k)
+      fold_set[ct]=(q*N)/(m*k)
       
     }
     Data_mtrix[,i]<-P_set
-    EnrichmentM[,i]<-enrichment_set
+    Fold[,i]<-fold_set
     
   }
   
@@ -245,12 +255,12 @@ heatmap <- function(Meta_data,summaryTable,List,N) {
   stats<-paste0(unique(Devstates$cluster),stats)
   colnames(log10FDR)<-stats
   colnames(log10FDR)<-gsub(pattern = "C:","",colnames(log10FDR))
-  dimnames(EnrichmentM)<-dimnames(log10FDR)
+  dimnames(Fold)<-dimnames(log10FDR)
   
   result=list()
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
-  result$Enrichment=EnrichmentM
+  result$Fold=Fold
   
   print("done")
   
@@ -260,9 +270,9 @@ heatmap <- function(Meta_data,summaryTable,List,N) {
 
 
 
-NMF_heatmap<-function(Meta_data,summaryTable,List,N){
+NMF_heatmap<-function(Meta_data,summaryTable,List,N,test){
   
-  print("Over-representation test with NMFs")
+  #print("Over-representation test with NMFs")
   Devstates<-summaryTable
   #print(paste0("Cutoff: ",cutoff)) 
   #print(paste0("The number of clusters: ",length(unique(Devstates$cluster))))
@@ -270,7 +280,7 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N){
   r=length(unique(Meta_data$Cell_State))
   col=length(unique(Devstates$cluster))
 
-  EnrichmentM<-array(data=NA,dim = c(r,col))
+  Fold<-array(data=NA,dim = c(r,col))
   Data_mtrix<-array(data=NA,dim = c(r,col))
   
   Devstates$cluster<-paste0("C:",(Devstates$cluster))
@@ -278,7 +288,7 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N){
   colnames(Data_mtrix)<-unique(Devstates$cluster)
   rownames(Data_mtrix)<-unique(Meta_data$Cell_State)
   
-  dimnames(EnrichmentM)<-dimnames(Data_mtrix)
+  dimnames(Fold)<-dimnames(Data_mtrix)
   
   for (i in unique(Devstates$cluster)){
     
@@ -291,8 +301,8 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N){
     P_set=rep(NA,length(unique(Meta_data$Cell_State)))
     names(P_set)<-unique(Meta_data$Cell_State)
     
-    enrichment_set<-rep(NA,length(unique(Meta_data$Cell_State)))
-    names(enrichment_set)<-unique(Meta_data$Cell_State)
+    fold_set<-rep(NA,length(unique(Meta_data$Cell_State)))
+    names(fold_set)<-unique(Meta_data$Cell_State)
     
     
     for (ct in unique(Meta_data$Cell_State)){
@@ -302,13 +312,23 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N){
       #N=dim(Meta_data)[1]
       n=N-m
       k=length(cell_types)
-      p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) #https://www.biostars.org/p/15548/
+      
+      if (test=="Over_representation") {
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      } else{
+        #print("Under representation test")
+        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+      }
+      #https://www.biostars.org/p/15548/
+      #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
+      #https://seqqc.wordpress.com/2019/07/25/how-to-use-phyper-in-r/
+      
       P_set[ct]=p_value
-      enrichment_set[ct]=(q*N)/(m*k)
+      fold_set[ct]=(q*N)/(m*k)
     }
     
     Data_mtrix[,i]<-P_set
-    EnrichmentM[,i]<-enrichment_set
+    Fold[,i]<-fold_set
   }
   
   Data_mtrix<-Data_mtrix+2.2e-16
@@ -341,30 +361,30 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N){
   stats<-paste0(unique(Devstates$cluster),stats)
   colnames(log10FDR)<-stats
   colnames(log10FDR)<-gsub(pattern = "C:","",colnames(log10FDR))
-  dimnames(EnrichmentM)<-dimnames(log10FDR)
+  dimnames(Fold)<-dimnames(log10FDR)
   
   result=list()
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
-  result$Enrichment=EnrichmentM
+  result$Fold=Fold
   
   return(result)
   
 }
 
-StateVsType<-function(Meta_data,N){
+StateVsType<-function(Meta_data,N,test){
 
-    print("Over-representation test cell types with NMFs")
+    #print("Over-representation test cell types with NMFs")
     r=length(unique(Meta_data$Cell_State))
     col=length(unique(Meta_data$Cell_Types))
     
     Data_mtrix<-array(data=NA,dim = c(r,col))
-    EnrichmentM<-array(data=NA,dim = c(r,col))
+    Fold<-array(data=NA,dim = c(r,col))
     
     colnames(Data_mtrix)<-unique(Meta_data$Cell_Types)
     rownames(Data_mtrix)<-unique(Meta_data$Cell_State)
 
-    dimnames(EnrichmentM)<-dimnames(Data_mtrix)
+    dimnames(Fold)<-dimnames(Data_mtrix)
     
     for (i in unique(Meta_data$Cell_Types)){
       #print(i)
@@ -375,8 +395,8 @@ StateVsType<-function(Meta_data,N){
       names(P_set)<-unique(Meta_data$Cell_State)
       
       
-      enrichment_set<-rep(NA,length(unique(Meta_data$Cell_State)))
-      names(enrichment_set)<-unique(Meta_data$Cell_State)
+      fold_set<-rep(NA,length(unique(Meta_data$Cell_State)))
+      names(fold_set)<-unique(Meta_data$Cell_State)
       
       for (ct in unique(Meta_data$Cell_State)){
         
@@ -387,13 +407,20 @@ StateVsType<-function(Meta_data,N){
         #N=dim(Meta_data)[1]
         n=N-m
         k=length(cell_types)
-        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) #https://www.biostars.org/p/15548/
+        
+        if (test=="Over_representation") {
+          p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+        } else{
+          #print("Under representation test")
+          p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+        }
+        
         P_set[ct]=p_value
-        enrichment_set[ct]=(q*N)/(m*k)
+        fold_set[ct]=(q*N)/(m*k)
         
       }
       Data_mtrix[,i]<-P_set
-      EnrichmentM[,i]<-enrichment_set
+      Fold[,i]<-fold_set
     }
   
     Data_mtrix<-Data_mtrix+2.2e-16
@@ -424,23 +451,21 @@ StateVsType<-function(Meta_data,N){
     stats<-paste0(unique(Meta_data$Cell_State),stats)
     rownames(log10FDR)<-stats
     
-    dimnames(EnrichmentM)<-dimnames(log10FDR)
+    dimnames(Fold)<-dimnames(log10FDR)
     
     
     result=list()
     result$log10FDR=log10FDR
     result$Mydata_raw_m=Mydata_raw_m
-    result$Enrichment=EnrichmentM
+    result$Fold=Fold
     
     return(result)
   
 }
 
 
-ListTest <- function(list,N) { 
+ListTest <- function(list,N,test) { 
   
-  print("Over-representation test between states")
-  #print(head(list))
   r=length(names(list))
   col=length(names(list))
   
@@ -448,8 +473,8 @@ ListTest <- function(list,N) {
   colnames(Data_mtrix)<-names(list)
   rownames(Data_mtrix)<-names(list)
   
-  EnrichmentM<-array(data=NA,dim = c(r,col))
-  dimnames(EnrichmentM)<-dimnames(Data_mtrix)
+  Fold<-array(data=NA,dim = c(r,col))
+  dimnames(Fold)<-dimnames(Data_mtrix)
   
   for (i in names(list)){
     #print(i)
@@ -458,8 +483,8 @@ ListTest <- function(list,N) {
     names(P_set)<-names(list)
    
     
-    enrichment_set<-rep(NA,length(names(list)))
-    names(enrichment_set)<-names(list)
+    fold_set<-rep(NA,length(names(list)))
+    names(fold_set)<-names(list)
     
     
     for (ct in names(list)){
@@ -470,15 +495,22 @@ ListTest <- function(list,N) {
       m=length(Lists)
       n=N-m
       k=length(List_types)
-      p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      
+      if (test=="Over_representation") {
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+      } else{
+        #print("Under representation test")
+        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+      }
+      
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
       #print(p_value)
       P_set[ct]=p_value
-      enrichment_set[ct]=(q*N)/(m*k)
+      fold_set[ct]=(q*N)/(m*k)
     }
     Data_mtrix[,i]<-P_set
-    EnrichmentM[,i]<-enrichment_set
+    Fold[,i]<-fold_set
     
   }
   
@@ -516,14 +548,13 @@ ListTest <- function(list,N) {
   rownames(log10FDR)<-gsub(pattern = "C:","",colnames(log10FDR))
   
   
-  dimnames(EnrichmentM)<-dimnames(log10FDR)
+  dimnames(Fold)<-dimnames(log10FDR)
   
   result=list()
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
-  result$Enrichment=EnrichmentM
+  result$Fold=Fold
   print("done")
-  #print(result)
   return(result)
   
 }

@@ -400,8 +400,23 @@ server <- function(input, output,session) {
       input$colorHeatmapGene
     })
     
+    
+    TestSelected_Genes<- eventReactive(input$action_heatmap_genes, { 
+      input$TestGenes
+    })
+    
+    colorGenes<-eventReactive(input$action_heatmap_genes, { 
+      if (TestSelected_Genes()=="Over_representation") {
+        color<-"firebrick3"
+      }else{
+        color<-"#2166ac"
+      }
+      color
+    })
+    
+    
     result_genes <- eventReactive(input$action_heatmap_genes,{
-      result_genes<-heatmapGenes(usedCellStateGene(),GetGenesList_All(),N=as.integer(input$NO.background))
+      result_genes<-heatmapGenes(usedCellStateGene(),GetGenesList_All(),N=as.integer(input$NO.background),TestSelected_Genes())
       #N=25678 the number of genes in whole human genome
       result_genes$cutoff=input$cutoff
       result_genes
@@ -412,7 +427,7 @@ server <- function(input, output,session) {
                          fontsize = 12,fontsize_number = 15,
                          main=result_genes()[["cutoff"]],
                          cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                         color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                         color = colorRampPalette(c("white",colorGenes()))(10),breaks = seq(0, 10, by = 1))
     })
     
    ## Download csv
@@ -438,14 +453,14 @@ server <- function(input, output,session) {
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                            main=result_genes()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                           color = colorRampPalette(c("white",colorGenes()))(10),breaks = seq(0, 10, by = 1))
         dev.off()
         
       } )
     
     ### StateGenes:
     StateGenes <- eventReactive(input$action_heatmap_genes,{
-      StateGenesResult<-ListTest(GetGenesList_All(),as.integer(input$NO.background))
+      StateGenesResult<-ListTest(GetGenesList_All(),as.integer(input$NO.background),TestSelected_Genes())
       StateGenesResult$cutoff=input$cutoff
       StateGenesResult
     })
@@ -454,7 +469,7 @@ server <- function(input, output,session) {
       pheatmap::pheatmap(border_color = NA,   StateGenes()[[colorHeatmapGene()]],display_numbers = StateGenes()$Mydata_raw_m,
                          fontsize = 12,fontsize_number = 15,
                          cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
-                         color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                         color = colorRampPalette(c("white",colorGenes()))(10),breaks = seq(0, 10, by = 1))
     })
     ## Download csv
     output$downloadheatmap_genes2<-downloadHandler(
@@ -479,7 +494,7 @@ server <- function(input, output,session) {
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                            main= StateGenes()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                           color = colorRampPalette(c("white",colorGenes()))(10),breaks = seq(0, 10, by = 1))
         dev.off()
         
       } )
@@ -491,8 +506,23 @@ server <- function(input, output,session) {
       input$colorHeatmapCells
     })
     
+    
+    TestSelected_Cells<- eventReactive(input$action_heatmap, { 
+      input$TestCells
+    })
+    
+    colorCells<-eventReactive(input$action_heatmap, { 
+      if (TestSelected_Cells()=="Over_representation") {
+        color<-"firebrick3"
+      }else{
+        color<-"#2166ac"
+      }
+      color
+    })
+    
+    
     result1 <- eventReactive(input$action_heatmap,{
-      result1<-heatmap(usedMeta_data(),summaryTable(), List(),N=dim(usedTable()$count)[1])
+      result1<-heatmap(usedMeta_data(),summaryTable(), List(),N=dim(usedTable()$count)[1],TestSelected_Cells())
       result1$cutoff=input$cutoff
       result1
     } )
@@ -502,7 +532,7 @@ server <- function(input, output,session) {
                            fontsize = 12,fontsize_number = 15,
                             main=result1()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                           color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
     })
     
     ## Download csv
@@ -545,7 +575,7 @@ server <- function(input, output,session) {
                            fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                            main=result1()[["cutoff"]],
                            cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                           color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
         dev.off()
 
      } )
@@ -553,7 +583,7 @@ server <- function(input, output,session) {
     
     # Heatmap2 (Tab)
     result2 <- eventReactive(input$action_heatmap,{  
-      result2<-NMF_heatmap(usedMeta_data(),summaryTable(),List(),N=dim(usedTable()$count)[1])
+      result2<-NMF_heatmap(usedMeta_data(),summaryTable(),List(),N=dim(usedTable()$count)[1],TestSelected_Cells())
       result2$cutoff=input$cutoff
       result2  } )
     
@@ -562,7 +592,7 @@ server <- function(input, output,session) {
                          fontsize = 12,fontsize_number = 15,
                          main=result2()[["cutoff"]],
                          cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                         color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                         color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
     })
       ## download csv
       output$downloadheatmap2<-downloadHandler(
@@ -586,20 +616,20 @@ server <- function(input, output,session) {
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                              main=result2()[["cutoff"]],
                              cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                             color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                             color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
           dev.off()
         } )
       
       
       #Heatmap3(Tab):
       result <- eventReactive(input$action_heatmap,{
-        StateVsType(usedMeta_data(),N=dim(usedTable()$count)[1])
+        StateVsType(usedMeta_data(),N=dim(usedTable()$count)[1],TestSelected_Cells())
       })
       output$cellstates_types <- renderPlot({
       pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
                            fontsize = 12,fontsize_number = 15,
                            cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                           color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
       })
       ## download csv
       output$downloadheatmap3<-downloadHandler(
@@ -622,7 +652,7 @@ server <- function(input, output,session) {
           pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()[["Mydata_raw_m"]],
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                              cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                             color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                             color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
           dev.off()
           
         } )
@@ -630,7 +660,7 @@ server <- function(input, output,session) {
       
       ##Heatmap-Tab4: cellStates
       cellStates <- eventReactive(input$action_heatmap,{
-        testResult<-ListTest(List(),N=dim(usedTable()$count)[1])
+        testResult<-ListTest(List(),N=dim(usedTable()$count)[1],TestSelected_Cells())
         testResult$cutoff=input$cutoff
         testResult
       })
@@ -638,7 +668,7 @@ server <- function(input, output,session) {
         pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
                            fontsize = 12,fontsize_number = 15,
                            cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                           color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
       })
       
       ## download csv
@@ -663,7 +693,7 @@ server <- function(input, output,session) {
                              fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
                              main=cellStates()[["cutoff"]],
                              cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                             color = colorRampPalette(c("white","firebrick3"))(10),breaks = seq(0, 10, by = 1))
+                             color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
           dev.off()
           
         } )
