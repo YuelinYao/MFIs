@@ -94,16 +94,18 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
       n=N-m
       k=length(Gene_types)
       if (test=="Over_representation") {
-        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE)
+        fold_value=(q*N)/(m*k)
       } else{
         #print("Under representation test")
-        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE)
+        fold_value=(N*(m-q))/(m*(N-k))
       }
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
       #print(p_value)
       P_set[ct]=p_value
-      enrichment_set[ct]=(q*N)/(m*k)
+      enrichment_set[ct]=fold_value
     }
     Data_mtrix[,i]<-P_set
     Fold[,i]<-enrichment_set

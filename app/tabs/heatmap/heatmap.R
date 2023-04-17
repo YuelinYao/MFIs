@@ -208,15 +208,17 @@ heatmap <- function(Meta_data,summaryTable,List,N,test) {
       
       if (test=="Over_representation") {
         p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+        fold_value=(q*N)/(m*k)
       } else{
         #print("Under representation test")
         p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+        fold_value=(N*(m-q))/(m*(N-k))
       }
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
       #https://seqqc.wordpress.com/2019/07/25/how-to-use-phyper-in-r/
       P_set[ct]=p_value
-      fold_set[ct]=(q*N)/(m*k)
+      fold_set[ct]=fold_value
       
     }
     Data_mtrix[,i]<-P_set
@@ -314,17 +316,19 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N,test){
       k=length(cell_types)
       
       if (test=="Over_representation") {
-        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE)
+        fold_value=(q*N)/(m*k)
       } else{
         #print("Under representation test")
         p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+        fold_value=(N*(m-q))/(m*(N-k))
       }
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
       #https://seqqc.wordpress.com/2019/07/25/how-to-use-phyper-in-r/
       
       P_set[ct]=p_value
-      fold_set[ct]=(q*N)/(m*k)
+      fold_set[ct]=fold_value
     }
     
     Data_mtrix[,i]<-P_set
@@ -409,14 +413,16 @@ StateVsType<-function(Meta_data,N,test){
         k=length(cell_types)
         
         if (test=="Over_representation") {
-          p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+          p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE)
+          fold_value=(q*N)/(m*k)
         } else{
           #print("Under representation test")
-          p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+          p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE)
+          fold_value=(N*(m-q))/(m*(N-k))
         }
         
         P_set[ct]=p_value
-        fold_set[ct]=(q*N)/(m*k)
+        fold_set[ct]=fold_value
         
       }
       Data_mtrix[,i]<-P_set
@@ -497,17 +503,19 @@ ListTest <- function(list,N,test) {
       k=length(List_types)
       
       if (test=="Over_representation") {
-        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE)
+        fold_value=(q*N)/(m*k)
       } else{
         #print("Under representation test")
-        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
+        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE)
+        fold_value=(N*(m-q))/(m*(N-k))
       }
       
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
       #print(p_value)
       P_set[ct]=p_value
-      fold_set[ct]=(q*N)/(m*k)
+      fold_set[ct]=fold_value
     }
     Data_mtrix[,i]<-P_set
     Fold[,i]<-fold_set
