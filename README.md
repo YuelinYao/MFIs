@@ -7,6 +7,7 @@
 3. **all_DTuples.csv** : located in the output from Abel's pipeline (HOIsummaries folder)
 4. **trainingData_.csv** : which is also in the output from Abel's pipeline (output folder)
 5. **GeneAnnotationSet.csv** (optional): which is used in heatmap-genes, over-representation test between gene list. Example file format see ./data/CancerState.csv 
+6. **UMAP.csv** (optional): which is used in UMAP Plot, Example file format see ./data/UMAP_coords.csv
 
 ## Libarary:
 R:
