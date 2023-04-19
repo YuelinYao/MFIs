@@ -43,7 +43,7 @@ about <- function(){
       tags$br(),
       tags$br(),
       
-      tags$b("Statistical analysis",style = "color: #337ab7;"),
+      #tags$b("Statistical analysis",style = "color: #337ab7;"),
       
       
       html = TRUE)
