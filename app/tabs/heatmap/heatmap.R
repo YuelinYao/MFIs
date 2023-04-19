@@ -41,9 +41,9 @@ HeatmapInput<- function(){
     radioButtons(inputId = "TestCells", "Test:",
                  choices = c("Enrichment" = "Over_representation", "Depletion" = "Under_representation"), 
                  selected = "Over_representation", inline = TRUE),
-  radioButtons(inputId = "colorHeatmapCells", "Colored by:",
-                choices = c("-log10FDR" = "log10FDR", "Fold" = "Fold"),
-                selected = "log10FDR", inline = TRUE),
+  #radioButtons(inputId = "colorHeatmapCells", "Colored by:",
+   #             choices = c("-log10FDR" = "log10FDR", "Fold" = "Fold"),
+    #            selected = "log10FDR", inline = TRUE),
     actionButton("action_heatmap","Submit",icon("paper-plane"), 
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
   )

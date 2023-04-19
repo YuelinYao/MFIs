@@ -364,7 +364,7 @@ server <- function(input, output,session) {
     show_Table <- eventReactive(input$action_table, { 
       table<-summaryTable()
       table$cluster<-paste0("Cluster:",table$cluster)
-      colnames(table)<-c("Genes","D-tuple","Enrichment","Pval_corrected","No.Cells","Cluster")
+      colnames(table)<-c("Genes","D-tuple","LogEnrichment","Pval_corrected","No.Cells","Cluster")
       table$`D-tuple`<-paste0("[",table$`D-tuple`,"]")
       table
     })
@@ -397,7 +397,9 @@ server <- function(input, output,session) {
     
     # color by -log10FDR or enrichment fold
     colorHeatmapGene<- eventReactive(input$action_heatmap_genes, { 
-      input$colorHeatmapGene
+      #input$colorHeatmapGene
+      selected="log10FDR"
+      selected
     })
     
     
@@ -503,7 +505,9 @@ server <- function(input, output,session) {
     
     ## Heatmap for cells(Tab)
     colorHeatmapCells<- eventReactive(input$action_heatmap, { 
-      input$colorHeatmapCells
+      #input$colorHeatmapCells
+      selected="log10FDR"
+      selected
     })
     
     

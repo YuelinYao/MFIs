@@ -22,7 +22,9 @@ about <- function(){
         tags$li("rrvgo - Simplifying the redundance of GO sets.", style="list-style-type: square;"),
         tags$li("Upset Plot - Visualisation of how many cells sharing among states.", style="list-style-type: square;"),
         tags$li("DE analysis - Differential expression analysis for two mutually exclusive states.", style="list-style-type: square;"),
+        tags$li("Find Markers - Identify marker genes for a give cell state.", style="list-style-type: square;"),
         tags$li("Markov Blanket - Visualisation of Markov Blanket for given gene(s).", style="list-style-type: square;"),
+        tags$li("UMAP Plot - Visualisation of UMAP for given a cell state.", style="list-style-type: square;"),
         tags$br(),
       
         ##Tutorial
@@ -35,6 +37,7 @@ about <- function(){
         tags$li("all_DTuples.csv: located in the output from stator pipeline (HOIsummaries folder)", style="list-style-type: square;"),
         tags$li("trainingData_.csv: which is also in the output from stator pipeline (output folder)", style="list-style-type: square;"),
         tags$li("GeneAnnotationSet.csv (optional): which is used in heatmap-genes, over-representation test between gene list. Example file format see ./data/CancerState.csv", style="list-style-type: square;"),
+        tags$li("UMAP.csv (optional): which is used in UMAP plot. Example file format see ./data/UMAP_coords.csv", style="list-style-type: square;"),
         "The example of file can be found at: ",a(icon("house"), href="https://github.com/YuelinYao/MFIs/tree/main/data", target="_blank", style = "color: steelblue;"),
       
       tags$br(),
