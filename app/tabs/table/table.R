@@ -8,7 +8,8 @@ TableUI <- function(){
     tags$h3(paste0("Table for deviating MFIs"), style = "color: steelblue;"),
     textOutput("textsummary"),tags$br(),
     DTOutput("table") %>% withSpinner(color="#4682B4"),
-    downloadButton("downloadtable","Download as .csv")
+    downloadButton("downloadtable","Download as .csv"),
+    downloadButton("downloadCellList","Download Cell List as .csv")
   )}
 
 

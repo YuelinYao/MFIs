@@ -395,23 +395,30 @@ server <- function(input, output,session) {
       return(CellStateGenes_path)
     })  
     
-    # color by -log10FDR or enrichment fold
-    colorHeatmapGene<- eventReactive(input$action_heatmap_genes, { 
-      #input$colorHeatmapGene
-      selected="log10FDR"
-      selected
-    })
     
     
     TestSelected_Genes<- eventReactive(input$action_heatmap_genes, { 
       input$TestGenes
     })
     
+    # color by -log10FDR or enrichment fold
+    colorHeatmapGene<- eventReactive(input$action_heatmap_genes, { 
+      if (TestSelected_Genes()=="Fisher"){
+        selected="Fold"
+      } else{
+        selected="log10FDR"
+      }
+      selected
+    })
+    
+    
     colorGenes<-eventReactive(input$action_heatmap_genes, { 
       if (TestSelected_Genes()=="Over_representation") {
-        color<-"firebrick3"
-      }else{
-        color<-"#2166ac"
+        color<-colorRampPalette(c("white","firebrick3"))(100)
+      } else if (TestSelected_Genes()=="Under_representation"){
+        color<-colorRampPalette(c("white","#2166ac"))(100)}
+      else{
+        color<-colorRampPalette(c("#2166ac", "white", "#cc3333"))(100)
       }
       color
     })
@@ -425,11 +432,19 @@ server <- function(input, output,session) {
     } )
     
     output$heatmap_GeneSet <- renderPlot({
-      pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
+      if (!TestSelected_Genes()=="Fisher"){
+       pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
                          fontsize = 12,fontsize_number = 15,
                          main=result_genes()[["cutoff"]],
                          cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                         color = colorRampPalette(c("white",colorGenes()))(10),breaks = seq(0, 10, by = 1))
+                         color =  colorGenes(),breaks = seq(0, 10, by = 0.1))}
+      else{
+        pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
+                           fontsize = 12,fontsize_number = 15,
+                           main=result_genes()[["cutoff"]],
+                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                           color =  colorGenes(),  breaks = seq(-2, 2, length.out = 100))}
+      #breaks = seq(0, 10, by = 1)
     })
     
    ## Download csv
@@ -451,11 +466,18 @@ server <- function(input, output,session) {
         width=dim(result_genes()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(result_genes()[["log10FDR"]])))*5/25.4+2
         height=dim(result_genes()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(result_genes()[["log10FDR"]])))*5/25.4+5
         pdf(heatmap1,width =width,height = height)
-        pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
-                           fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
-                           main=result_genes()[["cutoff"]],
-                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white",colorGenes()))(10),breaks = seq(0, 10, by = 1))
+        if (!TestSelected_Genes()=="Fisher"){
+          pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
+                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                             main=result_genes()[["cutoff"]],breaks = seq(0, 10, by = 0.1),
+                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                             color =  colorGenes())}
+        else{
+          pheatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
+                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                             main=result_genes()[["cutoff"]],
+                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                             color =  colorGenes(),  breaks = seq(-2, 2, length.out = 100))}
         dev.off()
         
       } )
@@ -468,10 +490,19 @@ server <- function(input, output,session) {
     })
     
     output$heatmapStateGenes<- renderPlot({
+      if (!TestSelected_Genes()=="Fisher"){
       pheatmap::pheatmap(border_color = NA,   StateGenes()[[colorHeatmapGene()]],display_numbers = StateGenes()$Mydata_raw_m,
-                         fontsize = 12,fontsize_number = 15,
+                         fontsize = 12,fontsize_number = 15,breaks = seq(0, 10, by = 0.1),
                          cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
-                         color = colorRampPalette(c("white",colorGenes()))(10),breaks = seq(0, 10, by = 1))
+                         color =colorGenes())}
+      
+      else{
+        pheatmap::pheatmap(border_color = NA,   StateGenes()[[colorHeatmapGene()]],display_numbers = StateGenes()$Mydata_raw_m,
+                           fontsize = 12,fontsize_number = 15,
+                           cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
+                           color =colorGenes(),breaks = seq(-2, 2, length.out = 100))
+      }
+      #breaks = seq(0, 10, by = 1)
     })
     ## Download csv
     output$downloadheatmap_genes2<-downloadHandler(
@@ -492,11 +523,18 @@ server <- function(input, output,session) {
         width=dim( StateGenes()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames( StateGenes()[["log10FDR"]])))*5/25.4+2
         height=dim( StateGenes()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames( StateGenes()[["log10FDR"]])))*5/25.4+5
         pdf(heatmap1,width =width,height = height)
-        pheatmap::pheatmap(border_color = NA, StateGenes()[[colorHeatmapGene()]],display_numbers =  StateGenes()[["Mydata_raw_m"]],
-                           fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
-                           main= StateGenes()[["cutoff"]],
-                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white",colorGenes()))(10),breaks = seq(0, 10, by = 1))
+        if (!TestSelected_Genes()=="Fisher"){
+          pheatmap::pheatmap(border_color = NA,   StateGenes()[[colorHeatmapGene()]],display_numbers = StateGenes()$Mydata_raw_m,
+                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,breaks = seq(0, 10, by = 0.1),
+                             cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
+                             color =colorGenes())}
+        
+        else{
+          pheatmap::pheatmap(border_color = NA,   StateGenes()[[colorHeatmapGene()]],display_numbers = StateGenes()$Mydata_raw_m,
+                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                             cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
+                             color =colorGenes(),breaks = seq(-2, 2, length.out = 100))
+        }
         dev.off()
         
       } )
@@ -504,22 +542,27 @@ server <- function(input, output,session) {
   
     
     ## Heatmap for cells(Tab)
+    TestSelected_Cells<- eventReactive(input$action_heatmap, { 
+      input$TestCells
+    })
+
     colorHeatmapCells<- eventReactive(input$action_heatmap, { 
-      #input$colorHeatmapCells
-      selected="log10FDR"
+      if (TestSelected_Cells()=="Fisher"){
+        selected="Fold"
+      } else{
+        selected="log10FDR"
+      }
       selected
     })
     
     
-    TestSelected_Cells<- eventReactive(input$action_heatmap, { 
-      input$TestCells
-    })
-    
     colorCells<-eventReactive(input$action_heatmap, { 
       if (TestSelected_Cells()=="Over_representation") {
-        color<-"firebrick3"
-      }else{
-        color<-"#2166ac"
+        color<-colorRampPalette(c("white","firebrick3"))(100)
+      } else if (TestSelected_Cells()=="Under_representation"){
+        color<-colorRampPalette(c("white","#2166ac"))(100)}
+      else{
+        color<-colorRampPalette(c("#2166ac", "white", "#cc3333"))(100)
       }
       color
     })
@@ -532,11 +575,23 @@ server <- function(input, output,session) {
     } )
     
     output$heatmap_celltypes <- renderPlot({
-    pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
+    
+      if (!TestSelected_Cells()=="Fisher"){
+      
+      pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
                            fontsize = 12,fontsize_number = 15,
-                            main=result1()[["cutoff"]],
+                            main=result1()[["cutoff"]],breaks = seq(0, 10, by = 0.1),
                            cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
+                           color = colorCells())}#,breaks = seq(0, 10, by = 1)}
+        else{
+          pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
+                             fontsize = 12,fontsize_number = 15,
+                             main=result1()[["cutoff"]],
+                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,color = colorCells(),
+                             breaks = seq(-2, 2, length.out = 100)) #color = colorCells()
+          
+        }
+        
     })
     
     ## Download csv
@@ -575,11 +630,19 @@ server <- function(input, output,session) {
         width=dim(result1()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(result1()[["log10FDR"]])))*5/25.4+2
         height=dim(result1()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(result1()[["log10FDR"]])))*5/25.4+5
         pdf(heatmap1,width =width,height = height)
-        pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
-                           fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
-                           main=result1()[["cutoff"]],
-                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
+        if (!TestSelected_Cells()=="Fisher"){
+          pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
+                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                             main=result1()[["cutoff"]],breaks = seq(0, 10, by = 0.1),
+                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                             color = colorCells())}#,breaks = seq(0, 10, by = 1)}
+        else{
+          pheatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
+                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                             main=result1()[["cutoff"]],
+                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,color = colorCells(),
+                             breaks = seq(-2, 2, length.out = 100)) #color = colorCells()
+        }
         dev.off()
 
      } )
@@ -592,11 +655,22 @@ server <- function(input, output,session) {
       result2  } )
     
       output$heatmap_cellstates <- renderPlot({
-      pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
-                         fontsize = 12,fontsize_number = 15,
+        if (!TestSelected_Cells()=="Fisher"){
+        pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
+                         fontsize = 12,fontsize_number = 15,breaks = seq(0, 10, by = 0.1),
                          main=result2()[["cutoff"]],
                          cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                         color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
+                         color = colorCells()) }#breaks = seq(0, 10, by = 1)}
+          else{
+            pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
+                               fontsize = 12,fontsize_number = 15,
+                               main=result2()[["cutoff"]],
+                               cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                               color = colorCells(),breaks = seq(-2, 2, length.out = 100))
+            
+          }
+          
+          
     })
       ## download csv
       output$downloadheatmap2<-downloadHandler(
@@ -616,11 +690,20 @@ server <- function(input, output,session) {
           width=dim(result2()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(result2()[["log10FDR"]])))*5/25.4+2
           height=dim(result2()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(result2()[["log10FDR"]])))*5/25.4+5
           pdf(heatmap2,width =width,height = height)
-          pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
-                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
-                             main=result2()[["cutoff"]],
-                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                             color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
+          if (!TestSelected_Cells()=="Fisher"){
+            pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
+                               fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                               main=result2()[["cutoff"]],breaks = seq(0, 10, by = 0.1),
+                               cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                               color = colorCells()) }#breaks = seq(0, 10, by = 1)}
+          else{
+            pheatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
+                               fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                               main=result2()[["cutoff"]],
+                               cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                               color = colorCells(),breaks = seq(-2, 2, length.out = 100))
+            
+          }
           dev.off()
         } )
       
@@ -630,10 +713,19 @@ server <- function(input, output,session) {
         StateVsType(usedMeta_data(),N=dim(usedTable()$count)[1],TestSelected_Cells())
       })
       output$cellstates_types <- renderPlot({
-      pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
-                           fontsize = 12,fontsize_number = 15,
+      
+        if (!TestSelected_Cells()=="Fisher"){
+        pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
+                           fontsize = 12,fontsize_number = 15,breaks = seq(0, 10, by = 0.1),
                            cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
+                           color = colorCells())}#breaks = seq(0, 10, by = 1)
+        else{
+          pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
+                             fontsize = 12,fontsize_number = 15,
+                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                             color = colorCells(),breaks = seq(-2, 2, length.out = 100))
+        }
+        
       })
       ## download csv
       output$downloadheatmap3<-downloadHandler(
@@ -653,10 +745,17 @@ server <- function(input, output,session) {
           width=dim(result()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(result()[["log10FDR"]])))*5/25.4+2
           height=dim(result()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(result()[["log10FDR"]])))*5/25.4+5
           pdf(heatmap3,width =width,height = height)
-          pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()[["Mydata_raw_m"]],
-                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
-                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                             color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
+          if (!TestSelected_Cells()=="Fisher"){
+            pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
+                               fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,breaks = seq(0, 10, by = 0.1),
+                               cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                               color = colorCells())}#breaks = seq(0, 10, by = 1)
+          else{
+            pheatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
+                               fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                               cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                               color = colorCells(),breaks = seq(-2, 2, length.out = 100))
+          }
           dev.off()
           
         } )
@@ -669,10 +768,18 @@ server <- function(input, output,session) {
         testResult
       })
       output$cellStates_cellStates<- renderPlot({
+        if (!TestSelected_Cells()=="Fisher"){
         pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
-                           fontsize = 12,fontsize_number = 15,
+                           fontsize = 12,fontsize_number = 15,breaks = seq(0, 10, by = 0.1),
                            cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
-                           color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
+                           color = colorCells())}
+        else{
+          pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
+                             fontsize = 12,fontsize_number = 15,
+                             cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
+                             color = colorCells(),breaks = seq(-2, 2, length.out = 100))
+        }
+        #breaks = seq(0, 10, by = 1)
       })
       
       ## download csv
@@ -693,11 +800,17 @@ server <- function(input, output,session) {
           width=dim(cellStates()[["log10FDR"]])[2]*5/25.4+max(nchar(rownames(cellStates()[["log10FDR"]])))*5/25.4+2
           height=dim(cellStates()[["log10FDR"]])[1]*5/25.4+max(nchar(colnames(cellStates()[["log10FDR"]])))*5/25.4+5
           pdf(heatmap4,width =width,height = height)
-          pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()[["Mydata_raw_m"]],
-                             fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
-                             main=cellStates()[["cutoff"]],
-                             cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                             color = colorRampPalette(c("white",colorCells()))(10),breaks = seq(0, 10, by = 1))
+          if (!TestSelected_Cells()=="Fisher"){
+            pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
+                               fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,breaks = seq(0, 10, by = 0.1),
+                               cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
+                               color = colorCells())}
+          else{
+            pheatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
+                               fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
+                               cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
+                               color = colorCells(),breaks = seq(-2, 2, length.out = 100))
+          }
           dev.off()
           
         } )

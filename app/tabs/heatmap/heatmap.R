@@ -4,8 +4,7 @@ heatmapUI <- function(){
     tags$h3(paste0("Heatmap: Cell types (clustering + singleR)"), style = "color: steelblue;"),
     plotOutput(outputId ="heatmap_celltypes", width = "90%") %>% withSpinner(color="#4682B4"),
     downloadButton("downloadheatmap1","Download as .csv"),
-    downloadButton("downloadheatmap_plot1","Download as .pdf"),
-    downloadButton("downloadCellList","Download Cell List as .csv"),
+    downloadButton("downloadheatmap_plot1","Download as .pdf")
   )}
 
 NMF_UI <- function(){
@@ -39,7 +38,7 @@ Test_CellstateUI<-function(){
 HeatmapInput<- function(){
   tagList( 
     radioButtons(inputId = "TestCells", "Test:",
-                 choices = c("Enrichment" = "Over_representation", "Depletion" = "Under_representation"), 
+                 choices = c("Enrichment" = "Over_representation", "Depletion" = "Under_representation", "Two.side" = "Fisher"), 
                  selected = "Over_representation", inline = TRUE),
   #radioButtons(inputId = "colorHeatmapCells", "Colored by:",
    #             choices = c("-log10FDR" = "log10FDR", "Fold" = "Fold"),
@@ -202,24 +201,28 @@ heatmap <- function(Meta_data,summaryTable,List,N,test) {
       cell_types<-rownames(Meta_data)[which(Meta_data$Cell_Types==ct)]
       q=length(intersect(Cell,cell_types))
       m=length(Cell)
-      #N=dim(Meta_data)[1]
-      n=N-m
+      n=N-m #N=dim(Meta_data)[1]
       k=length(cell_types)
       
       if (test=="Over_representation") {
         p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
         fold_value=(q*N)/(m*k)
-      } else{
+      } else if (test=="Under_representation") {
         #print("Under representation test")
         p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
         fold_value=(N*(m-q))/(m*(N-k))
-      }
+        } else {
+        fisherTest<-fisher.test(matrix(c(q, m-q, k-q, N-m-k+q), 2, 2), alternative='two.sided')
+        p_value<-as.numeric(fisherTest$p.value)
+        fold_value<-as.numeric(fisherTest$estimate)
+        #as.numeric(fisherTest$estimate)
+        } 
+      
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
       #https://seqqc.wordpress.com/2019/07/25/how-to-use-phyper-in-r/
       P_set[ct]=p_value
       fold_set[ct]=fold_value
-      
     }
     Data_mtrix[,i]<-P_set
     Fold[,i]<-fold_set
@@ -262,7 +265,9 @@ heatmap <- function(Meta_data,summaryTable,List,N,test) {
   result=list()
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
-  result$Fold=Fold
+  Fold[Fold==0]<-2.2e-16
+  Fold[Fold==Inf]<-100
+  result$Fold=log10(Fold)
   
   print("done")
   
@@ -316,13 +321,18 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N,test){
       k=length(cell_types)
       
       if (test=="Over_representation") {
-        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE)
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
         fold_value=(q*N)/(m*k)
-      } else{
+      } else if (test=="Under_representation") {
         #print("Under representation test")
         p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
         fold_value=(N*(m-q))/(m*(N-k))
-      }
+      } else {
+        fisherTest<-fisher.test(matrix(c(q, m-q, k-q, N-m-k+q), 2, 2), alternative='two.sided')
+        p_value<-as.numeric(fisherTest$p.value)
+        fold_value<-as.numeric(fisherTest$estimate)
+        #as.numeric(fisherTest$estimate)
+      } 
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
       #https://seqqc.wordpress.com/2019/07/25/how-to-use-phyper-in-r/
@@ -370,7 +380,9 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N,test){
   result=list()
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
-  result$Fold=Fold
+  Fold[Fold==0]<-2.2e-16
+  Fold[Fold==Inf]<-100
+  result$Fold=log10(Fold)
   
   return(result)
   
@@ -413,13 +425,18 @@ StateVsType<-function(Meta_data,N,test){
         k=length(cell_types)
         
         if (test=="Over_representation") {
-          p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE)
+          p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
           fold_value=(q*N)/(m*k)
-        } else{
+        } else if (test=="Under_representation") {
           #print("Under representation test")
-          p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE)
+          p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
           fold_value=(N*(m-q))/(m*(N-k))
-        }
+        } else {
+          fisherTest<-fisher.test(matrix(c(q, m-q, k-q, N-m-k+q), 2, 2), alternative='two.sided')
+          p_value<-as.numeric(fisherTest$p.value)
+          fold_value<-as.numeric(fisherTest$estimate)
+          #as.numeric(fisherTest$estimate)
+        } 
         
         P_set[ct]=p_value
         fold_set[ct]=fold_value
@@ -463,7 +480,9 @@ StateVsType<-function(Meta_data,N,test){
     result=list()
     result$log10FDR=log10FDR
     result$Mydata_raw_m=Mydata_raw_m
-    result$Fold=Fold
+    Fold[Fold==0]<-2.2e-16
+    Fold[Fold==Inf]<-100
+    result$Fold=log10(Fold)
     
     return(result)
   
@@ -503,13 +522,18 @@ ListTest <- function(list,N,test) {
       k=length(List_types)
       
       if (test=="Over_representation") {
-        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE)
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
         fold_value=(q*N)/(m*k)
-      } else{
-        #print("Under representation test")
-        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE)
+      } else if (test=="Under_representation") {
+       # print("Under representation test")
+        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
         fold_value=(N*(m-q))/(m*(N-k))
-      }
+      } else {
+        fisherTest<-fisher.test(matrix(c(q, m-q, k-q, N-m-k+q), 2, 2), alternative='two.sided')
+        p_value<-as.numeric(fisherTest$p.value)
+        fold_value<-as.numeric(fisherTest$estimate)
+        #as.numeric(fisherTest$estimate)
+      } 
       
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
@@ -561,7 +585,9 @@ ListTest <- function(list,N,test) {
   result=list()
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
-  result$Fold=Fold
+  Fold[Fold==0]<-2.2e-16
+  Fold[Fold==Inf]<-100
+  result$Fold=log10(Fold)
   print("done")
   return(result)
   

@@ -19,7 +19,7 @@ stateGenesUI <- function(){
 HeatmapGenesInput<- function(){
   tagList( 
     radioButtons(inputId = "TestGenes", "Test:",
-                 choices = c("Enrichment" = "Over_representation", "Depletion" = "Under_representation"), 
+                choices = c("Enrichment" = "Over_representation", "Depletion" = "Under_representation", "Two.side" = "Fisher"), 
                  selected = "Over_representation", inline = TRUE),
     #radioButtons(inputId = "colorHeatmapGene", "Colored by:",
      #            choices = c("-log10FDR" = "log10FDR", "Fold" = "Fold"),
@@ -92,15 +92,21 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
       #print(q)
       m=length(Genes)
       n=N-m
-      k=length(Gene_types)
+      
       if (test=="Over_representation") {
-        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE)
+        p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
         fold_value=(q*N)/(m*k)
-      } else{
+      } else if (test=="Under_representation") {
         #print("Under representation test")
-        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE)
+        p_value<-phyper(q, m, n, k, lower.tail = TRUE, log.p = FALSE) 
         fold_value=(N*(m-q))/(m*(N-k))
-      }
+      } else {
+        fisherTest<-fisher.test(matrix(c(q, m-q, k-q, N-m-k+q), 2, 2), alternative='two.sided')
+        p_value<-as.numeric(fisherTest$p.value)
+        fold_value<-as.numeric(fisherTest$estimate)
+        #as.numeric(fisherTest$estimate)
+      } 
+      
       #https://www.biostars.org/p/15548/
       #https://pnnl-comp-mass-spec.github.io/proteomics-data-analysis-tutorial/ora.html
       #print(p_value)
@@ -148,7 +154,9 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
   result=list()
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
-  result$Fold=Fold
+  Fold[Fold==0]<-2.2e-16
+  Fold[Fold==Inf]<-100
+  result$Fold=log10(Fold)
   #print(result)
   print("done")
   
