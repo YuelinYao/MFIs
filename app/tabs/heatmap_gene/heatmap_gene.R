@@ -92,7 +92,7 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
       #print(q)
       m=length(Genes)
       n=N-m
-      
+      k=length(Gene_types)
       if (test=="Over_representation") {
         p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
         fold_value=(q*N)/(m*k)

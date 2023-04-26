@@ -335,6 +335,8 @@ server <- function(input, output,session) {
     })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) 
     
     
+  
+    
     # Get gene list: function in GO_plot.R
     GetGenesList<-reactive({
       GetGenes(summaryTable(),Remove=T)
@@ -382,6 +384,25 @@ server <- function(input, output,session) {
       }
     )
 
+    
+    Cellstateslists <- eventReactive(input$action_table, { 
+      cellstates<-data.frame(State=NA,CellID=NA)
+      for(i in 1:length(List())){
+        cellstates[i,]<-c(names(List())[i],paste0(List()[[i]],collapse=','))
+      }
+      cellstates
+    })
+    
+    
+    ## Download cell list csv
+    output$downloadCellList<-downloadHandler(
+      filename = function(){
+        paste('CellList-',Sys.Date(), '.csv', sep='')
+      },
+      content=function(celllist){
+        write.csv(Cellstateslists(),celllist)
+      }
+    )
     
     ## Heatmap-genes:
     usedCellStateGene <- reactive({
@@ -605,21 +626,7 @@ server <- function(input, output,session) {
    )
     
     
-    
-    ## Download cell list csv
-    output$downloadCellList<-downloadHandler(
-      filename = function(){
-        paste('CellList-',Sys.Date(), '.csv', sep='')
-      },
-      content=function(celllist){
-        cellstates<-data.frame(State=NA,CellID=NA)
-        for(i in 1:length(List())){
-          cellstates[i,]<-c(names(List())[i],paste0(List()[[i]],collapse=','))
-        }
-        write.csv(cellstates,celllist)
-      }
-    )
-    
+  
     
     ## Download pdf
     output$downloadheatmap_plot1<-downloadHandler(
