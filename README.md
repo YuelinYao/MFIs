@@ -133,6 +133,14 @@ if (!any(rownames(installed.packages()) == "ggplot2")){
   BiocManager::install("ggplot2")
 }
 library(ggplot2)
+
+
+install.packages('heatmaply')
+library(heatmaply)
+
+install.packages("plotly")
+library(plotly)
+
 ```
 
 
