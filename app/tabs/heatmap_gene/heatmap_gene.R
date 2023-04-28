@@ -15,6 +15,18 @@ stateGenesUI <- function(){
   )}
 
 
+
+iheatmapGenesUI <- function(){
+  tagList(
+    tags$h3(paste0("Heatmap: Gene set"), style = "color: steelblue;"),
+    plotlyOutput(outputId ="iheatmap_GeneSet", width = "90%") %>% withSpinner(color="#4682B4"),
+
+    tags$h3(paste0("Heatmap: State genes"), style = "color: steelblue;"),
+    plotlyOutput(outputId ="iheatmapStateGenes", width = "90%") %>% withSpinner(color="#4682B4"),
+    
+  )}
+
+
 ### Input function
 HeatmapGenesInput<- function(){
   tagList( 
@@ -76,6 +88,9 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
   
   dimnames(Fold)<-dimnames(Data_mtrix)
   
+  Overlap<-array(data=NA,dim = c(r,col))
+  dimnames(Overlap)<-dimnames(Data_mtrix)
+  
   for (i in names(Genelist)){
     #print(i)
     Genes<-Genelist[[i]]
@@ -93,6 +108,7 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
       m=length(Genes)
       n=N-m
       k=length(Gene_types)
+      Overlap[ct,i]<-q
       if (test=="Over_representation") {
         p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
         fold_value=(q*N)/(m*k)
@@ -134,6 +150,12 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
   
   df<-lengths(RefSet)
   percentage=df/sum(df)
+  
+  ##
+  percentage_row<-percentage
+  names(percentage_row)<-names(df)
+  percentage_row<-percentage_row[names(RefSet)]
+  
   stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
   names(stats)<-names(df)
   stats<-stats[names(RefSet)]
@@ -142,6 +164,12 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
   
   df<-lengths(Genelist)
   percentage=df/sum(df)
+  
+  ##
+  percentage_col<-percentage
+  names(percentage_col)<-names(df)
+  percentage_col<-percentage_col[names(Genelist)]
+  
   stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
   names(stats)<-names(df)
   stats<-stats[names(Genelist)]
@@ -157,6 +185,10 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
   Fold[Fold==0]<-2.2e-16
   Fold[Fold==Inf]<-100
   result$Fold=log10(Fold)
+  result$row=as.vector(percentage_row*100)
+  result$col=as.vector(percentage_col*100)
+  dimnames(Overlap)<-dimnames(log10FDR)
+  result$Overlap<-as.matrix(Overlap)
   #print(result)
   print("done")
   

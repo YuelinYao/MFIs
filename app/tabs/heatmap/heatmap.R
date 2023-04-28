@@ -33,6 +33,27 @@ Test_CellstateUI<-function(){
 }
 
 
+iheatmapUI <- function(){
+  tagList(
+    tags$h3(paste0("Heatmap: Cell types (clustering + singleR)"), style = "color: steelblue;"),
+    plotlyOutput(outputId ="iheatmap_celltypes", width = "90%") %>% withSpinner(color="#4682B4"),
+    
+    tags$h3("Heatmap: Cell states (NMF)", style = "color: steelblue;"),
+    plotlyOutput(outputId ="iheatmap_cellstates", width = "80%") %>% withSpinner(color="#4682B4"),
+    
+    tags$h3("Heatmap: Cell states vs. Cell types", style = "color: steelblue;"),
+    plotlyOutput(outputId ="icellstates_types", width = "80%") %>% withSpinner(color="#4682B4"),
+    
+    tags$h3("Heatmap: Cell states vs. Cell states", style = "color: steelblue;"),
+    plotlyOutput(outputId ="icellStates_cellStates", width = "80%") %>% withSpinner(color="#4682B4"),
+    
+  )}
+
+
+
+
+
+
 
 ### Input function
 HeatmapInput<- function(){
@@ -178,12 +199,16 @@ heatmap <- function(Meta_data,summaryTable,List,N,test) {
   Data_mtrix<-array(data=NA,dim = c(r,col))
   Fold<-array(data=NA,dim = c(r,col))
   
+  
+  
   Devstates$cluster<-paste0("C:",(Devstates$cluster))
   
   colnames(Data_mtrix)<-unique(Devstates$cluster)
   rownames(Data_mtrix)<-unique(Meta_data$Cell_Types)
   dimnames(Fold)<-dimnames(Data_mtrix)
 
+  Overlap<-array(data=NA,dim = c(r,col))
+  dimnames(Overlap)<-dimnames(Data_mtrix)
   
   for (i in unique(Devstates$cluster)){
   #print(i)
@@ -203,7 +228,7 @@ heatmap <- function(Meta_data,summaryTable,List,N,test) {
       m=length(Cell)
       n=N-m #N=dim(Meta_data)[1]
       k=length(cell_types)
-      
+      Overlap[ct,i]<-q
       if (test=="Over_representation") {
         p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
         fold_value=(q*N)/(m*k)
@@ -245,6 +270,13 @@ heatmap <- function(Meta_data,summaryTable,List,N,test) {
   
   df<-table(Meta_data$Cell_Types)
   percentage=df/sum(df)
+  
+  ##
+  percentage_row<-percentage
+  names(percentage_row)<-names(df)
+  percentage_row<-percentage_row[unique(Meta_data$Cell_Types)]
+  ##
+  
   stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
   names(stats)<-names(df)
   stats<-stats[unique(Meta_data$Cell_Types)]
@@ -254,6 +286,13 @@ heatmap <- function(Meta_data,summaryTable,List,N,test) {
   
   df<-lengths(List)
   percentage=df/sum(df)
+  
+  ##
+  percentage_col<-percentage
+  names(percentage_col)<-gsub("cluster_","",names(df))
+  percentage_col<-percentage_col[unique(Devstates$cluster)]
+  ##
+  
   stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
   names(stats)<-gsub("cluster_","",names(df))
   stats<-stats[unique(Devstates$cluster)]
@@ -261,6 +300,7 @@ heatmap <- function(Meta_data,summaryTable,List,N,test) {
   colnames(log10FDR)<-stats
   colnames(log10FDR)<-gsub(pattern = "C:","",colnames(log10FDR))
   dimnames(Fold)<-dimnames(log10FDR)
+  #dimnames(Overlap)<-dimnames(log10FDR)
   
   result=list()
   result$log10FDR=log10FDR
@@ -269,6 +309,12 @@ heatmap <- function(Meta_data,summaryTable,List,N,test) {
   Fold[Fold==Inf]<-100
   result$Fold=log10(Fold)
   
+  result$row=as.vector(percentage_row*100)
+  result$col=as.vector(percentage_col*100)
+  #print(result$col)
+  dimnames(Overlap)<-dimnames(log10FDR)
+  result$Overlap<-as.matrix(Overlap)
+  #print(Overlap)
   print("done")
   
   return(result)
@@ -297,6 +343,10 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N,test){
   
   dimnames(Fold)<-dimnames(Data_mtrix)
   
+  Overlap<-array(data=NA,dim = c(r,col))
+  dimnames(Overlap)<-dimnames(Data_mtrix)
+  
+  
   for (i in unique(Devstates$cluster)){
     
     #print(i)
@@ -319,7 +369,7 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N,test){
       #N=dim(Meta_data)[1]
       n=N-m
       k=length(cell_types)
-      
+      Overlap[ct,i]<-q
       if (test=="Over_representation") {
         p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
         fold_value=(q*N)/(m*k)
@@ -360,6 +410,13 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N,test){
   
   df<-table(Meta_data$Cell_State)
   percentage=df/sum(df)
+  
+  ##
+  percentage_row<-percentage
+  names(percentage_row)<-names(df)
+  percentage_row<-percentage_row[unique(Meta_data$Cell_State)]
+  ##
+  
   stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
   names(stats)<-names(df)
   stats<-stats[unique(Meta_data$Cell_State)]
@@ -369,6 +426,13 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N,test){
   
   df<-lengths(List)
   percentage=df/sum(df)
+  
+  ##
+  percentage_col<-percentage
+  names(percentage_col)<-gsub("cluster_","",names(df))
+  percentage_col<-percentage_col[unique(Devstates$cluster)]
+  ##
+  
   stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
   names(stats)<-gsub("cluster_","",names(df))
   stats<-stats[unique(Devstates$cluster)]
@@ -376,13 +440,19 @@ NMF_heatmap<-function(Meta_data,summaryTable,List,N,test){
   colnames(log10FDR)<-stats
   colnames(log10FDR)<-gsub(pattern = "C:","",colnames(log10FDR))
   dimnames(Fold)<-dimnames(log10FDR)
-  
+
   result=list()
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
   Fold[Fold==0]<-2.2e-16
   Fold[Fold==Inf]<-100
   result$Fold=log10(Fold)
+  
+  dimnames(Overlap)<-dimnames(log10FDR)
+  result$Overlap<-as.matrix(Overlap)
+  
+  result$row=as.vector(percentage_row*100)
+  result$col=as.vector(percentage_col*100)
   
   return(result)
   
@@ -401,6 +471,9 @@ StateVsType<-function(Meta_data,N,test){
     rownames(Data_mtrix)<-unique(Meta_data$Cell_State)
 
     dimnames(Fold)<-dimnames(Data_mtrix)
+    
+    Overlap<-array(data=NA,dim = c(r,col))
+    dimnames(Overlap)<-dimnames(Data_mtrix)
     
     for (i in unique(Meta_data$Cell_Types)){
       #print(i)
@@ -423,7 +496,7 @@ StateVsType<-function(Meta_data,N,test){
         #N=dim(Meta_data)[1]
         n=N-m
         k=length(cell_types)
-        
+        Overlap[ct,i]<-q
         if (test=="Over_representation") {
           p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
           fold_value=(q*N)/(m*k)
@@ -460,6 +533,11 @@ StateVsType<-function(Meta_data,N,test){
    
     df<-table(Meta_data$Cell_Types)
     percentage=df/sum(df)
+    
+    percentage_col<-percentage
+    names(percentage_col)<-names(df)
+    percentage_col<-percentage_col[unique(Meta_data$Cell_Types)]
+    
     stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
     names(stats)<-names(df)
     stats<-stats[unique(Meta_data$Cell_Types)]
@@ -468,6 +546,11 @@ StateVsType<-function(Meta_data,N,test){
     
     df<-table(Meta_data$Cell_State)
     percentage=df/sum(df)
+    
+    percentage_row<-percentage
+    names(percentage_row)<-gsub("cluster_","",names(df))
+    percentage_row<-percentage_row[unique(Meta_data$Cell_State)]
+    
     stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
     names(stats)<-names(df)
     stats<-stats[unique(Meta_data$Cell_State)]
@@ -483,6 +566,12 @@ StateVsType<-function(Meta_data,N,test){
     Fold[Fold==0]<-2.2e-16
     Fold[Fold==Inf]<-100
     result$Fold=log10(Fold)
+    
+    dimnames(Overlap)<-dimnames(log10FDR)
+    result$Overlap<-as.matrix(Overlap)
+    
+    result$row=as.vector(percentage_row*100)
+    result$col=as.vector(percentage_col*100)
     
     return(result)
   
@@ -500,6 +589,9 @@ ListTest <- function(list,N,test) {
   
   Fold<-array(data=NA,dim = c(r,col))
   dimnames(Fold)<-dimnames(Data_mtrix)
+  
+  Overlap<-array(data=NA,dim = c(r,col))
+  dimnames(Overlap)<-dimnames(Data_mtrix)
   
   for (i in names(list)){
     #print(i)
@@ -520,7 +612,7 @@ ListTest <- function(list,N,test) {
       m=length(Lists)
       n=N-m
       k=length(List_types)
-      
+      Overlap[ct,i]<-q
       if (test=="Over_representation") {
         p_value<-phyper(q-1, m, n, k, lower.tail = FALSE, log.p = FALSE) 
         fold_value=(q*N)/(m*k)
@@ -560,6 +652,12 @@ ListTest <- function(list,N,test) {
   
   df<-lengths(list)
   percentage=df/sum(df)
+  
+  percentage_row<-percentage
+  names(percentage_row)<-names(df)
+  percentage_row<-percentage_row[names(list)]
+  
+  
   stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
   names(stats)<-names(df)
   stats<-stats[names(list)]
@@ -568,6 +666,11 @@ ListTest <- function(list,N,test) {
   
   df<-lengths(list)
   percentage=df/sum(df)
+  
+  percentage_col<-percentage
+  names(percentage_col)<-names(df)
+  percentage_col<-percentage_col[names(list)]
+  
   stats<-paste0(" (",df,", ",round(percentage*100,2),"%",")")
   names(stats)<-names(df)
   stats<-stats[names(list)]
@@ -588,6 +691,13 @@ ListTest <- function(list,N,test) {
   Fold[Fold==0]<-2.2e-16
   Fold[Fold==Inf]<-100
   result$Fold=log10(Fold)
+  
+  dimnames(Overlap)<-dimnames(log10FDR)
+  result$Overlap<-as.matrix(Overlap)
+  
+  result$row=as.vector(percentage_row*100)
+  result$col=as.vector(percentage_col*100)
+  
   print("done")
   return(result)
   
