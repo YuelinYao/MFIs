@@ -556,7 +556,7 @@ server <- function(input, output,session) {
                              color =  colorGenes(),  breaks = seq(-2, 2, length.out = 100))}
        
         draw(ht)
-         dev.off()
+        dev.off()
         
       } )
     
@@ -1503,8 +1503,10 @@ server <- function(input, output,session) {
           ggsave(StateUMAPs(),filename = uPlot,width = 5,height = 3.8)
         } )
       
-      
-      
+      onSessionEnded(function() {
+        cat("Session Ended\n")
+        unlink("Rplot*")    
+      }) 
       
       }
 
