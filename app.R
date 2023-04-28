@@ -500,13 +500,13 @@ server <- function(input, output,session) {
       }
       if (!TestSelected_Cells()=="Fisher"){
         heatmaply(
-          result_genes()[[colorHeatmapGenes()]], colors = colorGenes(),show_dendrogram=c(F,F),
-          Rowv=pheatmap(result_genes()[[colorHeatmapGenes()]])[[1]],Colv=rev(pheatmap(result_genes()[[colorHeatmapGenes()]])[[2]]),
+          result_genes()[[colorHeatmapGene()]], colors = colorGenes(),show_dendrogram=c(F,F),
+          Rowv=pheatmap(result_genes()[[colorHeatmapGene()]])[[1]],Colv=rev(pheatmap(result_genes()[[colorHeatmapGene()]])[[2]]),
           custom_hovertext=matr,method = "ggplot")
       }
       else{
         heatmaply(
-          result_genes()[[colorHeatmapGenes()]],colors = colorGenes(),scale_fill_gradient_fun = ggplot2::scale_fill_gradient2(low = "#2166ac",high = "#cc3333",midpoint = 0,mid = "white"),Colv=rev(pheatmap(result_genes()[[colorHeatmapGenes()]])[[2]]),Rowv=pheatmap(result_genes()[[colorHeatmapGenes()]])[[1]],
+          result_genes()[[colorHeatmapGene()]],colors = colorGenes(),scale_fill_gradient_fun = ggplot2::scale_fill_gradient2(low = "#2166ac",high = "#cc3333",midpoint = 0,mid = "white"),Colv=rev(pheatmap(result_genes()[[colorHeatmapGene()]])[[2]]),Rowv=pheatmap(result_genes()[[colorHeatmapGene()]])[[1]],
           custom_hovertext=matr,show_dendrogram=c(F,F))
       }
     })
@@ -600,13 +600,13 @@ server <- function(input, output,session) {
       }
       if (!TestSelected_Cells()=="Fisher"){
         heatmaply(
-          StateGenes()[[colorHeatmapGenes()]], colors = colorGenes(),show_dendrogram=c(F,F),
-          Rowv=pheatmap(StateGenes()[[colorHeatmapGenes()]])[[1]],Colv=rev(pheatmap(StateGenes()[[colorHeatmapGenes()]])[[2]]),
+          StateGenes()[[colorHeatmapGene()]], colors = colorGenes(),show_dendrogram=c(F,F),
+          Rowv=pheatmap(StateGenes()[[colorHeatmapGene()]])[[1]],Colv=rev(pheatmap(StateGenes()[[colorHeatmapGene()]])[[2]]),
           custom_hovertext=matr,method = "ggplot")
       }
       else{
         heatmaply(
-          StateGenes()[[colorHeatmapGenes()]],colors = colorGenes(),scale_fill_gradient_fun = ggplot2::scale_fill_gradient2(low = "#2166ac",high = "#cc3333",midpoint = 0,mid = "white"),Colv=rev(pheatmap(StateGenes()[[colorHeatmapGenes()]])[[2]]),Rowv=pheatmap(StateGenes()[[colorHeatmapGenes()]])[[1]],
+          StateGenes()[[colorHeatmapGene()]],colors = colorGenes(),scale_fill_gradient_fun = ggplot2::scale_fill_gradient2(low = "#2166ac",high = "#cc3333",midpoint = 0,mid = "white"),Colv=rev(pheatmap(StateGenes()[[colorHeatmapGene()]])[[2]]),Rowv=pheatmap(StateGenes()[[colorHeatmapGene()]])[[1]],
           custom_hovertext=matr,show_dendrogram=c(F,F))
       }
     })
