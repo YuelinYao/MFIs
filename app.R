@@ -106,7 +106,6 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             conditionalPanel(condition= "input.tabs == 'heatmap_genes'",
                   HeatmapGenesInput()), 
  
-
  ## GO enrichment        
             conditionalPanel(condition= "input.tabs == 'GO'", # GO & KEGG Tab
                              GOInput()),
@@ -121,7 +120,6 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             conditionalPanel(condition= "input.tabs == 'DE'",
                              DEInput()),
 
- 
  ## Find Marker Tab
             conditionalPanel(condition= "input.tabs == 'Marker'",
                              MarkerInput()),
@@ -130,37 +128,35 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
             conditionalPanel(condition= "input.tabs == 'mb'",
                              MBInput()),
  
- 
-    conditionalPanel(condition= "input.tabs == 'umap'",
+ ## UMAP Tab
+            conditionalPanel(condition= "input.tabs == 'umap'",
                    UMAPInput()),
- 
-
- 
         ),
-        
-        
+
         mainPanel(
             tabsetPanel(type = "pills", id = 'tabs',
                 tabPanel("About", icon = icon("circle-info"), value = 'about', aboutUI()),
                 tabPanel("Table", icon = icon("table"),value="table",TableUI()),
                 tabPanel("Heatmap-Cells",icon = icon("map"), value="heatmap",
                          tags$br(),
+                         ## subtab : fixheatmap
                          tabsetPanel(type = "pills", id = 'heatmap', selected = "FixedHeatmap",
                               tabPanel(title= "Fixed Heatmap",  value = "FixedHeatmap",
                               heatmapUI(),
                               NMF_UI(),
                               NMF_CelltypeUI(),
                               Test_CellstateUI()),
-                        tabPanel(title= "Interactive visualisations",  value = "iHeatmap",iheatmapUI()))),
+                          ## subtab: interactive visualizations  
+                          tabPanel(title= "Interactive visualisations",  value = "iHeatmap",iheatmapUI()))),
                 tabPanel("Heatmap-Genes",icon = icon("map"), value="heatmap_genes",
                          tags$br(),
+                         ## subtab : fixheatmap
                          tabsetPanel(type = "pills", id = 'heatmap_genes', selected = "FixedHeatmap_cells",
                                      tabPanel(title= "Fixed Heatmap",  value = "FixedHeatmap_cells",
-                                      heatmapGenesUI(),stateGenesUI()),
-                          tabPanel(title= "Interactive visualisations",  value = "iHeatmap",iheatmapGenesUI()))),          
-                                     
-                                     
-                                     
+                                     heatmapGenesUI(),stateGenesUI()),
+                         ## subtab: interactive visualizations   
+                        tabPanel(title= "Interactive visualisations",  value = "iHeatmap",iheatmapGenesUI()))),          
+                              
                 tabPanel("GO & KEGG", icon = icon("chart-line"),value="GO",
                          FunctionUI(),
                          Function_tableUI()),
@@ -176,22 +172,18 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                          DE_TableUI(),
                          DEGO_UI(),
                          DEGOtable_UI()),
-                
                 tabPanel("Find Markers",icon = icon("random"),value="Marker",
                          Marker_UI(),
                          Marker_TableUI(),
                          MarkerGO_UI(),
                          MarkerGOtable_UI()),
                 
-                
                 tabPanel("Markov Blanket",icon = icon("circle-nodes"),value="mb",
                          MBUI()),
                 
-                
                 tabPanel("UMAP Plot",icon = icon("magnet"),value="umap",
                          umapUI()),
-                
-                
+     
         ))   )
 
 )
@@ -216,7 +208,7 @@ server <- function(input, output,session) {
     }
   })  
   
-  ## Load example data or read uploaded data: topDeviatingHOIstates.csv and trainingData_.csv
+  ## Load example data or read uploaded data: all_DTuples.csv and trainingData_.csv
   usedTable2 <- reactive({
     print(paste("Use HCC cancer data: ",input$TestTable))
     if(input$TestTable){
@@ -226,7 +218,6 @@ server <- function(input, output,session) {
       names(data_path)<-c("devStates","trainDat")
       return(data_path)
     }
-    
     else{
       file_devStates<-input$topDeviatingHOIstates
       file_trainDat<-input$trainingData_matrix
@@ -247,10 +238,8 @@ server <- function(input, output,session) {
       Meta_data_path<-input$Meta_Data 
       Meta_data<-read.csv(Meta_data_path$datapath,row.names = 1,colClasses = "character")
     }
-      
       colnames(Meta_data)<-c("Cell_State","Cell_Types")
       return(Meta_data)
-    
   })  
   
   
@@ -260,12 +249,10 @@ server <- function(input, output,session) {
     if(input$TestTable){
       MCMCGraph_path<-"./data/MCMCgraph_14698Cells_1000Genes.csv"
       MCMCGraph<-read.csv(MCMCGraph_path,header=T,row.names = 1,colClasses = "character")
-   
     } else{
       MCMCGraph_path<-input$MCMCgraph
       MCMCGraph<-read.csv(MCMCGraph_path$datapath,header=T,row.names = 1,colClasses = "character")
     }
-    
     MCMCGraph<-graph_from_adjacency_matrix(as(MCMCGraph, 'matrix'), mode="directed")
     return(MCMCGraph)
   })  
@@ -277,33 +264,26 @@ server <- function(input, output,session) {
     if(input$TestTable){
       UMAP_coords_path<-"./data/UMAP_coords.csv"
       UMAP_coords<-read.csv(UMAP_coords_path,header=T,row.names = 1)
-      
     } else{
       UMAP_coords_path<-input$UMAP_coords
       UMAP_coords<-read.csv(UMAP_coords_path$datapath,header=T,row.names = 1)
     }
-    
     return(UMAP_coords)
   })  
-  
-  
+
   
   
   ## Show example background genes for functional analysis
-  # Background genes:
+  # Background genes: used in several tabs
   BackgroundGenes<-reactive({
     background<-strsplit(input$background_genes, "\n")[[1]]
   }) 
-  
   BackgroundGenes2<-reactive({
     background<-strsplit(input$background_genesrrgvo, "\n")[[1]]
   }) 
-  
   BackgroundGenes3<-reactive({
     background<-strsplit(input$background_genesDE, "\n")[[1]]
   }) 
-  
-  
   BackgroundGenes4<-reactive({
     background<-strsplit(input$background_genesMarker, "\n")[[1]]
   }) 
@@ -328,7 +308,6 @@ server <- function(input, output,session) {
     }
   })
   
-  
   observe({
     if (input$bg_Liver3) {
       updateTextInput(session, "background_genesMarker", value = background)
@@ -346,65 +325,51 @@ server <- function(input, output,session) {
     List<-reactive({
       GetCellList(usedTable()$count,summaryTable())#input$cutoff,usedTable()$count,
     })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) 
-    
-    
-  
-    
+ 
     # Get gene list: function in GO_plot.R
     GetGenesList<-reactive({
       GetGenes(summaryTable(),Remove=T)
     })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) 
-    
     
     # Get gene list, this gene list consist all the genes, function in GO_plot.R
     GetGenesList_All<-reactive({
       GetGenes(summaryTable(),Remove=F)
     })%>% bindCache(input$cutoff,usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) 
     
-    
     # About: include overview and tutorial
     Text1 <- about()
     aboutOutput(output,Text1)
     
-    
     ## Table:
     showText<-eventReactive(input$action_table, {
-      paste(dim(summaryTable())[1]," deviating MFIs in total, ",length(unique(summaryTable()$cluster)), "clusters." )
-    })
+      paste(dim(summaryTable())[1]," deviating MFIs in total, ",length(unique(summaryTable()$cluster)), "clusters." )  })
     
     output$textsummary <- renderText({
-      showText()
-    })
+      showText()  })
     
     show_Table <- eventReactive(input$action_table, { 
       table<-summaryTable()
       table$cluster<-paste0("Cluster:",table$cluster)
       colnames(table)<-c("Genes","D-tuple","LogEnrichment","Pval_corrected","No.Cells","Cluster")
       table$`D-tuple`<-paste0("[",table$`D-tuple`,"]")
-      table
-    })
+      table })
     
     output$table <- renderDT({
-      show_Table()
-    })
+      show_Table() })
     
     output$downloadtable<-downloadHandler(
       filename=function(){
         paste0("State_Table-",Sys.Date(), '.csv')
       },
       content = function(file){
-        write.csv(show_Table(),file)
-      }
-    )
+        write.csv(show_Table(),file) })
 
     
     Cellstateslists <- eventReactive(input$action_table, { 
       cellstates<-data.frame(State=NA,CellID=NA)
       for(i in 1:length(List())){
-        cellstates[i,]<-c(names(List())[i],paste0(List()[[i]],collapse=','))
-      }
-      cellstates
-    })
+        cellstates[i,]<-c(names(List())[i],paste0(List()[[i]],collapse=',')) }
+        cellstates })
     
     
     ## Download cell list csv
@@ -413,9 +378,7 @@ server <- function(input, output,session) {
         paste('CellList-',Sys.Date(), '.csv', sep='')
       },
       content=function(celllist){
-        write.csv(Cellstateslists(),celllist)
-      }
-    )
+        write.csv(Cellstateslists(),celllist)  })
     
     ## Heatmap-genes:
     usedCellStateGene <- reactive({
@@ -430,12 +393,11 @@ server <- function(input, output,session) {
     })  
     
     
-    
     TestSelected_Genes<- eventReactive(input$action_heatmap_genes, { 
       input$TestGenes
     })
     
-    # color by -log10FDR or enrichment fold
+    # color by -log10FDR or odds ratio
     colorHeatmapGene<- eventReactive(input$action_heatmap_genes, { 
       if (TestSelected_Genes()=="Fisher"){
         selected="Fold"
@@ -445,7 +407,7 @@ server <- function(input, output,session) {
       selected
     })
     
-    
+    # color scale
     colorGenes<-eventReactive(input$action_heatmap_genes, { 
       if (TestSelected_Genes()=="Over_representation") {
         color<-colorRampPalette(c("white","firebrick3"))(100)
@@ -469,11 +431,9 @@ server <- function(input, output,session) {
       if (!TestSelected_Genes()=="Fisher"){
         ComplexHeatmap::pheatmap(border_color = NA,result_genes()[[colorHeatmapGene()]],display_numbers = result_genes()[["Mydata_raw_m"]],
                          fontsize = 12,fontsize_number = 15,name = "-Log10FDR",
-                         
                          top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result_genes()[["col"]])),  
                          left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result_genes()[["row"]])),
                          show_column_dend = FALSE, show_row_dend = FALSE, 
-                         
                          main=result_genes()[["cutoff"]],
                          cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                          color =  colorGenes(),breaks = seq(0, 10, by = 0.1))}
@@ -482,15 +442,14 @@ server <- function(input, output,session) {
                                  top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result_genes()[["col"]])),  
                                  left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result_genes()[["row"]])),
                                  show_column_dend = FALSE, show_row_dend = FALSE,  
-                                 
-                          fontsize = 12,fontsize_number = 15, name = "Log10 Odds ratio",
-                           main=result_genes()[["cutoff"]],
-                           cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
-                           color =  colorGenes(),  breaks = seq(-2, 2, length.out = 100))}
+                                fontsize = 12,fontsize_number = 15, name = "Log10 Odds ratio",
+                                main=result_genes()[["cutoff"]],
+                                cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
+                                 color =  colorGenes(),  breaks = seq(-2, 2, length.out = 100))}
       #breaks = seq(0, 10, by = 1)
     })
     
-    
+    ## interactive heatmap
     output$iheatmap_GeneSet <- renderPlotly({
       mt1<-result_genes()[["Overlap"]]
       mt2<-result_genes()[["Mydata_raw_m"]]
@@ -510,10 +469,7 @@ server <- function(input, output,session) {
           custom_hovertext=matr,show_dendrogram=c(F,F))
       }
     })
-    
-    
-    
-    
+
     
    ## Download csv
     output$downloadheatmap_genes<-downloadHandler(
@@ -539,9 +495,8 @@ server <- function(input, output,session) {
                                        top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result_genes()[["col"]])),  
                                        left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result_genes()[["row"]])),
                                        show_column_dend = FALSE, show_row_dend = FALSE, 
-                                       
                                        fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,name = "-Log10FDR",
-                             main=result_genes()[["cutoff"]],breaks = seq(0, 10, by = 0.1),
+                                      main=result_genes()[["cutoff"]],breaks = seq(0, 10, by = 0.1),
                              cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                              color =  colorGenes())}
         else{
@@ -557,7 +512,6 @@ server <- function(input, output,session) {
        
         draw(ht)
         dev.off()
-        
       } )
     
     ### StateGenes:
@@ -573,7 +527,6 @@ server <- function(input, output,session) {
                                top_annotation = columnAnnotation(Pct=anno_barplot(border = F,StateGenes()[["col"]])),  
                                left_annotation = rowAnnotation(Pct=anno_barplot(border = F,StateGenes()[["row"]])),
                                show_column_dend = FALSE, show_row_dend = FALSE, 
-                               
                                fontsize = 12,fontsize_number = 15,breaks = seq(0, 10, by = 0.1),name = "-Log10FDR",
                          cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                          color =colorGenes())}
@@ -585,8 +538,7 @@ server <- function(input, output,session) {
                                  show_column_dend = FALSE, show_row_dend = FALSE, 
                             fontsize = 12,fontsize_number = 15,name = "Log10 Odds ratio",
                            cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
-                           color =colorGenes(),breaks = seq(-2, 2, length.out = 100))
-      }
+                           color =colorGenes(),breaks = seq(-2, 2, length.out = 100)) }
       #breaks = seq(0, 10, by = 1)
     })
     
@@ -639,15 +591,12 @@ server <- function(input, output,session) {
                                        top_annotation = columnAnnotation(Pct=anno_barplot(border = F,StateGenes()[["col"]])),  
                                        left_annotation = rowAnnotation(Pct=anno_barplot(border = F,StateGenes()[["row"]])),
                                        show_column_dend = FALSE, show_row_dend = FALSE, 
-                                       
-                                       
                                        fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,breaks = seq(0, 10, by = 0.1),name = "-Log10FDR",
                              cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                              color =colorGenes())}
         
         else{
         ht<-  ComplexHeatmap::pheatmap(border_color = NA,   StateGenes()[[colorHeatmapGene()]],display_numbers = StateGenes()$Mydata_raw_m,
-                             
                                        top_annotation = columnAnnotation(Pct=anno_barplot(border = F,StateGenes()[["col"]])),  
                                        left_annotation = rowAnnotation(Pct=anno_barplot(border = F,StateGenes()[["row"]])),
                                        show_column_dend = FALSE, show_row_dend = FALSE, 
@@ -655,10 +604,8 @@ server <- function(input, output,session) {
                              cluster_cols = T,cluster_rows = T,main=StateGenes()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                              color =colorGenes(),breaks = seq(-2, 2, length.out = 100))
         }
-        
         draw(ht)
         dev.off()
-        
       } )
     
   
@@ -697,11 +644,8 @@ server <- function(input, output,session) {
     } )
     
     output$heatmap_celltypes <- renderPlot({
-    
       if (!TestSelected_Cells()=="Fisher"){
-      
       ComplexHeatmap::pheatmap(border_color = NA,result1()[[colorHeatmapCells()]],display_numbers = result1()[["Mydata_raw_m"]],
-                           
                             top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result1()[["col"]])),  
                             left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result1()[["row"]])),
                             show_column_dend = FALSE, show_row_dend = FALSE,
@@ -714,14 +658,11 @@ server <- function(input, output,session) {
                                    top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result1()[["col"]])),  
                                    left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result1()[["row"]])),
                                    show_column_dend = FALSE, show_row_dend = FALSE,     
-                                   
                              fontsize = 12,fontsize_number = 15,name = "Log10 Odds ratio",
                              main=result1()[["cutoff"]],
                              cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,color = colorCells(),
                              breaks = seq(-2, 2, length.out = 100)) #color = colorCells()
-          
         }
-        
     })
     
     output$iheatmap_celltypes <- renderPlotly({
@@ -803,15 +744,12 @@ server <- function(input, output,session) {
       result2<-NMF_heatmap(usedMeta_data(),summaryTable(),List(),N=dim(usedTable()$count)[1],TestSelected_Cells())
       result2$cutoff=input$cutoff
       result2  } )
-    
       output$heatmap_cellstates <- renderPlot({
         if (!TestSelected_Cells()=="Fisher"){
         ComplexHeatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
-                         
                                  top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result2()[["col"]])),  
                                  left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result2()[["row"]])),
                                  show_column_dend = FALSE, show_row_dend = FALSE,         
-                                 
                         fontsize = 12,fontsize_number = 15,breaks = seq(0, 10, by = 0.1),
                          main=result2()[["cutoff"]],name = "-Log10FDR",
                          cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
@@ -819,18 +757,13 @@ server <- function(input, output,session) {
           else{
             ComplexHeatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
                                fontsize = 12,fontsize_number = 15,
-                               
                                top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result2()[["col"]])),  
                                left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result2()[["row"]])),
                                show_column_dend = FALSE, show_row_dend = FALSE,         
-                               
                                main=result2()[["cutoff"]],name = "Log10 Odds ratio",
                                cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                                color = colorCells(),breaks = seq(-2, 2, length.out = 100))
-            
           }
-          
-          
     })
       
       output$iheatmap_cellstates <- renderPlotly({
@@ -854,11 +787,6 @@ server <- function(input, output,session) {
       })
       
       
-      
-      
-      
-      
-      
       ## download csv
       output$downloadheatmap2<-downloadHandler(
         filename = function(){
@@ -879,11 +807,9 @@ server <- function(input, output,session) {
           pdf(heatmap2,width =width,height = height)
           if (!TestSelected_Cells()=="Fisher"){
             ht<-ComplexHeatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
-                              
                                          top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result2()[["col"]])),  
                                          left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result2()[["row"]])),
                                          show_column_dend = FALSE, show_row_dend = FALSE,   
-                                         
                               fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,name = "-Log10FDR",
                                main=result2()[["cutoff"]],breaks = seq(0, 10, by = 0.1),
                                cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
@@ -891,15 +817,12 @@ server <- function(input, output,session) {
           else{
             ht<-ComplexHeatmap::pheatmap(border_color = NA,result2()[[colorHeatmapCells()]],display_numbers = result2()[["Mydata_raw_m"]],
                                fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,
-                               
                                top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result2()[["col"]])),  
                                left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result2()[["row"]])),
                                show_column_dend = FALSE, show_row_dend = FALSE,   
-                               
                                main=result2()[["cutoff"]],name = "Log10 Odds ratio",
                                cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                                color = colorCells(),breaks = seq(-2, 2, length.out = 100))
-            
           }
           draw(ht)
           dev.off()
@@ -914,11 +837,9 @@ server <- function(input, output,session) {
       
         if (!TestSelected_Cells()=="Fisher"){
         ComplexHeatmap::pheatmap(border_color = NA,result()[[colorHeatmapCells()]],display_numbers = result()$Mydata_raw_m,
-                           
                                  top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result()[["col"]])),  
                                  left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result()[["row"]])),
                                  show_column_dend = FALSE, show_row_dend = FALSE,   
-                                        
                           fontsize = 12,fontsize_number = 15,breaks = seq(0, 10, by = 0.1),name = "-Log10FDR",
                            cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                            color = colorCells())}#breaks = seq(0, 10, by = 1)
@@ -927,12 +848,10 @@ server <- function(input, output,session) {
                                    top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result()[["col"]])),  
                                    left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result()[["row"]])),
                                    show_column_dend = FALSE, show_row_dend = FALSE,    
-                                   
                             fontsize = 12,fontsize_number = 15,name = "Log10 Odds ratio",
                              cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,
                              color = colorCells(),breaks = seq(-2, 2, length.out = 100))
         }
-        
       })
       
       
@@ -955,10 +874,7 @@ server <- function(input, output,session) {
             custom_hovertext=matr,show_dendrogram=c(F,F))
         }
       })
-      
-      
-      
-      
+ 
       
       
       
@@ -985,7 +901,6 @@ server <- function(input, output,session) {
                                          top_annotation = columnAnnotation(Pct=anno_barplot(border = F,result()[["col"]])),  
                                          left_annotation = rowAnnotation(Pct=anno_barplot(border = F,result()[["row"]])),
                                          show_column_dend = FALSE, show_row_dend = FALSE,    
-                                         
                                fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,breaks = seq(0, 10, by = 0.1),
                                cluster_cols = T,cluster_rows = T,treeheight_row = 0, treeheight_col = 0,name = "-Log10FDR",
                                color = colorCells())}#breaks = seq(0, 10, by = 1)
@@ -1014,21 +929,17 @@ server <- function(input, output,session) {
       output$cellStates_cellStates<- renderPlot({
         if (!TestSelected_Cells()=="Fisher"){
         ComplexHeatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
-                           
                                  top_annotation = columnAnnotation(Pct=anno_barplot(border = F,cellStates()[["col"]])),  
                                  left_annotation = rowAnnotation(Pct=anno_barplot(border = F,cellStates()[["row"]])),
                                  show_column_dend = FALSE, show_row_dend = FALSE,    
-                                 
                           fontsize = 12,fontsize_number = 15,breaks = seq(0, 10, by = 0.1),name = "-Log10FDR",
                            cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                            color = colorCells())}
         else{
           ComplexHeatmap::pheatmap(border_color = NA,cellStates()[[colorHeatmapCells()]],display_numbers = cellStates()$Mydata_raw_m,
-                             
                                    top_annotation = columnAnnotation(Pct=anno_barplot(border = F,cellStates()[["col"]])),  
                                    left_annotation = rowAnnotation(Pct=anno_barplot(border = F,cellStates()[["row"]])),
                                    show_column_dend = FALSE, show_row_dend = FALSE,    
-                                   
                               fontsize = 12,fontsize_number = 15,name = "Log10 Odds ratio",
                              cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                              color = colorCells(),breaks = seq(-2, 2, length.out = 100))
@@ -1084,7 +995,6 @@ server <- function(input, output,session) {
                                          top_annotation = columnAnnotation(Pct=anno_barplot(border = F,cellStates()[["col"]])),  
                                          left_annotation = rowAnnotation(Pct=anno_barplot(border = F,cellStates()[["row"]])),
                                          show_column_dend = FALSE, show_row_dend = FALSE,   
-                                         
                               fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,breaks = seq(0, 10, by = 0.1),
                                cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                                color = colorCells())}
@@ -1093,7 +1003,6 @@ server <- function(input, output,session) {
                                          top_annotation = columnAnnotation(Pct=anno_barplot(border = F,cellStates()[["col"]])),  
                                          left_annotation = rowAnnotation(Pct=anno_barplot(border = F,cellStates()[["row"]])),
                                          show_column_dend = FALSE, show_row_dend = FALSE,  
-                                         
                                          fontsize = 12,fontsize_number = 15,cellwidth = 15,cellheight = 15,name = "Log10 Odds ratio",
                                cluster_cols = T,cluster_rows = T,main=cellStates()[["cutoff"]],treeheight_row = 0, treeheight_col = 0,
                                color = colorCells(),breaks = seq(-2, 2, length.out = 100))
@@ -1223,7 +1132,6 @@ server <- function(input, output,session) {
       ###rrvgo Table
       output$Reduced_Terms <- renderDT({
         rrvGO()$reducedTerms
-        
       })
       
       output$rrvgo_table<-downloadHandler(
