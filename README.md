@@ -106,6 +106,12 @@ if (!any(rownames(installed.packages()) == "rrvgo")){
 }
 library(rrvgo)
 
+if (!any(rownames(installed.packages()) == "limma")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("limma")
+}
+library("limma")
 
 if (!any(rownames(installed.packages()) == "org.Hs.eg.db")){
   if (!requireNamespace("BiocManager", quietly = TRUE))
