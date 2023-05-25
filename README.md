@@ -106,6 +106,23 @@ if (!any(rownames(installed.packages()) == "rrvgo")){
 }
 library(rrvgo)
 
+
+if (!any(rownames(installed.packages()) == "org.Hs.eg.db")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("org.Hs.eg.db")
+}
+
+if (!any(rownames(installed.packages()) == "org.Mm.eg.db")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("org.Mm.eg.db")
+}
+
+library(org.Hs.eg.db)
+library(org.Mm.eg.db)
+
+
 if (!any(rownames(installed.packages()) == "DT")){
   install.packages("DT")
 }
