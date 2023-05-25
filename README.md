@@ -36,6 +36,9 @@ if (!any(rownames(installed.packages()) == "shinycssloaders")){
 }
 library(shinycssloaders)
 
+if (!any(rownames(installed.packages()) == "import")){
+  install.packages("import")
+}
 
 import::from(shinycssloaders, withSpinner) 
 
