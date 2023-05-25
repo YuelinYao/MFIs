@@ -12,13 +12,7 @@
 ## Libarary:
 R:
 ```
-#------renv package: https://rstudio.github.io/renv/articles/renv.html
-# renv::restore() use the information from renv.lock file to retrieve and reinstall those packages in this project.
-# just enter the following in the project directory:
-renv::restore()
-
-
-#----- alternatively, install one by one...
+#----- Install one by one...
 
 if (!any(rownames(installed.packages()) == "shiny")){
   install.packages("shiny")
@@ -166,6 +160,15 @@ library(heatmaply)
 
 install.packages("plotly")
 library(plotly)
+
+
+#------ alternatively: renv package: https://rstudio.github.io/renv/articles/renv.html
+# uncomment "source("renv/activate.R")" (remove # ) in the .Rprofile file if you wish to use renv
+# renv::restore() use the information from renv.lock file to retrieve and reinstall those packages in this project.
+# just enter the following in the project directory:
+renv::restore()
+
+
 
 ```
 
