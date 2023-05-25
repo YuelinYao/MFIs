@@ -174,7 +174,12 @@ renv::restore()
 
 
 Python:
+
 ```
+# Install python from https://www.python.org/downloads/
+# Python 3.8
+
+
 # Define any Python packages needed for the app in R:
 #PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
              #           'matplotlib','Pillow','seaborn')
