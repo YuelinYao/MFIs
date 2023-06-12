@@ -53,14 +53,23 @@ UploadFilesUI <- function(){
     ),
     
     conditionalPanel(condition= "input.tabs != 'about' & input.tabs != 'mb'" ,
-                     textInput("minStateDeviation", "Minimum enrichment factor (Log2 transformed):",value = 3),
+                     textInput("minStateDeviation", label = div("Minimum enrichment factor (Log2 transformed):",bsButton("q1",label="",icon = icon("info"), style = "info", size = "extra-small")),value = 3),
+                     bsPopover(id = "q1",title=NULL,
+                               content ="E.g., 3 is referred as a 8-fold increase: log2(8)",
+                               placement = "right", 
+                               trigger = "hover", 
+                               options = list(container = "body")
+                     ),
                      textInput("minNoCells", "Minimum number of cells in each D-tuple:",value = 0),
                      textInput("stateDevAlpha", "Min. enrichment significance (corrected):",value = 0.05),
                      sliderInput("cutoff",
                                  "Dice distance:",
                                  min = 0,
                                  max = 1,
-                                 value = 0.91))
+                                 value = 0.91),
+                  
+                     
+                     )
     
     
   )

@@ -350,7 +350,7 @@ server <- function(input, output,session) {
     show_Table <- eventReactive(input$action_table, { 
       table<-summaryTable()
       table$cluster<-paste0("Cluster:",table$cluster)
-      colnames(table)<-c("Genes","D-tuple","LogEnrichment","Pval_corrected","No.Cells","Cluster")
+      colnames(table)<-c("Genes","D-tuple","Log2Enrichment","Pval_corrected","No.Cells","Cluster")
       table$`D-tuple`<-paste0("[",table$`D-tuple`,"]")
       table })
     
