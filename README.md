@@ -12,13 +12,7 @@
 ## Libarary:
 R:
 ```
-#------renv package: https://rstudio.github.io/renv/articles/renv.html
-# renv::restore() use the information from renv.lock file to retrieve and reinstall those packages in this project.
-# just enter the following in the project directory:
-renv::restore()
-
-
-#----- alternatively, install one by one...
+#----- Install one by one...
 
 if (!any(rownames(installed.packages()) == "shiny")){
   install.packages("shiny")
@@ -36,6 +30,9 @@ if (!any(rownames(installed.packages()) == "shinycssloaders")){
 }
 library(shinycssloaders)
 
+if (!any(rownames(installed.packages()) == "import")){
+  install.packages("import")
+}
 
 import::from(shinycssloaders, withSpinner) 
 
@@ -103,6 +100,29 @@ if (!any(rownames(installed.packages()) == "rrvgo")){
 }
 library(rrvgo)
 
+if (!any(rownames(installed.packages()) == "limma")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("limma")
+}
+library("limma")
+
+if (!any(rownames(installed.packages()) == "org.Hs.eg.db")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("org.Hs.eg.db")
+}
+
+if (!any(rownames(installed.packages()) == "org.Mm.eg.db")){
+  if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+  BiocManager::install("org.Mm.eg.db")
+}
+
+library(org.Hs.eg.db)
+library(org.Mm.eg.db)
+
+
 if (!any(rownames(installed.packages()) == "DT")){
   install.packages("DT")
 }
@@ -141,11 +161,25 @@ library(heatmaply)
 install.packages("plotly")
 library(plotly)
 
+
+#------ alternatively: renv package: https://rstudio.github.io/renv/articles/renv.html
+# uncomment "source("renv/activate.R")" (remove # ) in the .Rprofile file if you wish to use renv
+# renv::restore() use the information from renv.lock file to retrieve and reinstall those packages in this project.
+# just enter the following in the project directory:
+renv::restore()
+
+
+
 ```
 
 
 Python:
+
 ```
+# Install python from https://www.python.org/downloads/
+# Python 3.8
+
+
 # Define any Python packages needed for the app in R:
 #PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
              #           'matplotlib','Pillow','seaborn')
