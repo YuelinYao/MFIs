@@ -1064,7 +1064,7 @@ server <- function(input, output,session) {
       
       output$downloadGO<-downloadHandler(
         filename = function(){
-          paste('GOtable-', Sys.Date(), '.csv', sep='')
+          paste('GOKEGG_DtuplesGenes-', Sys.Date(), '.csv', sep='')
         },
         content=function(gotable){
           write.csv(GO(),gotable)
@@ -1087,7 +1087,7 @@ server <- function(input, output,session) {
       
       output$downloadGOPlot<-downloadHandler(
         filename = function(){
-          paste('GOPlot-', Sys.Date(), '.pdf', sep='')
+          paste('GOKEGG_DtuplesGenesPlot-', Sys.Date(), '.pdf', sep='')
         },
         content=function(gotable){
         ggsave(Plot_enrichment(GO()),filename = gotable,width = plot_size()[["width"]],height =plot_size()[["height"]] )
@@ -1111,7 +1111,7 @@ server <- function(input, output,session) {
       
       output$rrvgo_plot1<-downloadHandler(
         filename = function(){
-          paste('wordcloudPlot-', Sys.Date(), '.pdf', sep='')
+          paste('GO_DtuplesGenes_wordcloudPlot-', Sys.Date(), '.pdf', sep='')
         },
         content=function(wordcloud){
           pdf(wordcloud)
@@ -1129,7 +1129,7 @@ server <- function(input, output,session) {
       
       output$rrvgo_plot2<-downloadHandler(
         filename = function(){
-          paste('TreemapPlot-', Sys.Date(), '.pdf', sep='')
+          paste('GO_DtuplesGenes_TreemapPlot-', Sys.Date(), '.pdf', sep='')
         },
         content=function(treemap){
           pdf(treemap)
@@ -1147,7 +1147,7 @@ server <- function(input, output,session) {
       
       output$rrvgo_plot3<-downloadHandler(
         filename = function(){
-          paste('ScatterPlot-', Sys.Date(), '.pdf', sep='')
+          paste('GO_DtuplesGenes_ScatterPlot-', Sys.Date(), '.pdf', sep='')
         },
         content=function(scatter){
           scplot<-scatterPlot(labelSize = 5,rrvGO()$simMatrix, rrvGO()$reducedTerms)
@@ -1163,7 +1163,7 @@ server <- function(input, output,session) {
       
       output$rrvgo_table<-downloadHandler(
         filename = function(){
-          paste('rrvgo_table-', Sys.Date(), '.csv', sep='')
+          paste('GO_DtuplesGenes_rrvgo_table-', Sys.Date(), '.csv', sep='')
         },
         content=function(rrvgotable){
        write.csv(rrvGO()$reducedTerms,rrvgotable)
@@ -1233,7 +1233,7 @@ server <- function(input, output,session) {
       
       output$GeneHeatmap<-downloadHandler(
         filename = function(){
-          paste('GeneHeatmap-', Sys.Date(), '.pdf', sep='')
+          paste('DEGeneHeatmap-', Sys.Date(), '.pdf', sep='')
         },
         content=function(genesheatmap){
           doheatmap<-DoHeatmap(p_heatmap()[["sub"]],features = p_heatmap()[["top20"]],slot = "c",group.by = "state",
@@ -1317,7 +1317,7 @@ server <- function(input, output,session) {
       
       output$VolcanoPlot_Download<-downloadHandler(
         filename = function(){
-          paste('VolcanoPlot-', Sys.Date(), '.pdf', sep='')
+          paste('State_Markers_VolcanoPlot-', Sys.Date(), '.pdf', sep='')
         },
         content=function(VolcanoPlot){
           Volco<-Marker_plot()
@@ -1331,7 +1331,7 @@ server <- function(input, output,session) {
       
       output$MarkerTable_Downloaded<-downloadHandler(
         filename = function(){
-          paste('MarkerTable-', Sys.Date(), '.csv', sep='')
+          paste('State_MarkersTable-', Sys.Date(), '.csv', sep='')
         },
         content=function(MarkerTable){
           write.csv(Marker(),MarkerTable)
@@ -1353,7 +1353,7 @@ server <- function(input, output,session) {
       
       output$MarkerAnnotationPlot<-downloadHandler(
         filename = function(){
-          paste('MarkersAnnotationPlot-', Sys.Date(), '.pdf', sep='')
+          paste('State_MarkersAnnotationPlot-', Sys.Date(), '.pdf', sep='')
         },
         content=function(MarkersAnoPlot){
           p_Markers<-  Plot_Marker_enrichment(marker_plot())
@@ -1370,7 +1370,7 @@ server <- function(input, output,session) {
       
       output$MarkerAnnotationTable<-downloadHandler(
         filename = function(){
-          paste('MarkersAnnotationTable-', Sys.Date(), '.csv', sep='')
+          paste('State_MarkersAnnotationTable-', Sys.Date(), '.csv', sep='')
         },
         content=function(MarkersAnoTable){
           write.csv(marker_plot(),MarkersAnoTable)
