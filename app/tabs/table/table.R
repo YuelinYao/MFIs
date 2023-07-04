@@ -6,10 +6,12 @@
 TableUI <- function(){
   tagList(
     tags$h3(paste0("Table for deviating MFIs"), style = "color: steelblue;"),
+    textOutput("textModularity_scores"),tags$br(),
     textOutput("textsummary"),tags$br(),
     DTOutput("table") %>% withSpinner(color="#4682B4"),
     downloadButton("downloadtable","Download as .csv"),
-    downloadButton("downloadCellList","Download Cell List as .csv")
+    downloadButton("downloadCellList","Download Cell List as .csv"),
+    downloadButton("downloadModularity_score","Download Modularity Score as .csv")
   )}
 
 
@@ -41,5 +43,14 @@ Table_cluster<-function(cutoff,data_path,minStateDeviation,minNoCells,stateDevAl
   return(Devstates)
   
 }
+
+Table_modularity_scores<-function(minStateDeviation,minNoCells,stateDevAlpha){
+  modularity_scores<-read.csv(paste0('./',minStateDeviation,"_",minNoCells,"_",stateDevAlpha,'_modularity_scores.csv'),colClasses = c("character"))
+  file.remove(paste0('./',minStateDeviation,"_",minNoCells,"_",stateDevAlpha,'_modularity_scores.csv'))
+  return(modularity_scores)
+  
+}
+
+
 
 

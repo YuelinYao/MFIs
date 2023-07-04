@@ -24,7 +24,7 @@ from scipy.cluster.hierarchy import dendrogram, linkage, fcluster, cut_tree
 #import seaborn as sns
 #sns.set(style='white')
 #sns.set_palette('colorblind')
-
+from sklearn.metrics import pairwise_distances
 
 devStates = pd.read_csv(devStates_path, dtype=str, index_col=0)
 trainDat=pd.read_csv(trainDat_path)
@@ -65,17 +65,63 @@ devStates = devStates[devStates["No.Cells"] > float(minNoCells)]
 # Updated Binreps 
 binReps = np.array(devStates.apply(lambda x: (trainDat[x['genes'].rsplit('_')]==[int(g) for g in list(str(x['state']))]).all(axis=1), axis=1))*1
 
-
 # linkage defines the distances between the binReps, using the Dice-distance: https://en.wikipedia.org/wiki/Sørensen–Dice_coefficient
 linked_full = linkage(binReps, 'average', metric='dice')
-
-
 print(linked_full.shape)
+
+
+
+# modularity score
+def modularity_score(adjMat, cluster_labels, verbose=False):
+    '''
+    Calculate the modularity score for a given clustering of a graph.
+    '''
+    n = len(adjMat)
+    m = np.sum(adjMat) / 2.0
+    k = np.sum(adjMat, axis=1)
+    q = 0.0
+    for i in range(n):
+        for j in range(n):
+            if (cluster_labels[i] == cluster_labels[j]) & (i!=j):
+                q += (adjMat[i][j] - k[i]*k[j]/(2.0*m))       
+    if verbose:
+        print(f'n:{n}')
+        print(f'm:{m}')
+        print(f'k:{k}')
+        print(f'q:{q}')
+    return q/(2.0*m)
+
+
+# function to calculate the cluster labels for a given cutoff
+cutAt = lambda x: fcluster(linked_full, x, criterion = 'distance')
+pairwiseDists = pairwise_distances(binReps, metric='dice')
+
+# Modularity calculation for a range of N cutoffs (set to 50 for round numbers, but also forced to be round to 2 decimal places)
+N = 50
+cutoffs = np.linspace(0.01, 0.99, N)
+cutoffs = np.round(cutoffs, 2)
+
+modScores = [modularity_score((1-pairwiseDists), cutAt(d)) for d in cutoffs]
+
+diffCutoff_name=diffCutoff
+diffCutoff_max = cutoffs[np.argmax(modScores)]
+
+if diffCutoff == "Optimal":
+    diffCutoff = diffCutoff_max
+    print(f'Using cutoff of {diffCutoff} to maximise modularity score')
+
+print(f'Max modularity score: {max(modScores)}')
+print(f'Optimal dice distance: {diffCutoff_max}')
+print(f'Using cutoff of {diffCutoff} to cut')
+
+modularity_scores_path="./"+str(minStateDeviation)+'_'+str(minNoCells)+'_'+str(stateDevAlpha)+"_"+"modularity_scores.csv"
+pd.DataFrame(zip(cutoffs, modScores), columns=['Cutoff', 'Modularity score']).to_csv(modularity_scores_path)
+
 
 devStates['cluster'] = fcluster(linked_full, diffCutoff, criterion = 'distance')
 #devStates['cluster'] = fcluster(linked_full, diffCutoff, criterion = 'distance')
 
-path='./'+str(diffCutoff)+"_"+str(minStateDeviation)+'_'+str(minNoCells)+'_'+str(stateDevAlpha)+'_devStates.csv'
+path='./'+str(diffCutoff_name)+"_"+str(minStateDeviation)+'_'+str(minNoCells)+'_'+str(stateDevAlpha)+'_devStates.csv'
 pd.DataFrame(devStates).to_csv(path)
 
 #print(devStates['cluster'].shape)

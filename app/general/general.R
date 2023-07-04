@@ -62,11 +62,23 @@ UploadFilesUI <- function(){
                      ),
                      textInput("minNoCells", "Minimum number of cells in each D-tuple:",value = 0),
                      textInput("stateDevAlpha", "Min. enrichment significance (corrected):",value = 0.05),
-                     sliderInput("cutoff",
+                     
+                     #switch button to optimal
+                     radioButtons(inputId = "OptimalDiceDistance", label = div("Optimal Dice Distance:",bsButton("q2",label="",icon = icon("info"), style = "info", size = "extra-small")),                         
+                                  choices = c("Yes" = "Yes", "No" = "No"), selected = "No", inline = TRUE),
+                     bsPopover(id = "q2",title=NULL,
+                               content ="Optimal dice distance resulting in the largest modularity score",
+                               placement = "right", 
+                               trigger = "hover", 
+                               options = list(container = "body")
+                     ),
+ 
+                     conditionalPanel(condition = "input.OptimalDiceDistance == 'No'", 
+                                    sliderInput("cutoff",
                                  "Dice distance:",
                                  min = 0,
                                  max = 1,
-                                 value = 0.91),
+                                 value = 0.91) ),
                   
                      
                      )
