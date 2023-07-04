@@ -1,1 +1,0 @@
-Using cutoff of 0.85andthe optimal dice distance is 0.85
