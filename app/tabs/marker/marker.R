@@ -64,11 +64,17 @@ MarkerInput<- function(){
 Marker_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
   
   print("Find Marker genes")
-  selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
-  selected_cluster<-paste0("cluster_C:",selected_cluster)
-  selected_1<-List[[selected_cluster[1]]]
+  selected_cluster_list<-strsplit(selected_cluster, ",\\s*")[[1]]
+  
+  selected_1<-NULL
+  for (i in selected_cluster_list){
+  
+  selected_cluster<-paste0("cluster_C:",i)
+  selected_cells<-List[[selected_cluster]]
+  selected_1<-unique(c(selected_1,selected_cells))
   #print(length(selected_1)) The number of cells
-
+  }
+  print(length(selected_1))
   Marker<-FindMarkers(object = srt,ident.1 = selected_1,logfc.threshold = logfc)
   print("done")
   Marker<-Marker[Marker$p_val_adj<Pvalue,]
@@ -87,10 +93,7 @@ Marker_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
 PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List,GetGenesList_All){
   
   print("Plot VolcanoPlot")
-  selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
-  selected_cluster<-paste0("cluster_C:",selected_cluster)
-  selected_1<-List[[selected_cluster[1]]]
-  
+
   Marker[, "diff_pct"] <- Marker[, "pct.1"] - Marker[, "pct.2"]
   Marker[, "log10padj"] <- -log10(Marker[, "p_val_adj"])
   
@@ -99,8 +102,20 @@ PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List,GetGenesList_All){
   top20
   #shape = Ingroup
   Marker$Ingroup<-"Out"
+  
+  selected_cluster_list<-strsplit(selected_cluster, ",\\s*")[[1]]
+  
+  cluster_genes<-NULL
+  
+  for (i in selected_cluster_list){
+  
+  selected_cluster<-paste0("cluster_C:",i)
   names<-gsub("cluster_C:","cluster_",selected_cluster)
-  cluster_genes<-GetGenesList_All[[names]]
+  cluster_genes_list<-GetGenesList_All[[names]]
+  cluster_genes<-unique(c(cluster_genes,cluster_genes_list))
+  }
+  
+  print(length(cluster_genes))
   Marker$Ingroup<-1
   Marker$Ingroup[Marker$gene%in%cluster_genes]<-"In"
   
@@ -120,7 +135,7 @@ PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List,GetGenesList_All){
 
 
 
-MarkerGO<-function(Marker,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
+MarkerGO<-function(Marker,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
   
   print("Markers GO & KEGG")
   if (!any(rownames(installed.packages()) == go_species)){
@@ -128,8 +143,7 @@ MarkerGO<-function(Marker,selected_cluster,cutoff,Mart,kegg_species,go_species,l
   }
   library(go_species,character.only = T)
   #print(class(selected_cluster))
-  selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
-  selected_cluster<-paste0("cluster_C:",selected_cluster)
+
   
   mart <- useMart("ENSEMBL_MART_ENSEMBL")
   mart <- useDataset(Mart, mart) 

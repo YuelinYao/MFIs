@@ -52,7 +52,7 @@ library(org.Mm.eg.db)
 library("limma")
 library(heatmaply)
 library(plotly)
-options(shiny.maxRequestSize = 5000*1024^2)
+options(shiny.maxRequestSize = 10000*1024^2)
 import::from(plotly, plotlyOutput, renderPlotly, ggplotly)
 
 source("./app/general/general.R") # conditionalPanel
@@ -1340,7 +1340,7 @@ server <- function(input, output,session) {
       )
       
       marker_plot<- reactive({ #Marker,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes
-        MarkerGO(Marker(),input$selected_clusterMarker,input$cutoff,input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4())
+        MarkerGO(Marker(),input$cutoff,input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4())
       }) %>%
         bindCache(Marker(),input$selected_clusterMarker,input$cutoff,input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_Marker)
