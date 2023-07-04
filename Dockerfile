@@ -34,7 +34,7 @@ RUN Rscript -e 'renv::consent(provided = TRUE)'
 RUN Rscript -e 'renv::restore()'
 
 RUN Rscript -e 'reticulate::virtualenv_create(envname = "example_env_name", python = "python3")'
-RUN Rscript -e 'reticulate::virtualenv_install("example_env_name", packages = c("numpy","pandas","scipy"), ignore_installed=TRUE)'
+RUN Rscript -e 'reticulate::virtualenv_install("example_env_name", packages = c("numpy","pandas","scipy","sklearn"), ignore_installed=TRUE)'
 RUN Rscript -e 'reticulate::use_virtualenv("example_env_name", required = T)'
 
 

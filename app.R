@@ -14,7 +14,7 @@
 # Define any Python packages needed for the app in R:
 #PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
 #'matplotlib','Pillow','seaborn')
-#PYTHON_DEPENDENCIES = c('numpy','pandas','scipy')
+#PYTHON_DEPENDENCIES = c('numpy','pandas','scipy','sklearn')
 
 # ------------------ App virtualenv setup (Do not edit) ------------------- #
 # VIRTUALENV_NAME and PYTHON_PATH are definded in .Rprofile
