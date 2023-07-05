@@ -365,7 +365,7 @@ server <- function(input, output,session) {
     ## Table:
     
     showScoreText<-eventReactive(input$action_table, {
-      paste("The optimal dice distance is ",modularity_scoreTable()$Cutoff[which.max(modularity_scoreTable()$Modularity.score)], ".","Dice distance: ",usedDiceDistance()," is used")  })
+      paste("The optimal dice distance is ",modularity_scoreTable()$Cutoff[which.max(modularity_scoreTable()$Modularity.score)], ".","Dice distance: ",usedDiceDistance()," is used.")  })
     
     output$textModularity_scores <- renderText({
       showScoreText()  })
@@ -417,6 +417,16 @@ server <- function(input, output,session) {
       content = function(file){
         write.csv(modularity_scoreTable(),file) })
     
+    ## dice distance-title
+    dice_distance_title<-reactive({
+      if(usedDiceDistance()=="Optimal"){
+        return(paste0("Optimal: ", modularity_scoreTable()$Cutoff[which.max(modularity_scoreTable()$Modularity.score)]))}
+      else{
+        return(usedDiceDistance())
+      }
+      
+    })
+    
     
     
     ## Heatmap-genes:
@@ -462,7 +472,7 @@ server <- function(input, output,session) {
     result_genes <- eventReactive(input$action_heatmap_genes,{
       result_genes<-heatmapGenes(usedCellStateGene(),GetGenesList_All(),N=as.integer(input$NO.background),TestSelected_Genes())
       #N=25678 the number of genes in whole human genome
-      result_genes$cutoff=usedDiceDistance()
+      result_genes$cutoff=dice_distance_title()
       result_genes
     } )
     
@@ -560,7 +570,7 @@ server <- function(input, output,session) {
     ### StateGenes:
     StateGenes <- eventReactive(input$action_heatmap_genes,{
       StateGenesResult<-ListTest(GetGenesList_All(),as.integer(input$NO.background),TestSelected_Genes())
-      StateGenesResult$cutoff=usedDiceDistance()
+      StateGenesResult$cutoff=dice_distance_title()
       StateGenesResult
     })
     
@@ -686,7 +696,7 @@ server <- function(input, output,session) {
     
     result1 <- eventReactive(input$action_heatmap,{
       result1<-heatmap(usedMeta_data(),summaryTable(), List(),N=dim(usedTable()$count)[1],TestSelected_Cells())
-      result1$cutoff=usedDiceDistance()
+      result1$cutoff=dice_distance_title()
       result1
     } )
     
@@ -796,7 +806,7 @@ server <- function(input, output,session) {
     # Heatmap2 (Tab)
     result2 <- eventReactive(input$action_heatmap,{  
       result2<-NMF_heatmap(usedMeta_data(),summaryTable(),List(),N=dim(usedTable()$count)[1],TestSelected_Cells())
-      result2$cutoff=usedDiceDistance()
+      result2$cutoff=dice_distance_title()
       result2  } )
       output$heatmap_cellstates <- renderPlot({
         if (!TestSelected_Cells()=="Fisher"){
@@ -985,7 +995,7 @@ server <- function(input, output,session) {
       ##Heatmap-Tab4: cellStates
       cellStates <- eventReactive(input$action_heatmap,{
         testResult<-ListTest(List(),N=dim(usedTable()$count)[1],TestSelected_Cells())
-        testResult$cutoff=usedDiceDistance()
+        testResult$cutoff=dice_distance_title()
         testResult
       })
       output$cellStates_cellStates<- renderPlot({
@@ -1219,7 +1229,7 @@ server <- function(input, output,session) {
         bindEvent(input$action_upset)
       
       cutoff<- eventReactive(input$action_upset, { 
-      usedDiceDistance()})
+      dice_distance_title()})
       
       output$UPsetPlot<- renderPlot({
       ComplexHeatmap::UpSet(m(),top_annotation = upset_top_annotation(m(), add_numbers = TRUE),column_title =cutoff(),
