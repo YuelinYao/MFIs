@@ -37,7 +37,7 @@ DEGOtable_UI<- function(){
 ### Input function
 DEInput<- function(){
   tagList( 
-    textInput("selected_clusterDE", "Select cluster(s)",value = "6,19"),
+    textInput("selected_clusterDE", "Select cluster(s)",value = "46,19"),
     selectInput("Mart_DE", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
     textInput("go_species_DE", "GO OrgDb:",value = "org.Hs.eg.db"),
     textInput("kegg_species_DE", "KEGG organism:",value = "hsa"),

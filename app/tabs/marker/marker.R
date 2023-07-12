@@ -37,7 +37,7 @@ MarkerGOtable_UI<- function(){
 ### Input function
 MarkerInput<- function(){
   tagList( 
-    textInput("selected_clusterMarker", "Select cluster:",value = "23"),
+    textInput("selected_clusterMarker", "Select cluster:",value = "6"),
     selectInput("Mart_Marker", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
     textInput("go_species_Marker", "GO OrgDb:",value = "org.Hs.eg.db"),
     textInput("kegg_species_Marker", "KEGG organism:",value = "hsa"),

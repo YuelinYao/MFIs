@@ -10,7 +10,7 @@ UPsetUI <- function(){
 ### Input function
 UPsetInput<- function(){
   tagList( 
-    textInput("selected_cluster_upset", "Input cluster(s):",value = "1,3,8"),
+    textInput("selected_cluster_upset", "Input cluster(s):",value = "19,46,47"),
     actionButton("action_upset","Submit",icon("paper-plane"), 
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
   )

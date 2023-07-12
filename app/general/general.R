@@ -65,7 +65,7 @@ UploadFilesUI <- function(){
                      
                      #switch button to optimal
                      radioButtons(inputId = "OptimalDiceDistance", label = div("Optimal Dice Distance:",bsButton("q2",label="",icon = icon("info"), style = "info", size = "extra-small")),                         
-                                  choices = c("Yes" = "Yes", "No" = "No"), selected = "No", inline = TRUE),
+                                  choices = c("Yes" = "Yes", "No" = "No"), selected = "Yes", inline = TRUE),
                      bsPopover(id = "q2",title=NULL,
                                content ="Optimal dice distance resulting in the largest modularity score. Choose [No] if you want to change the dice distance.",
                                placement = "right", 
