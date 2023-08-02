@@ -1469,9 +1469,8 @@ server <- function(input, output,session) {
       
       
       ### Plot umap
-      
       StateUMAPs <- eventReactive(input$action_umap, { 
-        cluster_umap(input$selected_umap,usedUMAP_coords(),srt(),List())
+        cluster_umap(input$selected_umap,usedUMAP_coords(),srt(),List(),summaryTable())
       })
       
       
@@ -1484,7 +1483,7 @@ server <- function(input, output,session) {
           paste('UMAP-',input$selected_umap,"-",Sys.Date(), '.pdf', sep='')
         },
         content=function(uPlot){
-          ggsave(StateUMAPs(),filename = uPlot,width = 5,height = 3.8)
+          ggsave(StateUMAPs(),filename = uPlot,width = 4,height = 3)
         } )
       
       onSessionEnded(function() {
