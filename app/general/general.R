@@ -102,9 +102,7 @@ read_data<-function(path_countmatrix){
   
 }
 
-# Example background_genes:
-background_genes<-read.table("./data/Background_genes.txt")
-background<-paste0(background_genes$V1,collapse='\n')
+
 
 
 ## processed_seruat ftunction:

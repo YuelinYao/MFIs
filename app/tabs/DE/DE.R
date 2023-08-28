@@ -50,7 +50,7 @@ DEInput<- function(){
     textAreaInput("background_genesDE", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
     actionButton(inputId = "bg_Liver2",                                       #action button to display background genes
                  label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-    bsTooltip("bg_Liver2","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
+    bsTooltip("bg_Liver2","Load background genes as expressed genes in the current dataset.",placement = "bottom", trigger = "hover",
               options = NULL),
     actionButton("action_DE","Submit",icon("paper-plane"), 
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")

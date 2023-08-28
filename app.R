@@ -286,6 +286,15 @@ server <- function(input, output,session) {
 
   
   
+  # Example background_genes:
+  background<- reactive({
+  background<-colnames(usedTable()$count)[colSums(usedTable()$count)>0]
+  background<-paste0(background,collapse='\n')  
+  return(background)
+      })
+  
+  
+  
   ## Show example background genes for functional analysis
   # Background genes: used in several tabs
   BackgroundGenes<-reactive({
@@ -305,25 +314,25 @@ server <- function(input, output,session) {
   # Load background genes
   observe({
     if (input$bg_Liver0) {
-      updateTextInput(session, "background_genes", value = background)
+      updateTextInput(session, "background_genes", value = background())
     }
   })
   
   observe({
     if (input$bg_Liver) {
-      updateTextInput(session, "background_genesrrgvo", value = background)
+      updateTextInput(session, "background_genesrrgvo", value = background())
     }
   })
   
   observe({
     if (input$bg_Liver2) {
-      updateTextInput(session, "background_genesDE", value = background)
+      updateTextInput(session, "background_genesDE", value = background())
     }
   })
   
   observe({
     if (input$bg_Liver3) {
-      updateTextInput(session, "background_genesMarker", value = background)
+      updateTextInput(session, "background_genesMarker", value = background())
     }
   })
   

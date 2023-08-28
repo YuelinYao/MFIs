@@ -44,7 +44,7 @@ rrvgoInput<- function(){
     textAreaInput("background_genesrrgvo", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
     actionButton(inputId = "bg_Liver",                                       #action button to display background genes
                  label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
-    bsTooltip("bg_Liver","Load background genes in HCC dataset.",placement = "bottom", trigger = "hover",
+    bsTooltip("bg_Liver","Load background genes as expressed genes in the current dataset.",placement = "bottom", trigger = "hover",
               options = NULL),
     actionButton("action_rrvgo","Submit",icon("paper-plane"),       # submit button
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
