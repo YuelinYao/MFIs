@@ -64,6 +64,7 @@ source("./app/tabs/upsetplot/upsetplot.R")
 source("./app/tabs/table/table.R") 
 source("./app/tabs/DE/DE.R") 
 source("./app/tabs/marker/marker.R") 
+source("./app/tabs/automatic/automatic.R") 
 source("./app/tabs/rrvgo/rrvgo.R") 
 source("./app/tabs/markovBlanket/markovBlanket.R") 
 source("./app/tabs/umap/umap.R") 
@@ -123,6 +124,11 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
  ## Find Marker Tab
             conditionalPanel(condition= "input.tabs == 'Marker'",
                              MarkerInput()),
+ 
+ ## Automatic annotation
+            conditionalPanel(condition= "input.tabs == 'automatic'",
+                  AllMarkerInput()),
+ 
           
  ## MB Tab
             conditionalPanel(condition= "input.tabs == 'mb'",
@@ -177,6 +183,10 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                          Marker_TableUI(),
                          MarkerGO_UI(),
                          MarkerGOtable_UI()),
+                tabPanel("Automatic annotations",icon = icon("random"),value="automatic",
+                         AllMarker_TableUI(),
+                         AllMarkerAnnotationTable_UI(),
+                         Automatic_Heatmap_UI()),
                 
                 tabPanel("Markov Blanket",icon = icon("circle-nodes"),value="mb",
                          MBUI()),
@@ -1435,6 +1445,117 @@ server <- function(input, output,session) {
           
         }
       )
+      
+      ##  All Cell state markers
+      AllMarkers<- reactive({
+        MarkerAll_set(usedDiceDistance(),usedTable()$count,srt(),input$logfcMarker,input$Pvalue_Marker,List())
+      }) %>%  #cutoff,count,srt,logfc,Pvalue,List
+        bindCache(usedDiceDistance(),input$logfcMarker,input$Pvalue_Marker,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
+        bindEvent(input$action_AllMarkers)
+      
+      
+      output$AllMarkerTable <- renderDT({
+        AllMarkers()#[,-1]
+      })
+      
+      output$AllMarkerTable_Downloaded<-downloadHandler(
+        filename = function(){
+          paste('State_AllMarkersTable-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(AllMarkerTable){
+          write.csv(AllMarkers(),AllMarkerTable)
+          
+        }
+      )
+      
+      
+      ## Load annotation file: 
+      Annotations <- reactive({
+        print(paste("Use Annotation file"))
+        
+        Annotations_path<-input$Auto_annot
+        Annotations<-read.csv(Annotations_path$datapath)
+
+        return(Annotations)
+      })  
+      
+      
+      regulation<- eventReactive(input$action_AllMarkers, { 
+        input$regulation
+      })
+      
+      
+      
+      ## Markers in AnnotTable
+      Markers_in_AnnotTable<- reactive({
+        Markers_in_Annot(AllMarkers(),Annotations(), regulation())
+      }) %>%  
+        bindCache(AllMarkers(),Annotations(),regulation()) %>%
+        bindEvent(input$action_AllMarkers)
+      
+      
+      output$AllMarker_AutomaticAnnotation <- renderDT({
+        Markers_in_AnnotTable()#[,-1]
+      })
+      
+      output$AllMarker_AutomaticAnnotationTable<-downloadHandler(
+        filename = function(){
+          paste('Markers_in_AnnotTable-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(AllMarkerAnnotInTable){
+          write.csv(Markers_in_AnnotTable(),AllMarkerAnnotInTable)
+          
+        }
+      )
+      
+      ### number all
+      NumberAllAnnot<- reactive({
+        number_all(Annotations())
+      }) %>%  
+        bindCache(AllMarkers(),Annotations(),regulation()) %>%
+        bindEvent(input$action_AllMarkers)
+      
+      
+      ## summary_table
+      summaryDF<- reactive({
+        summary_df(Markers_in_AnnotTable(),NumberAllAnnot())
+      }) %>%  
+        bindCache(AllMarkers(),Annotations(),regulation()) %>%
+        bindEvent(input$action_AllMarkers)
+      
+      
+      
+      summaryDF_per<- reactive({
+        percent_summaryDF(summaryDF(),NumberAllAnnot())
+      }) %>%  
+        bindCache(AllMarkers(),Annotations(),regulation()) %>%
+        bindEvent(input$action_AllMarkers)
+      
+      ##Get gene list in each annotation
+      summary_genelist<-reactive({
+        get_genelist_annotation(Markers_in_AnnotTable(),NumberAllAnnot())
+      }) %>%  
+        bindCache(AllMarkers(),Annotations(),regulation()) %>%
+        bindEvent(input$action_AllMarkers)
+      
+      ### output Automatic_Annotation_Heatmap
+      output$Automatic_Annotation_Heatmap <- renderPlotly({
+        heatmaply(
+          summaryDF(), colors = colorRampPalette(c("white","firebrick3"))(100),show_dendrogram=c(F,F),
+          custom_hovertext=summary_genelist(),method = "ggplot",margins = c(5,10,30),dendrogram = "none")
+      
+      })
+      
+      output$downloadAutomatic_Annotation_Heatmap<-downloadHandler(
+        filename = function(){
+          paste('SummaryGeneMarkers_in_AnnotTable-', Sys.Date(), '.csv', sep='')
+        },
+        content=function(summary_genelistTable){
+          write.csv(summary_genelist(),summary_genelistTable)
+          
+        }
+      )
+      
       
       
       
