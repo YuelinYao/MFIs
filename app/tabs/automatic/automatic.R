@@ -146,7 +146,7 @@ get_genelist_annotation<-function(annotation,number_all){
       r1<-r1[order(r1$p_val_adj),]
       results[r,c]=""
       if( dim(r1)[1]>0){
-        gene_list<-paste0(r1$gene,c,collapse = ", ")
+        gene_list<-paste0(r1$gene,collapse = ", ")
         results[r,c]<-gene_list}
     }
   }
