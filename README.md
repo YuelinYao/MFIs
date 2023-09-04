@@ -209,7 +209,7 @@ Once all the packages have been installed,
 
 2. Download and run locally: ```shiny::runApp()```
 
-3. Run with Docker:
+Or you can run with Docker:
 
     i). Install docker on the local computer
   
