@@ -211,19 +211,20 @@ Once all the packages have been installed,
 
 Or you can run with Docker:
 
-    i). Install docker on the local computer
+i). Install docker on the local computer
   
-    ii). Git clone the repository: 
+ii). Git clone the repository: 
+   
     ```
     git clone https://github.com/YuelinYao/MFIs.git
     ```
-    iii). Enter the repository:
+iii). Enter the repository:
     
      ```
      docker build -t my-shiny-app .
      docker run --rm -p 3838:3838 my-shiny-app
      ```
-     For larger files go to Docker Desktop: Settings > Resources > Update the RAM to be more.
+For larger files go to Docker Desktop: Settings > Resources > Update the RAM to be more.
 
 **Share as a web page:**
 
