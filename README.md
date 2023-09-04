@@ -205,9 +205,10 @@ reticulate::use_virtualenv(virtualenv_dir, required = T)
 
 Once all the packages have been installed, 
 
-1. Enter: ```shiny::runGitHub( "MFIs", "YuelinYao")```
+Approach 1: Enter: ```shiny::runGitHub( "MFIs", "YuelinYao")```
 
-2. Download and run locally: ```shiny::runApp()```
+Approach 2: Download and run locally: ```shiny::runApp()```
+
 
 Or you can run with Docker:
 
