@@ -11,7 +11,8 @@ TableUI <- function(){
     DTOutput("table") %>% withSpinner(color="#4682B4"),
     downloadButton("downloadtable","Download as .csv"),
     downloadButton("downloadCellList","Download Cell List as .csv"),
-    downloadButton("downloadModularity_score","Download Modularity Score as .csv")
+    downloadButton("downloadModularity_score","Download Modularity Score as .csv"),
+    downloadButton("downloadbinReps","Download BinReps as .csv")
   )}
 
 
@@ -43,6 +44,19 @@ Table_cluster<-function(cutoff,data_path,minStateDeviation,minNoCells,stateDevAl
   return(Devstates)
   
 }
+
+
+binReps<-function(cutoff,data_path,minStateDeviation,minNoCells,stateDevAlpha){
+  
+
+  binReps_mat<-read.csv(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,"_",stateDevAlpha,'_binReps.csv'),colClasses = c("character"),row.names = 1)
+  file.remove(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,"_",stateDevAlpha,'_binReps.csv'))
+  return(binReps_mat)
+  
+}
+
+
+
 
 Table_modularity_scores<-function(minStateDeviation,minNoCells,stateDevAlpha){
   modularity_scores<-read.csv(paste0('./',minStateDeviation,"_",minNoCells,"_",stateDevAlpha,'_modularity_scores.csv'),colClasses = c("character"))

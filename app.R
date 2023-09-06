@@ -360,6 +360,11 @@ server <- function(input, output,session) {
     }) %>% bindCache(summaryTable())
     
     
+    # binReps
+    binReps_mat<-reactive({
+      binReps(usedDiceDistance(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha)
+    }) %>% bindCache(usedDiceDistance(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha)
+    
     
     
     # Get cell list, function in heatmap.R
@@ -435,6 +440,16 @@ server <- function(input, output,session) {
       },
       content = function(file){
         write.csv(modularity_scoreTable(),file) })
+    
+    
+        ## Download binReps
+    output$downloadbinReps<-downloadHandler(
+      filename=function(){
+        paste0("BinReps_Matrix-",Sys.Date(), '.csv')
+      },
+      content = function(binReps_file){
+        write.csv(binReps_mat(),binReps_file) })
+    
     
     ## dice distance-title
     dice_distance_title<-reactive({

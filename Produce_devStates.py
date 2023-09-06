@@ -65,6 +65,13 @@ devStates = devStates[devStates["No.Cells"] > float(minNoCells)]
 # Updated Binreps 
 binReps = np.array(devStates.apply(lambda x: (trainDat[x['genes'].rsplit('_')]==[int(g) for g in list(str(x['state']))]).all(axis=1), axis=1))*1
 
+
+# Save binReps
+binReps_pd = pd.DataFrame(binReps)
+binReps_pd.index=devStates['genes']+devStates['state']
+
+
+
 # linkage defines the distances between the binReps, using the Dice-distance: https://en.wikipedia.org/wiki/Sørensen–Dice_coefficient
 linked_full = linkage(binReps, 'average', metric='dice')
 print(linked_full.shape)
@@ -123,6 +130,11 @@ devStates['cluster'] = fcluster(linked_full, diffCutoff, criterion = 'distance')
 
 path='./'+str(diffCutoff_name)+"_"+str(minStateDeviation)+'_'+str(minNoCells)+'_'+str(stateDevAlpha)+'_devStates.csv'
 pd.DataFrame(devStates).to_csv(path)
+
+path2='./'+str(diffCutoff_name)+"_"+str(minStateDeviation)+'_'+str(minNoCells)+'_'+str(stateDevAlpha)+'_binReps.csv'
+binReps_pd.to_csv(path2)
+
+
 
 #print(devStates['cluster'].shape)
 print(len(set(devStates['cluster'])))
