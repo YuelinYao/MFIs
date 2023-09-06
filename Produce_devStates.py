@@ -68,7 +68,7 @@ binReps = np.array(devStates.apply(lambda x: (trainDat[x['genes'].rsplit('_')]==
 
 # Save binReps
 binReps_pd = pd.DataFrame(binReps)
-binReps_pd.index=devStates['genes']+devStates['state']
+binReps_pd.index=devStates['genes']+':'+devStates['state']
 
 
 
