@@ -178,7 +178,10 @@ Python:
 ```
 # Install python from https://www.python.org/downloads/
 # Python 3.8
-
+# Python packages: virtualenv and numpy
+# pip install virtualenv
+# pip install numpy
+# https://github.com/ranikay/shiny-reticulate-app
 
 # Define any Python packages needed for the app in R:
 #PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
