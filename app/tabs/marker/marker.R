@@ -98,7 +98,7 @@ PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List,GetGenesList_All){
   Marker[, "log10padj"] <- -log10(Marker[, "p_val_adj"])
   
   
-  Marker<-Marker[order(Marker$avg_log2FC),]
+  Marker<-Marker[order(Marker$avg_log2FC,decreasing = T),]
   up_genes<-Marker[Marker$cluster=="Up_regulated genes",]
   down_genes<-Marker[Marker$cluster=="Down_regulated genes",]
   top20<-c(head(up_genes$gene,10),tail(down_genes$gene,10))
