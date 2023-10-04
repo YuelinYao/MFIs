@@ -11,6 +11,9 @@ UPsetUI <- function(){
 UPsetInput<- function(){
   tagList( 
     textInput("selected_cluster_upset", "Input cluster(s):",value = "19,46,47"),
+    radioButtons(inputId = "UpsetMode", "Mode:",
+                 choices = c("Intersect" = "intersect", "Distinct" = "distinct", "Union" = "union"), 
+                 selected = "intersect", inline = TRUE),
     actionButton("action_upset","Submit",icon("paper-plane"), 
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
   )
@@ -19,10 +22,10 @@ UPsetInput<- function(){
 
 
 
-Up_set<-function(selected_cluster,cutoff,List){
+Up_set<-function(selected_cluster,cutoff,List,mode){
   selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
   selected_cluster<-paste0("cluster_C:",selected_cluster)
-  m=make_comb_mat(List[selected_cluster],mode = "intersect")  
+  m=make_comb_mat(List[selected_cluster],mode = mode)  
   return(m)
 
 }

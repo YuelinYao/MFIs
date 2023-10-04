@@ -1256,10 +1256,16 @@ server <- function(input, output,session) {
       
       
       ### Upset Plot
+      
+      Upset_mode<- eventReactive(input$action_upset, { 
+        input$UpsetMode
+      })
+      
+      
       m <- reactive({
-        Up_set(input$selected_cluster_upset,usedDiceDistance(),List())
+        Up_set(input$selected_cluster_upset,usedDiceDistance(),List(),Upset_mode())
       }) %>%
-        bindCache(input$selected_cluster_upset,usedDiceDistance(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
+        bindCache(input$selected_cluster_upset,usedDiceDistance(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha,Upset_mode()) %>%
         bindEvent(input$action_upset)
       
       cutoff<- eventReactive(input$action_upset, { 
@@ -1275,9 +1281,14 @@ server <- function(input, output,session) {
           paste('UPsetPlot-', Sys.Date(), '.pdf', sep='')
         },
         content=function(UPsetPlot){
-          upsetplot<-ComplexHeatmap::UpSet(m(),top_annotation = upset_top_annotation(m(), add_numbers = TRUE),column_title =cutoff(),
+          
+          width=(dim(m())[2]*5+25)*0.05
+          height=(dim(m())[1]*5+30)*0.05
+          
+          upsetplot<-ComplexHeatmap::UpSet(m(),top_annotation = upset_top_annotation(m(), add_numbers = TRUE),column_title =cutoff(),width = ncol(m())*unit(5, "mm"),
+                                           height = nrow(m())*unit(5, "mm"),
                                 right_annotation = upset_right_annotation(m(), add_numbers = TRUE),comb_order = order(comb_size(m())))
-          pdf(UPsetPlot,width =8 ,height = 6)
+          pdf(UPsetPlot,width = width ,height = height)
           draw(upsetplot)
           dev.off()
         }
