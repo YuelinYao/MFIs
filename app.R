@@ -1282,12 +1282,12 @@ server <- function(input, output,session) {
         },
         content=function(UPsetPlot){
           
-          width=(dim(m())[2]*5+25)*0.05
-          height=(dim(m())[1]*5+30)*0.05
+          width=(dim(m())[2]*5+40)*0.05
+          height=(dim(m())[1]*5+50)*0.05
           
-          upsetplot<-ComplexHeatmap::UpSet(m(),top_annotation = upset_top_annotation(m(), add_numbers = TRUE),column_title =cutoff(),width = ncol(m())*unit(5, "mm"),
+          upsetplot<-ComplexHeatmap::UpSet(m(),top_annotation = upset_top_annotation(m(), add_numbers = TRUE,height = unit(40, "pt")),column_title =cutoff(),width = ncol(m())*unit(5, "mm"),
                                            height = nrow(m())*unit(5, "mm"),
-                                right_annotation = upset_right_annotation(m(), add_numbers = TRUE),comb_order = order(comb_size(m())))
+                                right_annotation = upset_right_annotation(m(), add_numbers = TRUE,width = unit(40, "pt")),comb_order = order(comb_size(m())))
           pdf(UPsetPlot,width = width ,height = height)
           draw(upsetplot)
           dev.off()

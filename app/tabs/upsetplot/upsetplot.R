@@ -24,7 +24,8 @@ UPsetInput<- function(){
 
 Up_set<-function(selected_cluster,cutoff,List,mode){
   selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
-  selected_cluster<-paste0("cluster_C:",selected_cluster)
+  names(List)<-gsub("cluster_C:","",names(List))
+  #selected_cluster<-paste0("cluster_C:",selected_cluster)
   m=make_comb_mat(List[selected_cluster],mode = mode)  
   return(m)
 
