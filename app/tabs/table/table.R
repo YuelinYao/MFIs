@@ -47,7 +47,6 @@ Table_cluster<-function(cutoff,data_path,minStateDeviation,minNoCells,stateDevAl
 
 
 binReps<-function(cutoff,data_path,minStateDeviation,minNoCells,stateDevAlpha){
-  
 
   binReps_mat<-read.csv(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,"_",stateDevAlpha,'_binReps.csv'),colClasses = c("character"),row.names = 1)
   file.remove(paste0('./',cutoff,"_",minStateDeviation,"_",minNoCells,"_",stateDevAlpha,'_binReps.csv'))

@@ -1644,7 +1644,8 @@ server <- function(input, output,session) {
       
       onSessionEnded(function() {
         cat("Session Ended\n")
-        unlink("Rplot*")    
+        unlink("Rplot*")
+        unlink("*.csv") 
       }) 
       
       }
