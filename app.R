@@ -1306,14 +1306,14 @@ server <- function(input, output,session) {
       
       
       p <- reactive({
-        DE_set(input$selected_clusterDE,usedDiceDistance(),usedTable()$count,srt(),input$logfc,input$Pvalue_DE,List())
+        DE_set(input$selected_clusterDE1,input$selected_clusterDE2,usedDiceDistance(),usedTable()$count,srt(),input$logfc,input$Pvalue_DE,List())
       }) %>%
-        bindCache(input$selected_clusterDE,usedDiceDistance(),input$logfc,input$Pvalue_DE,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
+        bindCache(input$selected_clusterDE1,input$selected_clusterDE2,usedDiceDistance(),input$logfc,input$Pvalue_DE,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_DE)
       
       
       p_heatmap <- eventReactive(input$action_DE, { 
-        PlotDEheatmap(input$selected_clusterDE,usedDiceDistance(),p(),srt(),List())
+        PlotDEheatmap(input$selected_clusterDE1,input$selected_clusterDE2,usedDiceDistance(),p(),srt(),List())
       })
   
       
@@ -1355,9 +1355,9 @@ server <- function(input, output,session) {
  
     ####DE function enrichment
       p_plot<- reactive({
-        DEGO(p(),input$selected_clusterDE,usedDiceDistance(),input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3())
+        DEGO(p(),usedDiceDistance(),input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3())
       }) %>%
-        bindCache(p(),input$selected_clusterDE,usedDiceDistance(),input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
+        bindCache(p(),usedDiceDistance(),input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_DE)
       
       output$DEG_enrichment<- renderPlot({

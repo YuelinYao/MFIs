@@ -37,7 +37,8 @@ DEGOtable_UI<- function(){
 ### Input function
 DEInput<- function(){
   tagList( 
-    textInput("selected_clusterDE", "Select cluster(s)",value = "46,19"),
+    textInput("selected_clusterDE1", "Select cluster(s) for group 1:",value = "46,19"),
+    textInput("selected_clusterDE2", "Select cluster(s) for group 2:",value = "45,28"),
     selectInput("Mart_DE", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
     textInput("go_species_DE", "GO OrgDb:",value = "org.Hs.eg.db"),
     textInput("kegg_species_DE", "KEGG organism:",value = "hsa"),
@@ -62,16 +63,40 @@ DEInput<- function(){
 
 
 
-DE_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
+DE_set<-function(selected_cluster1,selected_cluster2,cutoff,count,srt,logfc,Pvalue,List){
   
   print("Find DE genes")
-  selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
-  selected_cluster<-paste0("cluster_C:",selected_cluster)
   
-  selected_1<-List[[selected_cluster[1]]]
+  selected_cluster_list1<-strsplit(selected_cluster1, ",\\s*")[[1]]
+  selected_1<-NULL
+  for (i in selected_cluster_list1){
+    
+    selected_cluster<-paste0("cluster_C:",i)
+    selected_cells<-List[[selected_cluster]]
+    selected_1<-unique(c(selected_1,selected_cells))
+    #print(length(selected_1)) The number of cells
+  }
   print(length(selected_1))
-  selected_2<-List[[selected_cluster[2]]]
+  
+  
+  selected_cluster_list2<-strsplit(selected_cluster2, ",\\s*")[[1]]
+  selected_2<-NULL
+  for (i in selected_cluster_list2){
+    
+    selected_cluster<-paste0("cluster_C:",i)
+    selected_cells<-List[[selected_cluster]]
+    selected_2<-unique(c(selected_2,selected_cells))
+    #print(length(selected_1)) The number of cells
+  }
   print(length(selected_2))
+  
+  #selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
+  #selected_cluster<-paste0("cluster_C:",selected_cluster)
+  
+  #selected_1<-List[[selected_cluster[1]]]
+  #print(length(selected_1))
+  #selected_2<-List[[selected_cluster[2]]]
+  #print(length(selected_2))
   
   overlap<-intersect(selected_1,selected_2)
   
@@ -82,8 +107,8 @@ DE_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
   DE<-DE[DE$p_val_adj<Pvalue,]
   DE$gene<-rownames(DE)
   
-  DE$cluster[DE$avg_log2FC>0]<-paste0("up_",selected_cluster[1])
-  DE$cluster[DE$avg_log2FC<0]<-paste0("up_",selected_cluster[2])
+  DE$cluster[DE$avg_log2FC>0]<-paste0("up_",paste0(selected_cluster_list1,collapse = "_"))
+  DE$cluster[DE$avg_log2FC<0]<-paste0("up_",paste0(selected_cluster_list2,collapse = "_"))
   
   print(table(DE$cluster))
   return(DE)
@@ -92,14 +117,40 @@ DE_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
   
 
 
-PlotDEheatmap<-function(selected_cluster,cutoff,DE,srt,List){
+PlotDEheatmap<-function(selected_cluster1,selected_cluster2,cutoff,DE,srt,List){
   
-    print("Plot DEA Heatmap")
-    selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
-    selected_cluster<-paste0("cluster_C:",selected_cluster)
+  print("Plot DEA Heatmap")
+    
+  selected_cluster_list1<-strsplit(selected_cluster1, ",\\s*")[[1]]
+  selected_1<-NULL
+  
+  for (i in selected_cluster_list1){
+    
+    selected_cluster<-paste0("cluster_C:",i)
+    selected_cells<-List[[selected_cluster]]
+    selected_1<-unique(c(selected_1,selected_cells))
+    #print(length(selected_1)) The number of cells
+  }
+  print(length(selected_1))
+  
+  
+  selected_cluster_list2<-strsplit(selected_cluster2, ",\\s*")[[1]]
+  selected_2<-NULL
+  for (i in selected_cluster_list2){
+    
+    selected_cluster<-paste0("cluster_C:",i)
+    selected_cells<-List[[selected_cluster]]
+    selected_2<-unique(c(selected_2,selected_cells))
+    #print(length(selected_1)) The number of cells
+  }
+  print(length(selected_2))
+  
+  
+    #selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
+    #selected_cluster<-paste0("cluster_C:",selected_cluster)
 
-    selected_1<-List[[selected_cluster[1]]]
-    selected_2<-List[[selected_cluster[2]]]
+    #selected_1<-List[[selected_cluster[1]]]
+    #selected_2<-List[[selected_cluster[2]]]
     
     
     overlap<-intersect(selected_1,selected_2)
@@ -113,9 +164,10 @@ PlotDEheatmap<-function(selected_cluster,cutoff,DE,srt,List){
     top20
   
     sub<-srt[,colnames(srt)%in%c(selected_1,selected_2)]
+    
     sub$state<-NA
-    sub$state[colnames(sub)%in%c(selected_1)]<-gsub("cluster_","",selected_cluster[1])
-    sub$state[colnames(sub)%in%c(selected_2)]<-gsub("cluster_","",selected_cluster[2])
+    sub$state[colnames(sub)%in%c(selected_1)]<-gsub("cluster_","",paste0(selected_cluster_list1,collapse = "_"))
+    sub$state[colnames(sub)%in%c(selected_2)]<-gsub("cluster_","",paste0(selected_cluster_list2,collapse = "_"))
     
     DE_heatmap<-list(top20,sub)
     names(DE_heatmap)<-c("top20","sub")
@@ -127,14 +179,14 @@ PlotDEheatmap<-function(selected_cluster,cutoff,DE,srt,List){
 
 
 
-DEGO<-function(DE,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
+DEGO<-function(DE,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
   
   if (!any(rownames(installed.packages()) == go_species)){
     BiocManager::install(go_species,update = F)
   }
   library(go_species,character.only = T)
-  selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
-  selected_cluster<-paste0("cluster_C:",selected_cluster)
+  #selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
+  #selected_cluster<-paste0("cluster_C:",selected_cluster)
 
   mart <- useMart("ENSEMBL_MART_ENSEMBL")
   mart <- useDataset(Mart, mart) 
