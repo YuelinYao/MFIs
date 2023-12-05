@@ -23,6 +23,7 @@ about <- function(){
         tags$li("Upset Plot - Visualisation of how many cells sharing among states.", style="list-style-type: square;"),
         tags$li("DE analysis - Differential expression analysis for two mutually exclusive states.", style="list-style-type: square;"),
         tags$li("Find Markers - Identify marker genes for a give cell state.", style="list-style-type: square;"),
+      tags$li("Automatic annotations - Identify marker genes for all stator states and return DEGs in the provided gene list.", style="list-style-type: square;"),
         tags$li("Markov Blanket - Visualisation of Markov Blanket for given gene(s).", style="list-style-type: square;"),
         tags$li("UMAP Plot - Visualisation of UMAP for given a cell state.", style="list-style-type: square;"),
         tags$br(),
