@@ -230,6 +230,8 @@ iii). Enter the repository:
      ```
 For larger files go to Docker Desktop: Settings > Resources > Update the RAM to be more.
 
+Dockerhub: https://hub.docker.com/r/yuelinyao120/stator-app
+
 **Share as a web page:**
 
 1. shinyapps.io: https://yuelinyao120.shinyapps.io/MFIs-shinyapps/ (Server is provided by Rstudio, but the memory for free is not enough.)
