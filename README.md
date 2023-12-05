@@ -217,7 +217,7 @@ Or you can run with Docker:
 
 i). Install docker on the local computer
   
-ii). Git clone the repository: 
+ii). Git clone the repository, Local branch: 
    
     ```
     git clone https://github.com/YuelinYao/MFIs.git
