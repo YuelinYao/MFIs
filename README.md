@@ -10,6 +10,9 @@
 6. **UMAP.csv** (optional): which is used in UMAP Plot, Example file format see ./data/UMAP_coords.csv
 
 ## Libarary:
+
+**Note:** Please use the following versions: dbplyr_2.3.3 (by devtools::install_version("dbplyr", version = "2.3.3")), clusterProfiler_4.8.2 and Seurat_4.3.0.1
+
 R:
 ```
 #----- Install one by one...
