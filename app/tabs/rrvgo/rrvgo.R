@@ -57,7 +57,7 @@ rrvgoInput<- function(){
 
 
 
-rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,GenesList,background_genes){
+rrvgo_FunctionE <- function(selected_cluster,subclass,go_species,Mart,GenesList,background_genes){
   
   if (!any(rownames(installed.packages()) == go_species)){
     BiocManager::install(go_species,update = F)

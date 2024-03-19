@@ -63,7 +63,7 @@ DEInput<- function(){
 
 
 
-DE_set<-function(selected_cluster1,selected_cluster2,cutoff,count,srt,logfc,Pvalue,List){
+DE_set<-function(selected_cluster1,selected_cluster2,srt,logfc,Pvalue,List){
   
   print("Find DE genes")
   
@@ -117,7 +117,7 @@ DE_set<-function(selected_cluster1,selected_cluster2,cutoff,count,srt,logfc,Pval
   
 
 
-PlotDEheatmap<-function(selected_cluster1,selected_cluster2,cutoff,DE,srt,List){
+PlotDEheatmap<-function(selected_cluster1,selected_cluster2,DE,srt,List){
   
   print("Plot DEA Heatmap")
     
@@ -179,7 +179,7 @@ PlotDEheatmap<-function(selected_cluster1,selected_cluster2,cutoff,DE,srt,List){
 
 
 
-DEGO<-function(DE,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
+DEGO<-function(DE,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
   
   if (!any(rownames(installed.packages()) == go_species)){
     BiocManager::install(go_species,update = F)

@@ -58,8 +58,8 @@ InformationUI <- function(){
   text = tags$span(
     br("If you like Stator and use it, please consider citing the related article:",
        tags$br(),
-       a("Higher-order interactions in statistical physics and machine learning: A model-independent solution to the inverse problem at equilibrium", href = "https://journals.aps.org/pre/abstract/10.1103/PhysRevE.102.053314", target="_blank", style = "color: steelblue;"),
-       a("Sjoerd Viktor Beentjes and Ava Khamseh, Phys. Rev. E. 2020 Nov 102, 053314", href= "https://journals.aps.org/pre/abstract/10.1103/PhysRevE.102.053314", target="_blank", style = "color: grey;")),
+       a("High order expression dependencies finely resolve cryptic states and subtypes in single cell data", href = "https://journals.aps.org/pre/abstract/10.1103/PhysRevE.102.053314", target="_blank", style = "color: steelblue;"),
+       a("Abel Jansma, Yuelin Yao, et al., BioRxiv", href= "https://www.biorxiv.org/content/10.1101/2023.12.18.572232v1.abstract", target="_blank", style = "color: grey;")),
     
     tags$br(),
     tags$b("Stator",style = "color: #337ab7;"), "application code is available through Github", a(icon("house"), href="https://github.com/AJnsm", target="_blank", style = "color: steelblue;"),

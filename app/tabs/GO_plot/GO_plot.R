@@ -90,7 +90,7 @@ GetGenes<-function(Devstates,Remove){
 
 
 
-FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,GenesList, background_genes){
+FunctionE <- function(selected_cluster,Mart,kegg_species,go_species,GenesList, background_genes){
 
   if (!any(rownames(installed.packages()) == go_species)){
     BiocManager::install(go_species,update = F)

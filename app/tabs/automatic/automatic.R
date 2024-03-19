@@ -50,7 +50,7 @@ AllMarkerInput<- function(){
 
 
 
-MarkerAll_set<-function(cutoff,count,srt,logfc,Pvalue,List){
+MarkerAll_set<-function(srt,logfc,Pvalue,List){
   
   print("Find All marker genes")
   All_Markers<-NULL

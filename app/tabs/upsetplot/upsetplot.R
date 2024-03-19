@@ -22,7 +22,7 @@ UPsetInput<- function(){
 
 
 
-Up_set<-function(selected_cluster,cutoff,List,mode){
+Up_set<-function(selected_cluster,List,mode){
   selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
   names(List)<-gsub("cluster_C:","",names(List))
   #selected_cluster<-paste0("cluster_C:",selected_cluster)

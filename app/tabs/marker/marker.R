@@ -61,7 +61,7 @@ MarkerInput<- function(){
 
 
 
-Marker_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
+Marker_set<-function(selected_cluster,srt,logfc,Pvalue,List){
   
   print("Find Marker genes")
   selected_cluster_list<-strsplit(selected_cluster, ",\\s*")[[1]]
@@ -90,7 +90,7 @@ Marker_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
 
 
 
-PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List,GetGenesList_All){
+PlotVolcano<-function(selected_cluster,Marker,List,GetGenesList_All){
   
   print("Plot VolcanoPlot")
 
@@ -138,7 +138,7 @@ PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List,GetGenesList_All){
 
 
 
-MarkerGO<-function(Marker,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
+MarkerGO<-function(Marker,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
   
   print("Markers GO & KEGG")
   if (!any(rownames(installed.packages()) == go_species)){
