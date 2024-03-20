@@ -83,6 +83,11 @@ List<-GetCellList(count,Devstates)
 
 head(List,2)
 lengths(List)
+
+List_dtuples<-GetCellList_d(count,Devstates)
+head(List,2)
+lengths(List)
+table(lengths(List_dtuples)==Devstates$No.Cells)
 ```
 
 # Heatmap Cells: Perform over/under-representation test

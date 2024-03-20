@@ -94,27 +94,28 @@ GetCellList <- function(count,summaryTable) {
       state<-cluster$state[c]
       State<-as.numeric(strsplit(as.character(state),"")[[1]])
 
+      count_names<-rownames(count)
       
       if ( length(Genes)==3 ) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3])]
       } else if ( length(Genes)==4) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4])]
       } else if ( length(Genes)==5) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5])]
       } else if ( length(Genes)==6){
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6])]
       } else if ( length(Genes)==7) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7])]
       } else if ( length(Genes)==8) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8])]
       } else if ( length(Genes)==9) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9])]
       } else {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9]&count[,Genes[10]]==State[10]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9]&count[,Genes[10]]==State[10])]
       }
       
       
-      cellnames<-rownames(c1)
+      cellnames<-c1
       Cell<-c(Cell,cellnames)
     }  
     
@@ -150,32 +151,34 @@ GetCellList_d <- function(count,summaryTable) {
       State<-as.numeric(strsplit(as.character(state),"")[[1]])
       
       
+      count_names<-rownames(count)
+      
       if ( length(Genes)==3 ) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3])]
       } else if ( length(Genes)==4) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4])]
       } else if ( length(Genes)==5) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5])]
       } else if ( length(Genes)==6){
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6])]
       } else if ( length(Genes)==7) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7])]
       } else if ( length(Genes)==8) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8])]
       } else if ( length(Genes)==9) {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9])]
       } else {
-        c1<-count[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9]&count[,Genes[10]]==State[10]),]
+        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9]&count[,Genes[10]]==State[10])]
       }
       
       
-      cellnames<-rownames(c1)
+      cellnames<-c1
       Cell<-c(Cell,cellnames)
     }  
     
     Cell<-unique(Cell)
     list=list(Cell)
-    #names(list)<-paste0("cluster_",i)
+    names(list)<-paste0(i)
     List<-c(List,list)
     
   }
