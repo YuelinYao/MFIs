@@ -52,6 +52,8 @@ library(org.Mm.eg.db)
 library("limma")
 library(heatmaply)
 library(plotly)
+library(dendextend)
+library(fastcluster)
 options(shiny.maxRequestSize = 10000*1024^2)
 import::from(plotly, plotlyOutput, renderPlotly, ggplotly)
 
@@ -68,6 +70,7 @@ source("./app/tabs/automatic/automatic.R")
 source("./app/tabs/rrvgo/rrvgo.R") 
 source("./app/tabs/markovBlanket/markovBlanket.R") 
 source("./app/tabs/umap/umap.R") 
+source("./app/tabs/dendrogram/dendrogram.R") 
 # Define UI for application
 ui <- fluidPage(theme = shinytheme("spacelab"),
                 # Application title
@@ -137,6 +140,11 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
  ## UMAP Tab
             conditionalPanel(condition= "input.tabs == 'umap'",
                    UMAPInput()),
+ 
+ 
+ ## Dendrogram Tab
+ conditionalPanel(condition= "input.tabs == 'dendrogram'",
+                  DendrogramInput()),
         ),
 
         mainPanel(
@@ -191,6 +199,9 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 tabPanel("Markov Blanket",icon = icon("circle-nodes"),value="mb",
                          MBUI()),
                 
+                tabPanel("Dendrogram",icon = icon("tree"),value="dendrogram",
+                         dendrogramUI()),
+  
                 tabPanel("UMAP Plot",icon = icon("magnet"),value="umap",
                          umapUI()),
      
@@ -1641,6 +1652,92 @@ server <- function(input, output,session) {
         content=function(uPlot){
           ggsave(StateUMAPs(),filename = uPlot,width = 4,height = 3)
         } )
+      
+      
+
+      ### dendrogram
+      dice_distance<-reactive({
+        if(usedDiceDistance()=="Optimal"){
+          return(as.numeric(modularity_scoreTable()$Cutoff[which.max(modularity_scoreTable()$Modularity.score)]))}
+        else{
+          return(as.numeric(usedDiceDistance()))
+        }
+      })
+      
+      
+      hcl <- reactive({
+        print(dice_distance())
+        Devstates<- summaryTable()
+        binReps_matrix<-binReps_mat()
+        hcl <-hcl_construct(binReps_matrix,Devstates)
+      })
+      
+      
+      hcl_cluster<-reactive({
+        Devstates<- summaryTable()
+        cutoff<-dice_distance()
+        hclutering<-hcl()
+        Devstates$mapping<-paste0(Devstates$genes,":",Devstates$state)
+        cluster<-cutree(hclutering,h = cutoff)
+        print(table(names(cluster)==Devstates$mapping))
+        cluster
+      })
+      
+      
+      avg_col_dend<-eventReactive(input$action_dendrogram,{
+        dend_d<-plot_full(hcl(), dice_distance(),hcl_cluster())
+        dend_d
+      })
+      
+      
+      output$Full_dendrogram <- renderPlot({
+        plot(avg_col_dend());rect.hclust(hcl() , h = dice_distance())
+      })
+      
+      
+      output$downloadFull_dendrogram<-downloadHandler(
+        filename = function(){
+          paste('Full_dendrogram-',Sys.Date(), '.pdf', sep='')
+        },
+        content=function(dPlot){
+          
+          width=dim(summaryTable())[1]*0.25+20
+          pdf(dPlot,width = width ,height = 12)
+          par(mar = c(25, 2.5, 0.5, 0.5))
+          plot(avg_col_dend())
+          rect.hclust(hcl() , h = as.numeric(dice_distance()))
+          dev.off()
+          
+        } )
+      
+      
+      
+      ## sub
+      sub<-eventReactive(input$action_dendrogram,{
+        plot_sub(hcl(), hcl_cluster(),input$selected_dendrogram)
+      })
+      
+      output$Sub_dendrogram <- renderPlot({
+        par(mar = c(15, 1, 1, 1))
+        plot(sub())
+        
+      })
+      
+      
+      output$downloadSub_dendrogram<-downloadHandler(
+        filename = function(){
+          paste('Sub_dendrogram-',dice_distance(),"-",input$selected_dendrogram,"-",Sys.Date(), '.pdf', sep='')
+        },
+        content=function(dPlot){
+          width=length(get_leaves_attr(sub(),"label"))*0.25+20
+          pdf(dPlot,width = width ,height = 12)
+          par(mar = c(25, 2.5, 0.5, 0.5))
+          plot(sub())
+          dev.off()
+          
+        } )
+      
+      
       
       onSessionEnded(function() {
         cat("Session Ended\n")

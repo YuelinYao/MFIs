@@ -425,4 +425,42 @@ cluster_umap(selected_umap,usedUMAP_coords,srt,List,Devstates)
 
 ```
 
+
+```{r dendrogram}
+library(dendextend)
+source("./app/tabs/dendrogram/dendrogram.R")
+
+data_path2="Optimal_3_0_0.05_binReps.csv"
+
+# The optimal dice distance is 0.85 from Optimal_3_0_0.05_modularity_scores.csv
+cutoff=0.85
+#"read Optimal_3_0_0.05_binReps.csv"
+
+binReps_mat<-binReps(cutoff,data_path2,minStateDeviation,minNoCells,stateDevAlpha)
+
+# Construct tree
+hcl<-hcl_construct(binReps_mat,Devstates)
+
+# Get clusters
+hcl_cluster<-hcl_cluster(hcl,cutoff,Devstates)
+
+# Color the dend
+avg_col_dend<-plot_full(hcl, cutoff,hcl_cluster)
+
+# Plot
+par(mar = c(25, 2.5, 0.5, 0.5))
+plot(avg_col_dend);rect.hclust(hcl , h = cutoff)
+
+# Get sub dend
+selected_dendrogram=45
+
+dend<-as.dendrogram(hcl)
+dend_list<-GetSubend(dend,hcl_cluster)
+sub<-dend_list[[selected_dendrogram]]
+
+# Plot sub
+par(mar = c(15, 5, 1, 1));plot(sub)
+
+```
+
 In the end, it is better to remove the unwanted the figures/files in the directory.

@@ -26,6 +26,7 @@ about <- function(){
         tags$li("Automatic annotations - Identify marker genes for all stator states and return DEGs in the provided gene list.", style="list-style-type: square;"),
         tags$li("Markov Blanket - Visualisation of Markov Blanket for given gene(s).", style="list-style-type: square;"),
         tags$li("UMAP Plot - Visualisation of UMAP for given a cell state.", style="list-style-type: square;"),
+        tags$li("Dendrogram - Visualisation of d-tuples dendrogram.", style="list-style-type: square;"),
         tags$br(),
       
         ##Tutorial
