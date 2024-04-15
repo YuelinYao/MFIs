@@ -53,7 +53,6 @@ library("limma")
 library(heatmaply)
 library(plotly)
 library(dendextend)
-library(fastcluster)
 options(shiny.maxRequestSize = 10000*1024^2)
 import::from(plotly, plotlyOutput, renderPlotly, ggplotly)
 
