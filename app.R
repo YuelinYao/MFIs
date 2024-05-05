@@ -405,7 +405,7 @@ server <- function(input, output,session) {
       showScoreText()  })
     
     showText<-eventReactive(input$action_table, {
-      paste(dim(summaryTable())[1]," deviating MFIs in total, ",length(unique(summaryTable()$cluster)), "clusters." )  })
+      paste(dim(summaryTable())[1]," Dtuples in total, ",length(unique(summaryTable()$cluster)), "clusters." )  })
     
     output$textsummary <- renderText({
       showText()  })
