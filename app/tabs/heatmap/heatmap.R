@@ -5,7 +5,7 @@ heatmapUI <- function(){
     plotOutput(outputId ="heatmap_celltypes", width = "90%") %>% withSpinner(color="#4682B4"),
     downloadButton("downloadheatmap1","Download as .csv"),
     downloadButton("downloadheatmap_plot1","Download as .pdf"),
-    downloadButton("downloadheatmap_pvalue","Download raw pvalue as .csv"),
+    downloadButton("downloadheatmap1_pvalue","Download raw pvalue as .csv"),
   )}
 
 NMF_UI <- function(){
