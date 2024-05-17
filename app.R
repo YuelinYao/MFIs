@@ -578,7 +578,7 @@ server <- function(input, output,session) {
       }
     )
     
-    output$downloadheatmap_genes_pvalue<-downloadHandler(
+    output$downloadheatmap_pvalue<-downloadHandler(
       filename = function(){
         paste('HeatmapGenes-raw_pvalue-',Sys.Date(), '.csv', sep='')
       },
