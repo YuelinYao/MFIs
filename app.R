@@ -578,6 +578,16 @@ server <- function(input, output,session) {
       }
     )
     
+    output$downloadheatmap_genes_pvalue<-downloadHandler(
+      filename = function(){
+        paste('HeatmapGenes-raw_pvalue-',Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(result_genes()[["raw_pvalue"]],heatmap1)
+      }
+    )
+    
+    
     ## Download heatmap pdf
     output$downloadheatmapgenes_plot<-downloadHandler(
       filename = function(){
@@ -676,6 +686,18 @@ server <- function(input, output,session) {
         write.csv(StateGenes()[[colorHeatmapGene()]],heatmap1)
       }
     )
+    
+    
+    output$downloadheatmap_genes2_pvalue<-downloadHandler(
+      filename = function(){
+        paste('HeatmapStateGenes-raw_pvalue-',Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(StateGenes()[["raw_pvalue"]],heatmap1)
+      }
+    )
+    
+    
     
     ## Download pdf
     output$downloadheatmapgenes_plot2<-downloadHandler(
@@ -806,6 +828,14 @@ server <- function(input, output,session) {
       }
    )
     
+    output$downloadheatmap1_pvalue<-downloadHandler(
+      filename = function(){
+        paste('Heatmap1-', "raw_pvalue","-",Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(result1()[["raw_pvalue"]],heatmap1)
+      }
+    )
     
   
     
@@ -908,6 +938,16 @@ server <- function(input, output,session) {
           write.csv(result2()[[colorHeatmapCells()]],heatmap2)
         }
       )
+      
+      output$downloadheatmap2_pvalue<-downloadHandler(
+        filename = function(){
+          paste('Heatmap2-',"raw_pvalue","-",Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap2){
+          write.csv(result2()[["raw_pvalue"]],heatmap2)
+        }
+      )
+      
       ## download pdf
       output$downloadheatmap_plot2<-downloadHandler(
         filename = function(){
@@ -1003,6 +1043,18 @@ server <- function(input, output,session) {
           write.csv(result()[[colorHeatmapCells()]],heatmap3)
         }
       )
+      
+      
+      output$downloadheatmap3_pvalue<-downloadHandler(
+        filename = function(){
+          paste('Heatmap3-', "raw_pvalue","-",Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap3){
+          write.csv(result()[["raw_pvalue"]],heatmap3)
+        }
+      )
+      
+      
       ## download pdf
       output$downloadheatmap_plot3<-downloadHandler(
         filename = function(){
@@ -1100,6 +1152,17 @@ server <- function(input, output,session) {
           write.csv(cellStates()[[colorHeatmapCells()]],heatmap1)
         }
       )
+      
+      output$downloadheatmap4_pvalue<-downloadHandler(
+        filename = function(){
+          paste('Heatmap4-', "raw_pvalue","-",Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap1){
+          write.csv(cellStates()[["raw_pvalue"]],heatmap1)
+        }
+      )
+      
+      
       ## download pdf
       output$downloadheatmap_plot4<-downloadHandler(
         filename = function(){

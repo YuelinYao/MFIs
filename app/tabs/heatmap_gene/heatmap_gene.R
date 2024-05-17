@@ -3,7 +3,9 @@ heatmapGenesUI <- function(){
   tagList(
     tags$h3(paste0("Heatmap: Gene set"), style = "color: steelblue;"),
     plotOutput(outputId ="heatmap_GeneSet", width = "90%") %>% withSpinner(color="#4682B4"),
-    downloadButton("downloadheatmap_genes","Download as .csv"),downloadButton("downloadheatmapgenes_plot","Download as .pdf")
+    downloadButton("downloadheatmap_genes","Download as .csv"),
+    downloadButton("downloadheatmapgenes_plot","Download as .pdf"),
+    downloadButton("downloadheatmap_genes_pvalue","Download raw pvalue as .csv"),
   )}
 
 
@@ -11,7 +13,9 @@ stateGenesUI <- function(){
   tagList(
     tags$h3(paste0("Heatmap: State genes"), style = "color: steelblue;"),
     plotOutput(outputId ="heatmapStateGenes", width = "90%") %>% withSpinner(color="#4682B4"),
-    downloadButton("downloadheatmap_genes2","Download as .csv"),downloadButton("downloadheatmapgenes_plot2","Download as .pdf")
+    downloadButton("downloadheatmap_genes2","Download as .csv"),
+    downloadButton("downloadheatmapgenes_plot2","Download as .pdf"),
+    downloadButton("downloadheatmap_genes2_pvalue","Download raw pvalue as .csv"),
   )}
 
 
@@ -133,7 +137,9 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
     Fold[,i]<-enrichment_set
   }
   
-  #Data_mtrix[Data_mtrix==0]<-2.2e-16
+  result=list()
+  result$raw_pvalue<-Data_mtrix
+  
   Data_mtrix<-Data_mtrix+2.2e-16
   Mydata_raw_FDR <- p.adjust(Data_mtrix,method = "BH")
   Mydata_raw_m <- matrix(Mydata_raw_FDR,nrow = dim(Data_mtrix)[1],byrow = F)
@@ -179,7 +185,7 @@ heatmapGenes <- function(RefSet,Genelist,N=25678,test) {
   
   dimnames(Fold)<-dimnames(log10FDR)
   
-  result=list()
+
   result$log10FDR=log10FDR
   result$Mydata_raw_m=Mydata_raw_m
   Fold[Fold==0]<-2.2e-16
