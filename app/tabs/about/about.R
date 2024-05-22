@@ -10,7 +10,7 @@ aboutUI <- function(){
 about <- function(){
   Text1 <- function(){
     text = tags$span(
-      tags$h3("Explore cell states by Stator App", style = "color: #337ab7;"),
+      tags$h3("Explore Stator states by App", style = "color: #337ab7;"),
         tags$b("Stator App",style = "color: #337ab7;"),  "takes in scRNA-seq count matrix, estimated higher-order gene interactions from Stator nextflow pipeline and defines Stator states with users-specific settings. Here we show how explore Stator states.",
         tags$br(),
       
