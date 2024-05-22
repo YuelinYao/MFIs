@@ -2,16 +2,16 @@
 
 ## Files required:
 
-1. **Count_matrix.csv** : count matrix of scRNA-seq data, the same file indicated in the "rawDataPath" in Abel's JSON file.
-2. **Meta_data.csv** : cell type annotations from other tools (e.g., clustering, NMFs, two coloum csv file, example in ./data folder), is only used in the overrepresentation test heatmap (heatmap-cell tabs), if you don't want to plot this heatmap, you can skip this file.
-3. **all_DTuples.csv** : located in the output from Abel's pipeline (HOIsummaries folder)
-4. **trainingData_.csv** : which is also in the output from Abel's pipeline (output folder)
-5. **GeneAnnotationSet.csv** (optional): which is used in heatmap-genes, over-representation test between gene list. Example file format see ./data/CancerState.csv 
-6. **UMAP.csv** (optional): which is used in UMAP Plot, Example file format see ./data/UMAP_coords.csv
+1. **Count_matrix.csv** : count matrix of scRNA-seq data, it can be the same file indicated in the "rawDataPath" in Stator nextflow JSON file. It is used for finding cells that satisfy the d-tuples within a group and differential expression analysis. 
+2. **Meta_data.csv** : cell's external annotations (e.g., from other tools clustering, NMFs, or experimental conditions), two coloum csv file, example in ./data folder), is only used in the overrepresentation test heatmap (heatmap-cell tabs), if you don't want to plot this heatmap, you can also skip this file.
+3. **all_DTuples.csv** : located in the output from Stator nextflow pipeline (HOIsummaries folder).
+4. **trainingData_.csv** : which is also in the output from Stator nextflow pipeline (output folder).
+5. **GeneAnnotationSet.csv** (optional): which is used in heatmap-genes, over-representation test between gene list. Example file format see ./data/CancerState.csv.
+6. **UMAP.csv** (optional): which is used in UMAP Plot, Example file format see ./data/UMAP_coords.csv.
+7. **MCMCgraph.csv** (optional): which is used in Markov Blanket Tab, located in the output folder from Stator nextflow pipeline. Example file format see ./data/MCMCgraph_14698Cells_1000Genes.csv.
 
 ## Libarary:
-
-**Note:** Please use the following versions: dbplyr_2.3.3 (by devtools::install_version("dbplyr", version = "2.3.3")), clusterProfiler_4.8.2 and Seurat_4.3.0.1
+**Note:** Please use the following versions: R version 4.3.0, dbplyr_2.3.3 (by devtools::install_version("dbplyr", version = "2.3.3")), clusterProfiler_4.8.2 and Seurat_4.3.0.1
 
 R:
 ```
@@ -237,9 +237,8 @@ Dockerhub: https://hub.docker.com/r/yuelinyao120/stator-app
 
 **Share as a web page:**
 
-1. shinyapps.io: https://yuelinyao120.shinyapps.io/MFIs-shinyapps/ (Server is provided by Rstudio, but the memory for free is not enough.)
 
-2. Shiny Server (We need to provide a server to host this application, might consider put on: https://shiny.igc.ed.ac.uk/)
+Shiny Server: https://shiny.igc.ed.ac.uk/MFIs/
 
 
 ## Notes
