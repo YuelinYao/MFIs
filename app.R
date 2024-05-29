@@ -201,7 +201,7 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 tabPanel("Dendrogram",icon = icon("tree"),value="dendrogram",
                          dendrogramUI()),
   
-                tabPanel("UMAP Plot",icon = icon("magnet"),value="umap",
+                tabPanel("2D Plot",icon = icon("magnet"),value="umap",
                          umapUI()),
      
         ))   )
