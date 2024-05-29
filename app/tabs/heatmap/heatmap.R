@@ -1,7 +1,10 @@
 ## UI ####
 heatmapUI <- function(){
   tagList(
-    tags$h3(paste0("Heatmap: Cell types (clustering + singleR)"), style = "color: steelblue;"),
+    tags$h3(paste0("Heatmap 1"), style = "color: steelblue;"), # Cell types (clustering + singleR)
+    tags$h5("Comparing Stator states vs. the annotations from the first column in meta data table."), 
+    tags$h5("For liver cancer dataset: Stator states vs. Cell types (by clustering + singleR)."), 
+    tags$br(),
     plotOutput(outputId ="heatmap_celltypes", width = "90%") %>% withSpinner(color="#4682B4"),
     downloadButton("downloadheatmap1","Download as .csv"),
     downloadButton("downloadheatmap_plot1","Download as .pdf"),
@@ -10,7 +13,10 @@ heatmapUI <- function(){
 
 NMF_UI <- function(){
   tagList(
-    tags$h3("Heatmap: Cell states (NMF)", style = "color: steelblue;"),
+    tags$h3("Heatmap 2", style = "color: steelblue;"), # Cell states (NMF)
+    tags$h5("Comparing Stator states vs. the annotations from the second column in meta data table."), 
+    tags$h5("For liver cancer dataset: Stator states vs. Cell states (by NMF)."), 
+    tags$br(),
     plotOutput(outputId ="heatmap_cellstates", width = "80%") %>% withSpinner(color="#4682B4"),
     downloadButton("downloadheatmap2","Download as .csv"), 
     downloadButton("downloadheatmap_plot2","Download as .pdf"),
@@ -21,7 +27,10 @@ NMF_UI <- function(){
 
 NMF_CelltypeUI<-function(){
   tagList(
-    tags$h3("Heatmap: Cell states vs. Cell types", style = "color: steelblue;"),
+    tags$h3("Heatmap 3", style = "color: steelblue;"), #  Cell states vs. Cell types
+    tags$h5("Comparing the annotations between the first and second column in meta data table."), 
+    tags$h5("For liver cancer dataset: Cell states vs. Cell types."), 
+    tags$br(),
     plotOutput(outputId ="cellstates_types", width = "80%") %>% withSpinner(color="#4682B4"),
     downloadButton("downloadheatmap3","Download as .csv"), 
     downloadButton("downloadheatmap_plot3","Download as .pdf"),
@@ -31,7 +40,9 @@ NMF_CelltypeUI<-function(){
 
 Test_CellstateUI<-function(){
   tagList(
-    tags$h3("Heatmap: Cell states vs. Cell states", style = "color: steelblue;"),
+    tags$h3("Heatmap 4", style = "color: steelblue;"), # Cell states vs. Cell states
+    tags$h5("Comparing between Stator states."), 
+    tags$br(),
     plotOutput(outputId ="cellStates_cellStates", width = "80%") %>% withSpinner(color="#4682B4"),
     downloadButton("downloadheatmap4","Download as .csv"), 
     downloadButton("downloadheatmap_plot4","Download as .pdf"),
@@ -42,16 +53,16 @@ Test_CellstateUI<-function(){
 
 iheatmapUI <- function(){
   tagList(
-    tags$h3(paste0("Heatmap: Cell types (clustering + singleR)"), style = "color: steelblue;"),
+    tags$h3(paste0("Heatmap 1"), style = "color: steelblue;"),
     plotlyOutput(outputId ="iheatmap_celltypes", width = "90%") %>% withSpinner(color="#4682B4"),
     
-    tags$h3("Heatmap: Cell states (NMF)", style = "color: steelblue;"),
+    tags$h3("Heatmap 2", style = "color: steelblue;"),
     plotlyOutput(outputId ="iheatmap_cellstates", width = "80%") %>% withSpinner(color="#4682B4"),
     
-    tags$h3("Heatmap: Cell states vs. Cell types", style = "color: steelblue;"),
+    tags$h3("Heatmap 3", style = "color: steelblue;"),
     plotlyOutput(outputId ="icellstates_types", width = "80%") %>% withSpinner(color="#4682B4"),
     
-    tags$h3("Heatmap: Cell states vs. Cell states", style = "color: steelblue;"),
+    tags$h3("Heatmap 4", style = "color: steelblue;"),
     plotlyOutput(outputId ="icellStates_cellStates", width = "80%") %>% withSpinner(color="#4682B4"),
     
   )}
