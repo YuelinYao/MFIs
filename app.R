@@ -1330,10 +1330,21 @@ server <- function(input, output,session) {
       
       ### Upset Plot
       
+      
+      
       Upset_mode<- eventReactive(input$action_upset, { 
         input$UpsetMode
       })
       
+      observeEvent(input$mode_upset,{
+        sendSweetAlert(session = session, title = NULL,
+                        text = tags$span(
+                          tags$h5("Reference: https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html", style = "color: steelblue;"),
+                          tags$img(src = "mode.png",width = "450px", height = "500px")
+                        ),
+                        html = TRUE,type = 'info')
+        
+      })
       
       m <- reactive({
         Up_set(input$selected_cluster_upset,List(),Upset_mode())

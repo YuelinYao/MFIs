@@ -16,7 +16,7 @@ dendrogramUI <- function(){
 ### Input function
 DendrogramInput<- function(){
   tagList( 
-    textInput("selected_dendrogram", "Select cluster:",value = "45"),
+    textInput("selected_dendrogram", "Select a Stator state:",value = "45"),
     actionButton("action_dendrogram","Submit",icon("paper-plane"), 
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
   )

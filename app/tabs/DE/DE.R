@@ -37,11 +37,24 @@ DEGOtable_UI<- function(){
 ### Input function
 DEInput<- function(){
   tagList( 
-    textInput("selected_clusterDE1", "Select cluster(s) for group 1:",value = "46,19"),
-    textInput("selected_clusterDE2", "Select cluster(s) for group 2:",value = "45,28"),
+    textInput("selected_clusterDE1", "Select Stator state(s) as group 1:",value = "46,19"),
+    textInput("selected_clusterDE2", "Select Stator state(s) as group 2:",value = "45,28"),
     selectInput("Mart_DE", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
-    textInput("go_species_DE", "GO OrgDb:",value = "org.Hs.eg.db"),
-    textInput("kegg_species_DE", "KEGG organism:",value = "hsa"),
+    textInput("go_species_DE", label = div("GO OrgDb:",bsButton("GOreference_DE",label="",icon = icon("info"), style = "info", size = "extra-small")),value = "org.Hs.eg.db"),
+    bsPopover(id = "GOreference_DE",title=NULL,
+              content =("GO reference genome: http://bioconductor.org/packages/release/BiocViews.html#___OrgDb"),
+              placement = "right", 
+              trigger = "click", 
+              options = list(container = "body")),
+    
+    textInput("kegg_species_DE", label = div("KEGG organism:",bsButton("KEGGreference_Marker",label="",icon = icon("info"), style = "info", size = "extra-small")),value = "hsa"),
+    bsPopover(id = "KEGGreference_DE",title=NULL,
+              content =("KEGG reference genome: https://www.genome.jp/kegg/catalog/org_list.html"),
+              placement = "right", 
+              trigger = "click", 
+              options = list(container = "body")),
+  
+  
     textInput("logfc", "logFC:",value = 0.25),
     sliderInput("Pvalue_DE",
                 "Adjusted p value:",
