@@ -1,6 +1,6 @@
 # install R packages for the shiny app
 package_list_cran <- c(
-    "shiny", "shinythemes", "shinycssloaders", "import",
+    "shiny", "shinythemes", "shinycssloaders", "import","arules"
     "reticulate", "shinyBS", "shinyWidgets", "gridExtra",
     "RColorBrewer", "stringr", "pheatmap","DT", 
     "data.table", "heatmaply", "plotly", "Seurat")
