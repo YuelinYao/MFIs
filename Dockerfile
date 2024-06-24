@@ -1,11 +1,10 @@
 # get shiny serves plus tidyverse packages image
-FROM rocker/shiny-verse:4.2.3
+FROM rocker/r-base:4.2.3
 
 # system libraries of general use
 RUN apt-get update && apt-get install -y \
     sudo \
     pandoc \
-    pandoc-citeproc \
     libcurl4-gnutls-dev \
     libcairo2-dev \
     libxt-dev \
@@ -17,25 +16,11 @@ RUN apt-get update && apt-get install -y \
 
 
 # copy the app to the image
-COPY app.R app.R
-COPY renv.lock renv.lock
-COPY data data
-COPY Produce_devStates.py Produce_devStates.py
-COPY app app
-COPY www www
-COPY renv renv
-COPY README.md README.md
-COPY .Rprofile .Rprofile
+COPY . ./
+
 
 # install R packages required 
-# (change it dependeing on the packages you need)
-RUN Rscript -e 'install.packages("renv")'
-RUN Rscript -e 'renv::consent(provided = TRUE)'
-RUN Rscript -e 'renv::restore()'
-
-RUN Rscript -e 'reticulate::virtualenv_create(envname = "example_env_name", python = "python3")'
-RUN Rscript -e 'reticulate::virtualenv_install("example_env_name", packages = c("numpy","pandas","scipy","scikit-learn"), ignore_installed=TRUE)'
-RUN Rscript -e 'reticulate::use_virtualenv("example_env_name", required = T)'
+RUN Rscript install_Rpackages.R
 
 
 
