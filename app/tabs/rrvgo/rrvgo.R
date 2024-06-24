@@ -36,7 +36,13 @@ rrvgoInput<- function(){
   tagList( 
     textInput("selected_clusterrrvgo", "Input a cluster:",value = "5"),
     selectInput("Mart_rrgvo", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
-    textInput("go_species_rrgvo", "GO OrgDb:",value = "org.Hs.eg.db"),
+    textInput("go_species_rrgvo", label = div("GO OrgDb:",bsButton("GOreference_rrvgo",label="",icon = icon("info"), style = "info", size = "extra-small")),value = "org.Hs.eg.db"),
+    bsPopover(id = "GOreference_rrvgo",title=NULL,
+              content =("GO reference genome: http://bioconductor.org/packages/release/BiocViews.html#___OrgDb"),
+              placement = "right", 
+              trigger = "click", 
+              options = list(container = "body")),
+
     radioButtons("subOntology", "Select sub-ontology:",
                  c("Biological Process" = "BP",
                    "Cellular Component" = "CC",
@@ -57,7 +63,7 @@ rrvgoInput<- function(){
 
 
 
-rrvgo_FunctionE <- function(cutoff,selected_cluster,subclass,go_species,Mart,GenesList,background_genes){
+rrvgo_FunctionE <- function(selected_cluster,subclass,go_species,Mart,GenesList,background_genes){
   
   if (!any(rownames(installed.packages()) == go_species)){
     BiocManager::install(go_species,update = F)

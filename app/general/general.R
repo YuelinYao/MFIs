@@ -61,7 +61,7 @@ UploadFilesUI <- function(){
                                options = list(container = "body")
                      ),
                      textInput("minNoCells", "Minimum number of cells in each D-tuple:",value = 0),
-                     textInput("stateDevAlpha", "Min. enrichment significance (corrected):",value = 0.05),
+                     textInput("stateDevAlpha", "Max. enrichment significance (corrected):",value = 0.05),
                      
                      #switch button to optimal
                      radioButtons(inputId = "OptimalDiceDistance", label = div("Optimal Dice Distance:",bsButton("q2",label="",icon = icon("info"), style = "info", size = "extra-small")),                         

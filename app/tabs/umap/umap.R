@@ -1,7 +1,7 @@
 ## UI ####
 umapUI <- function(){
   tagList(
-    tags$h3(paste0("UMAP plot"), style = "color: steelblue;"),
+    tags$h3(paste0("2D plot"), style = "color: steelblue;"),
     plotOutput(outputId ="umap_plot", width = "90%") %>% withSpinner(color="#4682B4"),
     downloadButton("downloadumap_plot","Download as .pdf")
   )}
@@ -12,7 +12,7 @@ umapUI <- function(){
 ### Input function
 UMAPInput<- function(){
   tagList( 
-    textInput("selected_umap", "Select cluster",value = "4"),
+    textInput("selected_umap", "Select a Stator state:",value = "4"),
     actionButton("action_umap","Submit",icon("paper-plane"), 
                  style="color: #fff; background-color: #337ab7; border-color: #2e6da4")
   )

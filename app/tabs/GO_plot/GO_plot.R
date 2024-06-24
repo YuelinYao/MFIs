@@ -20,8 +20,19 @@ GOInput<- function(){
   tagList( 
     textInput("selected_clusterGO", "Input cluster(s):",value = "1,3,8"),
     selectInput("Mart", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
-    textInput("go_species", "GO OrgDb:",value = "org.Hs.eg.db"),
-    textInput("kegg_species", "KEGG organism:",value = "hsa"),
+    textInput("go_species", label = div("GO OrgDb:",bsButton("GOreference",label="",icon = icon("info"), style = "info", size = "extra-small")),value = "org.Hs.eg.db"),
+    bsPopover(id = "GOreference",title=NULL,
+              content =("GO reference genome: http://bioconductor.org/packages/release/BiocViews.html#___OrgDb"),
+              placement = "right", 
+              trigger = "click", 
+              options = list(container = "body")),
+    textInput("kegg_species", label = div("KEGG organism:",bsButton("KEGGreference",label="",icon = icon("info"), style = "info", size = "extra-small")),value = "hsa"),
+    bsPopover(id = "KEGGreference",title=NULL,
+              content =("KEGG reference genome: https://www.genome.jp/kegg/catalog/org_list.html"),
+              placement = "right", 
+              trigger = "click", 
+              options = list(container = "body")),
+
     textAreaInput("background_genes", "Background genes (recommended): ",placeholder = "Just paste a list of genes (multiple-line gene list).",rows = 5),
     actionButton(inputId = "bg_Liver0",                                       #action button to display background genes
                  label = NULL, icon = icon("tag"),style="color: #fff; background-color: #337ab7; border-color: #2e6da4"),
@@ -38,9 +49,11 @@ GOInput<- function(){
 
 ## show all the reference set from ENSEMBL
 mart <- useMart("ENSEMBL_MART_ENSEMBL")
-datasets <- listDatasets(mart)
+#datasets <- listDatasets(mart)
+
+datasets<-read.csv("./data/ensembl_dataset.csv")
 datasets_list<-as.list(datasets$dataset)
-names(datasets_list)<-listDatasets(mart)$dataset
+names(datasets_list)<-datasets$description
 
 
 ## Gene_list list in each states
@@ -90,7 +103,7 @@ GetGenes<-function(Devstates,Remove){
 
 
 
-FunctionE <- function(cutoff,selected_cluster,Mart,kegg_species,go_species,GenesList, background_genes){
+FunctionE <- function(selected_cluster,Mart,kegg_species,go_species,GenesList, background_genes){
 
   if (!any(rownames(installed.packages()) == go_species)){
     BiocManager::install(go_species,update = F)

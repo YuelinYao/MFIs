@@ -38,7 +38,7 @@ Table_cluster<-function(cutoff,data_path,minStateDeviation,minNoCells,stateDevAl
   Devstates$cluster<-as.numeric(Devstates$cluster)
   Devstates$pval_corrected<-as.numeric(Devstates$pval_corrected)
   Devstates$No.Cells<-as.numeric(Devstates$No.Cells)
-  Devstates<-Devstates[order(Devstates$cluster),]
+  Devstates<-Devstates[order(as.numeric(as.character(Devstates$cluster))),]
   Devstates<-Devstates[,-1]
   
   return(Devstates)

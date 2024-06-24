@@ -52,6 +52,7 @@ library(org.Mm.eg.db)
 library("limma")
 library(heatmaply)
 library(plotly)
+library(dendextend)
 options(shiny.maxRequestSize = 10000*1024^2)
 import::from(plotly, plotlyOutput, renderPlotly, ggplotly)
 
@@ -68,6 +69,7 @@ source("./app/tabs/automatic/automatic.R")
 source("./app/tabs/rrvgo/rrvgo.R") 
 source("./app/tabs/markovBlanket/markovBlanket.R") 
 source("./app/tabs/umap/umap.R") 
+source("./app/tabs/dendrogram/dendrogram.R") 
 # Define UI for application
 ui <- fluidPage(theme = shinytheme("spacelab"),
                 # Application title
@@ -137,6 +139,11 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
  ## UMAP Tab
             conditionalPanel(condition= "input.tabs == 'umap'",
                    UMAPInput()),
+ 
+ 
+ ## Dendrogram Tab
+ conditionalPanel(condition= "input.tabs == 'dendrogram'",
+                  DendrogramInput()),
         ),
 
         mainPanel(
@@ -191,7 +198,10 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 tabPanel("Markov Blanket",icon = icon("circle-nodes"),value="mb",
                          MBUI()),
                 
-                tabPanel("UMAP Plot",icon = icon("magnet"),value="umap",
+                tabPanel("Dendrogram",icon = icon("tree"),value="dendrogram",
+                         dendrogramUI()),
+  
+                tabPanel("2D Plot",icon = icon("magnet"),value="umap",
                          umapUI()),
      
         ))   )
@@ -395,7 +405,7 @@ server <- function(input, output,session) {
       showScoreText()  })
     
     showText<-eventReactive(input$action_table, {
-      paste(dim(summaryTable())[1]," deviating MFIs in total, ",length(unique(summaryTable()$cluster)), "clusters." )  })
+      paste(dim(summaryTable())[1]," Dtuples in total, ",length(unique(summaryTable()$cluster)), "clusters." )  })
     
     output$textsummary <- renderText({
       showText()  })
@@ -568,6 +578,16 @@ server <- function(input, output,session) {
       }
     )
     
+    output$downloadheatmap_genes_pvalue<-downloadHandler(
+      filename = function(){
+        paste('HeatmapGenes-raw_pvalue-',Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(result_genes()[["raw_pvalue"]],heatmap1)
+      }
+    )
+    
+    
     ## Download heatmap pdf
     output$downloadheatmapgenes_plot<-downloadHandler(
       filename = function(){
@@ -666,6 +686,18 @@ server <- function(input, output,session) {
         write.csv(StateGenes()[[colorHeatmapGene()]],heatmap1)
       }
     )
+    
+    
+    output$downloadheatmap_genes2_pvalue<-downloadHandler(
+      filename = function(){
+        paste('HeatmapStateGenes-raw_pvalue-',Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(StateGenes()[["raw_pvalue"]],heatmap1)
+      }
+    )
+    
+    
     
     ## Download pdf
     output$downloadheatmapgenes_plot2<-downloadHandler(
@@ -796,6 +828,14 @@ server <- function(input, output,session) {
       }
    )
     
+    output$downloadheatmap1_pvalue<-downloadHandler(
+      filename = function(){
+        paste('Heatmap1-', "raw_pvalue","-",Sys.Date(), '.csv', sep='')
+      },
+      content=function(heatmap1){
+        write.csv(result1()[["raw_pvalue"]],heatmap1)
+      }
+    )
     
   
     
@@ -898,6 +938,16 @@ server <- function(input, output,session) {
           write.csv(result2()[[colorHeatmapCells()]],heatmap2)
         }
       )
+      
+      output$downloadheatmap2_pvalue<-downloadHandler(
+        filename = function(){
+          paste('Heatmap2-',"raw_pvalue","-",Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap2){
+          write.csv(result2()[["raw_pvalue"]],heatmap2)
+        }
+      )
+      
       ## download pdf
       output$downloadheatmap_plot2<-downloadHandler(
         filename = function(){
@@ -993,6 +1043,18 @@ server <- function(input, output,session) {
           write.csv(result()[[colorHeatmapCells()]],heatmap3)
         }
       )
+      
+      
+      output$downloadheatmap3_pvalue<-downloadHandler(
+        filename = function(){
+          paste('Heatmap3-', "raw_pvalue","-",Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap3){
+          write.csv(result()[["raw_pvalue"]],heatmap3)
+        }
+      )
+      
+      
       ## download pdf
       output$downloadheatmap_plot3<-downloadHandler(
         filename = function(){
@@ -1090,6 +1152,17 @@ server <- function(input, output,session) {
           write.csv(cellStates()[[colorHeatmapCells()]],heatmap1)
         }
       )
+      
+      output$downloadheatmap4_pvalue<-downloadHandler(
+        filename = function(){
+          paste('Heatmap4-', "raw_pvalue","-",Sys.Date(), '.csv', sep='')
+        },
+        content=function(heatmap1){
+          write.csv(cellStates()[["raw_pvalue"]],heatmap1)
+        }
+      )
+      
+      
       ## download pdf
       output$downloadheatmap_plot4<-downloadHandler(
         filename = function(){
@@ -1126,7 +1199,7 @@ server <- function(input, output,session) {
       ##GO Tab
       #http://www.genome.jp/kegg/catalog/org_list.html
       GO <- reactive({
-        FunctionE(usedDiceDistance(),input$selected_clusterGO,input$Mart,input$kegg_species,input$go_species,GetGenesList(),BackgroundGenes())
+        FunctionE(input$selected_clusterGO,input$Mart,input$kegg_species,input$go_species,GetGenesList(),BackgroundGenes())
       }) %>%
         bindCache(usedDiceDistance(),input$selected_clusterGO,input$Mart,input$kegg_species,input$go_species,BackgroundGenes(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_GO)
@@ -1180,7 +1253,7 @@ server <- function(input, output,session) {
       
       ###rrvgo Tab:
       rrvGO<- reactive({
-        rrvgo_FunctionE(usedDiceDistance(),input$selected_clusterrrvgo,input$subOntology,input$go_species_rrgvo,input$Mart_rrgvo,GetGenesList(),BackgroundGenes2())
+        rrvgo_FunctionE(input$selected_clusterrrvgo,input$subOntology,input$go_species_rrgvo,input$Mart_rrgvo,GetGenesList(),BackgroundGenes2())
       }) %>%
         bindCache(usedDiceDistance(),input$selected_clusterrrvgo,input$subOntology,input$go_species_rrgvo,input$Mart_rrgvo,BackgroundGenes2(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_rrvgo)
@@ -1257,13 +1330,24 @@ server <- function(input, output,session) {
       
       ### Upset Plot
       
+      
+      
       Upset_mode<- eventReactive(input$action_upset, { 
         input$UpsetMode
       })
       
+      observeEvent(input$mode_upset,{
+        sendSweetAlert(session = session, title = NULL,
+                        text = tags$span(
+                          tags$h5("Reference: https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html", style = "color: steelblue;"),
+                          tags$img(src = "mode.png",width = "450px", height = "500px")
+                        ),
+                        html = TRUE,type = 'info')
+        
+      })
       
       m <- reactive({
-        Up_set(input$selected_cluster_upset,usedDiceDistance(),List(),Upset_mode())
+        Up_set(input$selected_cluster_upset,List(),Upset_mode())
       }) %>%
         bindCache(input$selected_cluster_upset,usedDiceDistance(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha,Upset_mode()) %>%
         bindEvent(input$action_upset)
@@ -1306,14 +1390,14 @@ server <- function(input, output,session) {
       
       
       p <- reactive({
-        DE_set(input$selected_clusterDE1,input$selected_clusterDE2,usedDiceDistance(),usedTable()$count,srt(),input$logfc,input$Pvalue_DE,List())
+        DE_set(input$selected_clusterDE1,input$selected_clusterDE2,srt(),input$logfc,input$Pvalue_DE,List())
       }) %>%
         bindCache(input$selected_clusterDE1,input$selected_clusterDE2,usedDiceDistance(),input$logfc,input$Pvalue_DE,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_DE)
       
       
       p_heatmap <- eventReactive(input$action_DE, { 
-        PlotDEheatmap(input$selected_clusterDE1,input$selected_clusterDE2,usedDiceDistance(),p(),srt(),List())
+        PlotDEheatmap(input$selected_clusterDE1,input$selected_clusterDE2,p(),srt(),List())
       })
   
       
@@ -1355,7 +1439,7 @@ server <- function(input, output,session) {
  
     ####DE function enrichment
       p_plot<- reactive({
-        DEGO(p(),usedDiceDistance(),input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3())
+        DEGO(p(),input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3())
       }) %>%
         bindCache(p(),usedDiceDistance(),input$Mart_DE,input$kegg_species_DE,input$go_species_DE,input$logfc,input$Pvalue_DE, BackgroundGenes3(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_DE)
@@ -1394,14 +1478,14 @@ server <- function(input, output,session) {
       
       ## Cell state marker
       Marker <- reactive({
-        Marker_set(input$selected_clusterMarker,usedDiceDistance(),usedTable()$count,srt(),input$logfcMarker,input$Pvalue_Marker,List())
-      }) %>%  #selected_cluster,cutoff,count,srt,logfc,Pvalue,List
+        Marker_set(input$selected_clusterMarker,srt(),input$logfcMarker,input$Pvalue_Marker,List())
+      }) %>%  #selected_cluster,srt,logfc,Pvalue,List
         bindCache(input$selected_clusterMarker,usedDiceDistance(),input$logfcMarker,input$Pvalue_Marker,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_Marker)
       
       #selected_cluster,cutoff,Marker,srt,List
       Marker_plot <- eventReactive(input$action_Marker, { 
-       PlotVolcano(input$selected_clusterMarker,usedDiceDistance(), Marker(),srt(),List(),GetGenesList_All())
+       PlotVolcano(input$selected_clusterMarker, Marker(),List(),GetGenesList_All())
       })
       
       
@@ -1434,7 +1518,7 @@ server <- function(input, output,session) {
       )
       
       marker_plot<- reactive({ #Marker,selected_cluster,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes
-        MarkerGO(Marker(),usedDiceDistance(),input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4())
+        MarkerGO(Marker(),input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4())
       }) %>%
         bindCache(Marker(),input$selected_clusterMarker,usedDiceDistance(),input$Mart_Marker,input$kegg_species_Marker,input$go_species_Marker,input$logfcMarker,input$Pvalue_Marker, BackgroundGenes4(),List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_Marker)
@@ -1474,7 +1558,7 @@ server <- function(input, output,session) {
       
       ##  All Cell state markers
       AllMarkers<- reactive({
-        MarkerAll_set(usedDiceDistance(),usedTable()$count,srt(),input$logfcMarker,input$Pvalue_Marker,List())
+        MarkerAll_set(srt(),input$logfcMarker,input$Pvalue_Marker,List())
       }) %>%  #cutoff,count,srt,logfc,Pvalue,List
         bindCache(usedDiceDistance(),input$logfcMarker,input$Pvalue_Marker,List(),usedTable(),usedTable2(),input$minStateDeviation,input$minNoCells,input$stateDevAlpha) %>%
         bindEvent(input$action_AllMarkers)
@@ -1641,6 +1725,92 @@ server <- function(input, output,session) {
         content=function(uPlot){
           ggsave(StateUMAPs(),filename = uPlot,width = 4,height = 3)
         } )
+      
+      
+
+      ### dendrogram
+      dice_distance<-reactive({
+        if(usedDiceDistance()=="Optimal"){
+          return(as.numeric(modularity_scoreTable()$Cutoff[which.max(modularity_scoreTable()$Modularity.score)]))}
+        else{
+          return(as.numeric(usedDiceDistance()))
+        }
+      })
+      
+      
+      hcl <- reactive({
+        print(dice_distance())
+        Devstates<- summaryTable()
+        binReps_matrix<-binReps_mat()
+        hcl <-hcl_construct(binReps_matrix,Devstates)
+      })
+      
+      
+      hcl_cluster<-reactive({
+        Devstates<- summaryTable()
+        cutoff<-dice_distance()
+        hclutering<-hcl()
+        Devstates$mapping<-paste0(Devstates$genes,":",Devstates$state)
+        cluster<-cutree(hclutering,h = cutoff)
+        print(table(names(cluster)==Devstates$mapping))
+        cluster
+      })
+      
+      
+      avg_col_dend<-eventReactive(input$action_dendrogram,{
+        dend_d<-plot_full(hcl(), dice_distance(),hcl_cluster())
+        dend_d
+      })
+      
+      
+      output$Full_dendrogram <- renderPlot({
+        plot(avg_col_dend());rect.hclust(hcl() , h = dice_distance())
+      })
+      
+      
+      output$downloadFull_dendrogram<-downloadHandler(
+        filename = function(){
+          paste('Full_dendrogram-',Sys.Date(), '.pdf', sep='')
+        },
+        content=function(dPlot){
+          
+          width=dim(summaryTable())[1]*0.25+20
+          pdf(dPlot,width = width ,height = 12)
+          par(mar = c(25, 2.5, 0.5, 0.5))
+          plot(avg_col_dend())
+          rect.hclust(hcl() , h = as.numeric(dice_distance()))
+          dev.off()
+          
+        } )
+      
+      
+      
+      ## sub
+      sub<-eventReactive(input$action_dendrogram,{
+        plot_sub(hcl(), hcl_cluster(),input$selected_dendrogram)
+      })
+      
+      output$Sub_dendrogram <- renderPlot({
+        par(mar = c(15, 1, 1, 1))
+        plot(sub())
+        
+      })
+      
+      
+      output$downloadSub_dendrogram<-downloadHandler(
+        filename = function(){
+          paste('Sub_dendrogram-',dice_distance(),"-",input$selected_dendrogram,"-",Sys.Date(), '.pdf', sep='')
+        },
+        content=function(dPlot){
+          width=length(get_leaves_attr(sub(),"label"))*0.25+20
+          pdf(dPlot,width = width ,height = 12)
+          par(mar = c(25, 2.5, 0.5, 0.5))
+          plot(sub())
+          dev.off()
+          
+        } )
+      
+      
       
       onSessionEnded(function() {
         cat("Session Ended\n")

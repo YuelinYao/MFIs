@@ -37,10 +37,22 @@ MarkerGOtable_UI<- function(){
 ### Input function
 MarkerInput<- function(){
   tagList( 
-    textInput("selected_clusterMarker", "Select cluster(s):",value = "6"),
+    textInput("selected_clusterMarker", "Select Stator state(s):",value = "6"),
     selectInput("Mart_Marker", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
-    textInput("go_species_Marker", "GO OrgDb:",value = "org.Hs.eg.db"),
-    textInput("kegg_species_Marker", "KEGG organism:",value = "hsa"),
+    textInput("go_species_Marker", label = div("GO OrgDb:",bsButton("GOreference_Marker",label="",icon = icon("info"), style = "info", size = "extra-small")),value = "org.Hs.eg.db"),
+    bsPopover(id = "GOreference_Marker",title=NULL,
+              content =("GO reference genome: http://bioconductor.org/packages/release/BiocViews.html#___OrgDb"),
+              placement = "right", 
+              trigger = "click", 
+              options = list(container = "body")),
+    
+    textInput("kegg_species_Marker", label = div("KEGG organism:",bsButton("KEGGreference_Marker",label="",icon = icon("info"), style = "info", size = "extra-small")),value = "hsa"),
+    bsPopover(id = "KEGGreference_Marker",title=NULL,
+              content =("KEGG reference genome: https://www.genome.jp/kegg/catalog/org_list.html"),
+              placement = "right", 
+              trigger = "click", 
+              options = list(container = "body")),
+    
     textInput("logfcMarker", "logFC:",value = 0.25),
     sliderInput("Pvalue_Marker",
                 "Adjusted p value:",
@@ -61,7 +73,7 @@ MarkerInput<- function(){
 
 
 
-Marker_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
+Marker_set<-function(selected_cluster,srt,logfc,Pvalue,List){
   
   print("Find Marker genes")
   selected_cluster_list<-strsplit(selected_cluster, ",\\s*")[[1]]
@@ -90,7 +102,7 @@ Marker_set<-function(selected_cluster,cutoff,count,srt,logfc,Pvalue,List){
 
 
 
-PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List,GetGenesList_All){
+PlotVolcano<-function(selected_cluster,Marker,List,GetGenesList_All){
   
   print("Plot VolcanoPlot")
 
@@ -138,7 +150,7 @@ PlotVolcano<-function(selected_cluster,cutoff,Marker,srt,List,GetGenesList_All){
 
 
 
-MarkerGO<-function(Marker,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
+MarkerGO<-function(Marker,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
   
   print("Markers GO & KEGG")
   if (!any(rownames(installed.packages()) == go_species)){

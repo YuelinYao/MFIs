@@ -37,11 +37,24 @@ DEGOtable_UI<- function(){
 ### Input function
 DEInput<- function(){
   tagList( 
-    textInput("selected_clusterDE1", "Select cluster(s) for group 1:",value = "46,19"),
-    textInput("selected_clusterDE2", "Select cluster(s) for group 2:",value = "45,28"),
+    textInput("selected_clusterDE1", "Select Stator state(s) as group 1:",value = "46,19"),
+    textInput("selected_clusterDE2", "Select Stator state(s) as group 2:",value = "45,28"),
     selectInput("Mart_DE", "Mart dataset:", choices=datasets_list, selected = "hsapiens_gene_ensembl", multiple = FALSE),
-    textInput("go_species_DE", "GO OrgDb:",value = "org.Hs.eg.db"),
-    textInput("kegg_species_DE", "KEGG organism:",value = "hsa"),
+    textInput("go_species_DE", label = div("GO OrgDb:",bsButton("GOreference_DE",label="",icon = icon("info"), style = "info", size = "extra-small")),value = "org.Hs.eg.db"),
+    bsPopover(id = "GOreference_DE",title=NULL,
+              content =("GO reference genome: http://bioconductor.org/packages/release/BiocViews.html#___OrgDb"),
+              placement = "right", 
+              trigger = "click", 
+              options = list(container = "body")),
+    
+    textInput("kegg_species_DE", label = div("KEGG organism:",bsButton("KEGGreference_Marker",label="",icon = icon("info"), style = "info", size = "extra-small")),value = "hsa"),
+    bsPopover(id = "KEGGreference_DE",title=NULL,
+              content =("KEGG reference genome: https://www.genome.jp/kegg/catalog/org_list.html"),
+              placement = "right", 
+              trigger = "click", 
+              options = list(container = "body")),
+  
+  
     textInput("logfc", "logFC:",value = 0.25),
     sliderInput("Pvalue_DE",
                 "Adjusted p value:",
@@ -63,7 +76,7 @@ DEInput<- function(){
 
 
 
-DE_set<-function(selected_cluster1,selected_cluster2,cutoff,count,srt,logfc,Pvalue,List){
+DE_set<-function(selected_cluster1,selected_cluster2,srt,logfc,Pvalue,List){
   
   print("Find DE genes")
   
@@ -117,7 +130,7 @@ DE_set<-function(selected_cluster1,selected_cluster2,cutoff,count,srt,logfc,Pval
   
 
 
-PlotDEheatmap<-function(selected_cluster1,selected_cluster2,cutoff,DE,srt,List){
+PlotDEheatmap<-function(selected_cluster1,selected_cluster2,DE,srt,List){
   
   print("Plot DEA Heatmap")
     
@@ -179,7 +192,7 @@ PlotDEheatmap<-function(selected_cluster1,selected_cluster2,cutoff,DE,srt,List){
 
 
 
-DEGO<-function(DE,cutoff,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
+DEGO<-function(DE,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
   
   if (!any(rownames(installed.packages()) == go_species)){
     BiocManager::install(go_species,update = F)

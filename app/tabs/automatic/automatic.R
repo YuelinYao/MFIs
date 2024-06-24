@@ -50,7 +50,7 @@ AllMarkerInput<- function(){
 
 
 
-MarkerAll_set<-function(cutoff,count,srt,logfc,Pvalue,List){
+MarkerAll_set<-function(srt,logfc,Pvalue,List){
   
   print("Find All marker genes")
   All_Markers<-NULL
@@ -68,7 +68,7 @@ MarkerAll_set<-function(cutoff,count,srt,logfc,Pvalue,List){
   Marker$cluster[Marker$avg_log2FC>0]<-paste0("Up_regulated genes")
   Marker$cluster[Marker$avg_log2FC<0]<-paste0("Down_regulated genes")
   print(table(Marker$cluster))
-  Marker$State<-i
+  Marker$State<-gsub("cluster_C:","",i)
   All_Markers<-rbind(All_Markers,Marker)
   
   }
@@ -142,7 +142,7 @@ get_genelist_annotation<-function(annotation,number_all){
   for (r in rownames(results)){
     
     for (c in colnames(results)){
-      r1<-annotation[annotation$State==paste0("cluster_C:",c)&annotation$Annotation==r,]
+      r1<-annotation[annotation$State==paste0("",c)&annotation$Annotation==r,]
       r1<-r1[order(r1$p_val_adj),]
       results[r,c]=""
       if( dim(r1)[1]>0){
