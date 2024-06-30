@@ -27,6 +27,10 @@ if (!any(rownames(installed.packages()) == "shinythemes")){
 }
 library(shinythemes)
 
+if (!any(rownames(installed.packages()) == "arules")){
+  install.packages("arules")
+}
+library(arules)
 
 if (!any(rownames(installed.packages()) == "shinycssloaders")){
   install.packages("shinycssloaders")
