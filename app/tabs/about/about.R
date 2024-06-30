@@ -15,6 +15,10 @@ about <- function(){
         tags$br(),
       
       tags$h4("Data Visualization &  Analysis", style="color: #337ab7;"),
+      
+      tags$h5("Notes: You have to click submit button in each tab, and submit again if you change some settings."),
+      
+      
         tags$li("Table - A summary statistics for deviating states.", style="list-style-type: square;"),
         tags$li("Heatmaps Cells - Over-representation test for MFIs and other external cell annotations.", style="list-style-type: square;"),  
         tags$li("Heatmaps Genes - Over-representation test for cell-state genes and external gene annotations.", style="list-style-type: square;"),
