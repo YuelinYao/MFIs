@@ -49,6 +49,7 @@ cluster_umap<-function(selected_cluster,umap,srt,List,Devstates){
   sums<-paste0("(",length(selected_1)," cells)\n","(",dim(stats)[1]," d-tuples)")
   all<-paste0(genes_cap,sums)
   colnames(umap)<-c("Dim_1","Dim_2")
+  umap<-umap[colnames(srt),]
   srt[["umap"]] <- CreateDimReducObject(embeddings = as.matrix(umap), key = "Dim_", assay = DefaultAssay(srt))
   p<-DimPlot(object = srt,reduction = "umap",cells.highlight =selected_1,cols.highlight = "#3776ab",cols = "gray", order = TRUE)+NoAxes()+NoLegend()+ggtitle(names)+theme(plot.title = element_text(hjust = 0.5))
   p<-p+labs(caption =  all)+theme(plot.caption = element_text(hjust = 0.5,face = "italic"))+ggtitle(names)
