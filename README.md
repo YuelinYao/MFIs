@@ -11,7 +11,7 @@
 7. **MCMCgraph.csv** (optional): which is used in Markov Blanket Tab, located in the output folder from Stator nextflow pipeline. Example file format see ./data/MCMCgraph_14698Cells_1000Genes.csv.
 
 ## Libarary:
-**Note:** Please use the following versions: R version 4.3.0, dbplyr_2.3.3 (by devtools::install_version("dbplyr", version = "2.3.3")), clusterProfiler_4.8.2 and Seurat_4.3.0.1
+**Note:** Please use the following versions: R version 4.3.0, dbplyr_2.3.3 (by devtools::install_version("dbplyr", version = "2.3.3")), clusterProfiler_4.8.2 and Seurat_4.3.0.1, Matrix (>1.6.3 required by Seruat may need to install manually.)
 
 R:
 ```
@@ -180,7 +180,7 @@ renv::restore()
 ```
 
 
-Python:
+Install the Python packages by following R codes:
 
 ```
 # Install python from https://www.python.org/downloads/
@@ -191,8 +191,8 @@ Python:
 # https://github.com/ranikay/shiny-reticulate-app
 
 # Define any Python packages needed for the app in R:
-#PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
-             #           'matplotlib','Pillow','seaborn')
+# PYTHON_DEPENDENCIES = c('pip', 'numpy','pandas','igraph','argparse','scipy',
+#           'matplotlib','Pillow','seaborn')
 PYTHON_DEPENDENCIES = c('numpy','pandas','scipy','scikit-learn') # The name of sklearn has been change to scikit-learn
 
 
