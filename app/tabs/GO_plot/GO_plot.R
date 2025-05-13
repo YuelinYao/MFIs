@@ -72,6 +72,8 @@ GetGenes<-function(Devstates,Remove){
       Genes<-cluster$genes[c]
       Genes<-str_split(Genes, "_")[[1]]
       
+      Genes<-gsub(".","-",Genes)
+      
       #print(length(Genes))
       state<-cluster$state[c]
       State<-as.numeric(strsplit(as.character(state),"")[[1]])
