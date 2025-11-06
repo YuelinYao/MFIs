@@ -96,7 +96,7 @@ HeatmapInput<- function(){
 GetCellList <- function(count,summaryTable) { 
   #cutoff,count
   
-  colnames(count)<-gsub("-",".",colnames(count))
+  # colnames(count)<-gsub("-",".",colnames(count))
   print("Get cells in each state")
   Devstates<-summaryTable
   Devstates$cluster<-paste0("C:",(Devstates$cluster))
@@ -154,7 +154,7 @@ GetCellList <- function(count,summaryTable) {
 GetCellList_d <- function(count,summaryTable) { 
   #cutoff,count
   print("Get cells in each d-tuple")
-  colnames(count)<-gsub("-",".",colnames(count))
+  # colnames(count)<-gsub("-",".",colnames(count))
   Devstates<-summaryTable
   Devstates$cluster<-paste(Devstates$genes,Devstates$state)
   
