@@ -286,7 +286,7 @@ DEGO<-function(DE,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
       cluster_GOMF$cluster<-cluster
       cluster_GOMF$class<-"GOMF"}
       
-      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
+      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg[,colnames(cluster_GOBP)],cluster_GOMF)
       
       AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
       #print(AllEnrichment)
@@ -382,7 +382,7 @@ DEGO<-function(DE,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
   cluster_GOMF$cluster<-cluster
   cluster_GOMF$class<-"GOMF"}
   
-  ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
+  ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg[,colnames(cluster_GOBP)],cluster_GOMF)
   AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
   #print(AllEnrichment)
   }
