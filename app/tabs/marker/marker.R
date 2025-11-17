@@ -243,7 +243,7 @@ MarkerGO<-function(Marker,Mart,kegg_species,go_species,logfc,Pvalue,background_g
       cluster_GOMF$class<-"GOMF" }
       
       
-      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
+      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg[,colnames(cluster_GOBP)],cluster_GOMF)
       AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  }
       
      
@@ -331,7 +331,7 @@ MarkerGO<-function(Marker,Mart,kegg_species,go_species,logfc,Pvalue,background_g
       cluster_GOMF$cluster<-cluster
       cluster_GOMF$class<-"GOMF" }
    
-      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
+      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg[,colnames(cluster_GOBP)],cluster_GOMF)
       AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  
     }
    
