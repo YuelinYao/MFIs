@@ -204,7 +204,7 @@ FunctionE <- function(selected_cluster,Mart,kegg_species,go_species,GenesList, b
       cluster_GOMF$class<-"GOMF"}
       
       
-      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
+      ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg[,colnames(cluster_GOBP)],cluster_GOMF)
       
       AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  }
       
@@ -294,7 +294,7 @@ FunctionE <- function(selected_cluster,Mart,kegg_species,go_species,GenesList, b
   cluster_GOMF$cluster<-i
   cluster_GOMF$class<-"GOMF"}
   
-  ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg,cluster_GOMF)
+  ClusterEnrich<-rbind(cluster_GOBP,cluster_GOCC,cluster_kegg[,colnames(cluster_GOBP)],cluster_GOMF)
   AllEnrichment<-rbind(AllEnrichment,ClusterEnrich)  }
 
   }
