@@ -9,9 +9,9 @@
 5. **GeneAnnotationSet.csv** (optional): which is used in heatmap-genes, over-representation test between gene list. Example file format see ./data/CancerState.csv.
 6. **UMAP.csv** (optional): which is used in UMAP Plot, Example file format see ./data/UMAP_coords.csv.
 7. **MCMCgraph.csv** (optional): which is used in Markov Blanket Tab, located in the output folder from Stator nextflow pipeline. Example file format see ./data/MCMCgraph_14698Cells_1000Genes.csv.
-
+8. **Binary_matrix.csv** (optional): upload your own binary matrix if needed. The same format as Count_matrix.csv.
 ## Libarary:
-**Note:** Please use the following versions: R version 4.3.0, dbplyr_2.3.3 (by devtools::install_version("dbplyr", version = "2.3.3")), clusterProfiler_4.8.2 and Seurat_4.3.0.1
+**Note:** Please use the following versions: R version 4.3.0, dbplyr_2.3.3 (by devtools::install_version("dbplyr", version = "2.3.3")), clusterProfiler_4.8.2 and Seurat_4.3.0.1 For faster version of DE analysis, update Seurat to V5 and install presto (see: https://github.com/immunogenomics/presto).
 
 R:
 ```
