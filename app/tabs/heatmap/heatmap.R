@@ -112,7 +112,6 @@ GetCellList <- function(count,summaryTable) {
       
       state<-cluster$state[c]
       State<-as.numeric(strsplit(as.character(state),"")[[1]])
-      
       count_names<-rownames(count)
       
       if ( length(Genes)==3 ) {

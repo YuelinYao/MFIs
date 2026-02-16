@@ -236,7 +236,8 @@ server <- function(input, output,session) {
     }
     else{
       file_countmatrix<-input$Count_matrix
-      data<-read_data(file_countmatrix$datapath)
+      file_binarymatrix<-input$Binary_matrix
+      data<-read_data(file_countmatrix$datapath,file_binarymatrix$datapath)
       return(data)
     }
   })  
