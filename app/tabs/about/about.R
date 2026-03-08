@@ -15,6 +15,10 @@ about <- function(){
         tags$br(),
       
       tags$h4("Data Visualization &  Analysis", style="color: #337ab7;"),
+      
+      tags$h5("Notes: You have to click submit button in each tab, and submit again if you change some settings."),
+      
+      
         tags$li("Table - A summary statistics for deviating states.", style="list-style-type: square;"),
         tags$li("Heatmaps Cells - Over-representation test for MFIs and other external cell annotations.", style="list-style-type: square;"),  
         tags$li("Heatmaps Genes - Over-representation test for cell-state genes and external gene annotations.", style="list-style-type: square;"),
@@ -42,6 +46,7 @@ about <- function(){
         tags$li("UMAP.csv (optional): which is used in 2D plot. Example file format see ./data/UMAP_coords.csv", style="list-style-type: square;"),
         "The example of file can be found at: ",a(icon("house"), href="https://github.com/YuelinYao/MFIs/tree/main/data", target="_blank", style = "color: steelblue;"),
       tags$li("MCMCgraph.csv (optional): which is used in Markov Blanket Tab, located in the output folder from Stator nextflow pipeline. Example file format see ./data/MCMCgraph_14698Cells_1000Genes.csv", style="list-style-type: square;"),
+      tags$li("Binary_matrix.csv (optional): upload your own binary matrix if needed,e.g., if you are using a different binarisation scheme. The same format as Count_matrix.csv.", style="list-style-type: square;"),
       tags$br(),
       tags$br(),
       
@@ -86,12 +91,12 @@ InformationUI <- function(){
     br("If you like Stator and use it, please consider citing the related article:",
        tags$br(),
        a("High order expression dependencies finely resolve cryptic states and subtypes in single cell data", href = "https://journals.aps.org/pre/abstract/10.1103/PhysRevE.102.053314", target="_blank", style = "color: steelblue;"),
-       a("Abel Jansma, Yuelin Yao, et al., BioRxiv", href= "https://www.biorxiv.org/content/10.1101/2023.12.18.572232v1.abstract", target="_blank", style = "color: grey;")),
+       a("Abel Jansma, Yuelin Yao, et al., Mol Syst Biol", href= "https://link.springer.com/article/10.1038/s44320-024-00074-1", target="_blank", style = "color: grey;")),
     
     tags$br(),
-    tags$b("Stator",style = "color: #337ab7;"), "application code is available through Github", a(icon("house"), href="https://github.com/AJnsm", target="_blank", style = "color: steelblue;"),
+    tags$b("Stator",style = "color: #337ab7;"), "application code is available through Github", a(icon("house"), href="https://github.com/AJnsm/Stator", target="_blank", style = "color: steelblue;"),
     tags$br(),
-    br( "If you have any question, you can send an e-mail",a(icon("mail-bulk"), href="mailto: s1914230@ed.ac.uk",  style = "color: steelblue;")) 
+    br( "If you have any question, you can send an e-mail",a(icon("mail-bulk"), href="mailto: yy605@cam.ac.uk",  style = "color: steelblue;")) 
   )
 }
 
