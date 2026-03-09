@@ -1,7 +1,7 @@
 ## general UI ####
 UploadFilesUI <- function(){
   tagList(
-    conditionalPanel(condition="input.tabs != 'about'",           #conditional panel: if the tab Tutorial is selected
+    conditionalPanel(condition="input.tabs != 'about' & input.tabs != 'reproducibility'",           #conditional panel: if the tab Tutorial is selected
                      br("Here we use scRNA-seq HCC dataset. \nTo upload your data, click the box:"),
                      switchInput(inputId = "TestTable",                            #switch button to upload your own data
                                  value = T, onStatus = "success"),
@@ -60,7 +60,7 @@ UploadFilesUI <- function(){
                      )
     ),
     
-    conditionalPanel(condition= "input.tabs != 'about' & input.tabs != 'mb'" ,
+    conditionalPanel(condition= "input.tabs != 'about' & input.tabs != 'mb' & input.tabs != 'reproducibility'" ,
                      textInput("minStateDeviation", label = div("Minimum enrichment factor (Log2 transformed):",bsButton("q1",label="",icon = icon("info"), style = "info", size = "extra-small")),value = 3),
                      bsPopover(id = "q1",title=NULL,
                                content ="E.g., 3 is referred as a 8-fold increase: log2(8)",

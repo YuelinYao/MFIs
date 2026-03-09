@@ -31,6 +31,7 @@ about <- function(){
         tags$li("Markov Blanket - Visualisation of Markov Blanket for given gene(s).", style="list-style-type: square;"),
         tags$li("2D Plot - Visualisation of UMAP for given a cell state.", style="list-style-type: square;"),
         tags$li("Dendrogram - Visualisation of d-tuples dendrogram.", style="list-style-type: square;"),
+        tags$li("Reproducibility - Reproducibility across two datasets.", style="list-style-type: square;"),
         tags$br(),
       
         ##Tutorial

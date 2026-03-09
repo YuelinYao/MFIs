@@ -48,7 +48,7 @@ GOInput<- function(){
 
 
 ## show all the reference set from ENSEMBL
-mart <- useMart("ENSEMBL_MART_ENSEMBL")
+# mart <- useMart("ENSEMBL_MART_ENSEMBL")
 #datasets <- listDatasets(mart)
 
 datasets<-read.csv("./data/ensembl_dataset.csv")
@@ -72,7 +72,7 @@ GetGenes<-function(Devstates,Remove){
       Genes<-cluster$genes[c]
       Genes<-str_split(Genes, "_")[[1]]
       
-      Genes<-gsub(".","-",Genes)
+      # Genes<-gsub(".","-",Genes)
       
       #print(length(Genes))
       state<-cluster$state[c]

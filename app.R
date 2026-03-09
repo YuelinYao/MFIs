@@ -69,7 +69,9 @@ source("./app/tabs/automatic/automatic.R")
 source("./app/tabs/rrvgo/rrvgo.R") 
 source("./app/tabs/markovBlanket/markovBlanket.R") 
 source("./app/tabs/umap/umap.R") 
-source("./app/tabs/dendrogram/dendrogram.R") 
+source("./app/tabs/dendrogram/dendrogram.R")
+source("./app/tabs/Reproducibility/reproducibility.R") 
+
 # Define UI for application
 ui <- fluidPage(theme = shinytheme("spacelab"),
                 # Application title
@@ -139,7 +141,10 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
  ## UMAP Tab
             conditionalPanel(condition= "input.tabs == 'umap'",
                    UMAPInput()),
- 
+
+          
+ conditionalPanel(condition= "input.tabs == 'reproducibility'",
+                  reproducibilityInput()),
  
  ## Dendrogram Tab
  conditionalPanel(condition= "input.tabs == 'dendrogram'",
@@ -198,11 +203,16 @@ ui <- fluidPage(theme = shinytheme("spacelab"),
                 tabPanel("Markov Blanket",icon = icon("circle-nodes"),value="mb",
                          MBUI()),
                 
+                
                 tabPanel("Dendrogram",icon = icon("tree"),value="dendrogram",
                          dendrogramUI()),
   
                 tabPanel("2D Plot",icon = icon("magnet"),value="umap",
                          umapUI()),
+                
+                ## reproducibility Tab
+                tabPanel("Reproducibility Plot",icon = icon("map"),value="reproducibility",
+                         reproducibilityUI())
      
         ))   )
 
@@ -1811,7 +1821,231 @@ server <- function(input, output,session) {
           
         } )
       
+      # ============================================================================
+      # REPRODUCIBILITY ANALYSIS - IMPROVED VERSION
+      # ============================================================================
       
+      # ============================================================================
+      # DATA LOADING REACTIVES
+      # ============================================================================
+      
+      # Load count matrix from dataset 1
+      reproduceCount1 <- reactive({
+        req(input$reproduce_count_matrix_1)
+        
+        tryCatch({
+          count <- as.matrix(
+            data.table::fread(input$reproduce_count_matrix_1$datapath),
+            rownames = 1
+          )
+          count[count>0]<-1
+          count[count==0]<-0
+          return(count)
+        },
+        error = function(e) {
+          showNotification("Error loading count matrix 1", type = "error")
+          return(NULL)
+        })
+      })
+      
+      # Load count matrix from dataset 2
+      reproduceCount2 <- reactive({
+        req(input$reproduce_count_matrix_2)
+        
+        tryCatch({
+          count <- as.matrix(
+            data.table::fread(input$reproduce_count_matrix_2$datapath),
+            rownames = 1
+          )
+          count[count>0]<-1
+          count[count==0]<-0
+          return(count)
+        },
+        error = function(e) {
+          showNotification("Error loading count matrix 2", type = "error")
+          return(NULL)
+        })
+      })
+      
+      # Load D-tuples table from dataset 1
+      reproduceDtuple1 <- reactive({
+        req(input$reproduce_dtuples_table_1)
+        
+        tryCatch({
+          dtuples_1 <- read.csv(input$reproduce_dtuples_table_1$datapath)
+          dtuples_1$Cluster <-gsub("Cluster:","",dtuples_1$Cluster)
+          return(dtuples_1)
+        },
+        error = function(e) {
+          showNotification("Error loading D-tuples table 1", type = "error")
+          return(NULL)
+        })
+      })
+      
+      # Load D-tuples table from dataset 2
+      reproduceDtuple2 <- reactive({
+        req(input$reproduce_dtuples_table_2)
+        
+        tryCatch({
+          dtuples_2 <- read.csv(input$reproduce_dtuples_table_2$datapath)
+          dtuples_2$Cluster <-gsub("Cluster:","",dtuples_2$Cluster)
+          return(dtuples_2)
+        },
+        error = function(e) {
+          showNotification("Error loading D-tuples table 2", type = "error")
+          return(NULL)
+        })
+      })
+      
+      # ============================================================================
+      # CELL LIST GENERATION
+      # ============================================================================
+      
+      # Apply to dataset 1 with both D-tuple tables
+      Reproduce_List1 <- reactive({
+        req(reproduceCount1(), reproduceDtuple1())
+        GetCellList_reproduce(reproduceCount1(), reproduceDtuple1())
+      })
+      
+      Reproduce_List2 <- reactive({
+        req(reproduceCount1(), reproduceDtuple2())
+        GetCellList_reproduce(reproduceCount1(), reproduceDtuple2())
+      })
+      
+      # Apply to dataset 2 with both D-tuple tables
+      Reproduce_List3 <- reactive({
+        req(reproduceCount2(), reproduceDtuple1())
+        GetCellList_reproduce(reproduceCount2(), reproduceDtuple1())
+      })
+      
+      Reproduce_List4 <- reactive({
+        req(reproduceCount2(), reproduceDtuple2())
+        GetCellList_reproduce(reproduceCount2(), reproduceDtuple2())
+      })
+      
+      # ============================================================================
+      # HEATMAP TEST RESULTS
+      # ============================================================================
+      
+      reproduce_dataset1_results <- eventReactive(input$action_reproducibility, {
+        req(Reproduce_List1(), Reproduce_List2(), reproduceCount1())
+        
+        tryCatch({
+          results <- heatmap_test(
+            Reproduce_List1(),
+            Reproduce_List2(),
+            N = nrow(reproduceCount1()),
+            test = "Over_representation"
+          )
+          return(results)
+        },
+        error = function(e) {
+          showNotification("Error in Dataset 1 analysis", type = "error")
+          return(NULL)
+        })
+      })
+      
+      reproduce_dataset2_results <- eventReactive(input$action_reproducibility, {
+        req(Reproduce_List3(), Reproduce_List4(), reproduceCount2())
+        
+        tryCatch({
+          results <- heatmap_test(
+            Reproduce_List3(),
+            Reproduce_List4(),
+            N = nrow(reproduceCount2()),
+            test = "Over_representation"
+          )
+          return(results)
+        },
+        error = function(e) {
+          showNotification("Error in Dataset 2 analysis", type = "error")
+          return(NULL)
+        })
+      })
+      
+      # ============================================================================
+      # PLOT 1: DATASET 1
+      # ============================================================================
+      
+      output$Reproducibility_plot1 <- renderPlot({
+        req(reproduce_dataset1_results())
+        
+        p <- create_heatmap_plot(
+          results_data = reproduce_dataset1_results(),
+          dataset_name = "Dataset 1",
+          row_dtuple = reproduceDtuple1(),
+          col_dtuple = reproduceDtuple2()
+        )
+        
+        ComplexHeatmap::draw(p, heatmap_legend_side = "left")
+      })
+      
+      # Download PDF for Dataset 1
+      output$download_reproducibility_plot1 <- downloadHandler(
+        filename = function() {
+          paste("Heatmap-", Sys.Date(), "-Dataset1.pdf", sep = "")
+        },
+        content = function(filepath) {
+          req(reproduce_dataset1_results())
+          
+          dims <- calculate_heatmap_dimensions(reproduce_dataset1_results())
+          
+          grDevices::pdf(filepath, width = dims$width, height = dims$height)
+          
+          p <- create_heatmap_plot(
+            results_data = reproduce_dataset1_results(),
+            dataset_name = "Dataset 1",
+            row_dtuple = reproduceDtuple1(),
+            col_dtuple = reproduceDtuple2(),
+            cellwidth = 15, cellheight = 15
+          )
+          
+          ComplexHeatmap::draw(p, heatmap_legend_side = "left")
+          grDevices::dev.off()
+        }
+      )
+      
+      # ============================================================================
+      # PLOT 2: DATASET 2
+      # ============================================================================
+      
+      output$Reproducibility_plot2 <- renderPlot({
+        req(reproduce_dataset2_results())
+        
+        p <- create_heatmap_plot(
+          results_data = reproduce_dataset2_results(),
+          dataset_name = "Dataset 2",
+          row_dtuple = reproduceDtuple1(),
+          col_dtuple = reproduceDtuple2()
+        )
+        
+        ComplexHeatmap::draw(p, heatmap_legend_side = "left")
+      })
+      
+      # Download PDF for Dataset 2
+      output$download_reproducibility_plot2 <- downloadHandler(
+        filename = function() {
+          paste("Heatmap-", Sys.Date(), "-Dataset2.pdf", sep = "")
+        },
+        content = function(filepath) {
+          req(reproduce_dataset2_results())
+          
+          dims <- calculate_heatmap_dimensions(reproduce_dataset2_results())
+          
+          grDevices::pdf(filepath, width = dims$width, height = dims$height)
+          
+          p <- create_heatmap_plot(
+            results_data = reproduce_dataset2_results(),
+            dataset_name = "Dataset 2",
+            row_dtuple = reproduceDtuple1(),
+            col_dtuple = reproduceDtuple2(),
+            cellwidth = 15, cellheight = 15
+          )
+          
+          ComplexHeatmap::draw(p, heatmap_legend_side = "left")
+          grDevices::dev.off()
+        }
+      )
       
       onSessionEnded(function() {
         cat("Session Ended\n")

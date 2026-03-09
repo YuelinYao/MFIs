@@ -24,12 +24,21 @@ DendrogramInput<- function(){
 
 
 ### function
-
-dice = function(mat) {
-  present = !is.na(mat) & mat > 0
-  as.matrix(arules::dissimilarity(t(present), method = 'dice'))
+dice <- function(mat) {
+  present <- (!is.na(mat) & mat > 0) * 1
+  x <- t(present)
+  
+  inter <- x %*% t(x)
+  rs <- rowSums(x)
+  
+  dis <- 1 - (2 * inter / outer(rs, rs, "+"))
+  diag(dis) <- 0
+  
+  dis
 }
 
+
+# dice = function(mat) { present = !is.na(mat) & mat > 0 as.matrix(arules::dissimilarity(t(present), method = 'dice')) }
 
 GetSubend<-function(dend,cluster){
   dend_list <- lapply(unique(cluster), function(cluster.id) {
