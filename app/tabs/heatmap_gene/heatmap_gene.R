@@ -76,11 +76,24 @@ makeGeneSetList<-function(csvfile){
 }
 
 ### function
+normalize_gene_names <- function(x) {
+  x <- as.character(x)
+  x <- gsub("-", ".", x, fixed = TRUE)
+  x <- unique(x)
+  x[!is.na(x) & x != ""]
+}
+
 #N=25678 the number of genes in whole human genome
 heatmapGenes <- function(RefSet,Genelist,N=25678,test) { 
 
   RefSet<-makeGeneSetList(RefSet)
   #print(head(RefSet))
+  
+  ## normalize gene names in both sets
+  RefSet <- lapply(RefSet, normalize_gene_names)
+  Genelist <- lapply(Genelist, normalize_gene_names)
+  
+  
   r=length(names(RefSet))
   col=length(names(Genelist))
   

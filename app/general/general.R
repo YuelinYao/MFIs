@@ -1,7 +1,7 @@
 ## general UI ####
 UploadFilesUI <- function(){
   tagList(
-    conditionalPanel(condition="input.tabs != 'about'",           #conditional panel: if the tab Tutorial is selected
+    conditionalPanel(condition="input.tabs != 'about' & input.tabs != 'reproducibility'",           #conditional panel: if the tab Tutorial is selected
                      br("Here we use scRNA-seq HCC dataset. \nTo upload your data, click the box:"),
                      switchInput(inputId = "TestTable",                            #switch button to upload your own data
                                  value = T, onStatus = "success"),
@@ -13,13 +13,15 @@ UploadFilesUI <- function(){
                fileInput(inputId = "Count_matrix",label = NULL, multiple = FALSE,
                           accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
                                           ),style="display:inline-block;vertical-align:top;width:70%;"),
-              tags$div(
+                
+             tags$div(
                br("Binary_martix.csv"),
                fileInput(inputId = "Binary_matrix",label = NULL, multiple = FALSE,
                          accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
                ),style="display:inline-block;vertical-align:top;width:70%;"),
              
-                tags$div(
+            
+             tags$div(
                 br("Meta_Data.csv"),
                  fileInput(inputId = "Meta_Data",label = NULL, multiple = FALSE,
                            accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
@@ -58,7 +60,7 @@ UploadFilesUI <- function(){
                      )
     ),
     
-    conditionalPanel(condition= "input.tabs != 'about' & input.tabs != 'mb'" ,
+    conditionalPanel(condition= "input.tabs != 'about' & input.tabs != 'mb' & input.tabs != 'reproducibility'" ,
                      textInput("minStateDeviation", label = div("Minimum enrichment factor (Log2 transformed):",bsButton("q1",label="",icon = icon("info"), style = "info", size = "extra-small")),value = 3),
                      bsPopover(id = "q1",title=NULL,
                                content ="E.g., 3 is referred as a 8-fold increase: log2(8)",
@@ -102,10 +104,10 @@ read_data<-function(path_countmatrix,path_binarymatrix){
   message(path_binarymatrix)
   
   if(is.null(path_binarymatrix)){
-  message("No binary matrix provided; deriving binary from count matrix.")
-  count<-Count_matrix
-  count[count>0]<-1
-  count[count==0]<-0
+    message("No binary matrix provided; deriving binary from count matrix.")
+    count<-Count_matrix
+    count[count>0]<-1
+    count[count==0]<-0
   } else{
     message("use uploaded binary matrix")
     count <- as.matrix(fread(path_binarymatrix),rownames=1)
@@ -114,11 +116,8 @@ read_data<-function(path_countmatrix,path_binarymatrix){
   data<-list(count,Count_matrix)
   names(data)<-c("count","Count_matrix")
   return(data)
-  
+
 }
-
-
-
 
 ## processed_seruat ftunction:
 processe_srt<-function(Count_matrix){

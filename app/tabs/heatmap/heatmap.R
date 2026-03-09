@@ -93,8 +93,62 @@ HeatmapInput<- function(){
 
 ####function
 ### Get List of cell
-GetCellList <- function(count,summaryTable) { 
+GetCellList <- function(count, summaryTable) { 
+  print("Get cells in each state")
+  
+  Devstates <- summaryTable
+  Devstates$cluster <- paste0("C:", Devstates$cluster)
+  
+  # normalize count column names once
+  norm_count_names <- gsub("-", ".", colnames(count), fixed = TRUE)
+  colnames(count) <- norm_count_names
+  
+  List <- NULL
+  
+  for (i in unique(Devstates$cluster)) {
+    cluster <- Devstates[Devstates$cluster == i, ]
+    Cell <- NULL
+    
+    for (c in seq_len(nrow(cluster))) {
+      Genes <- cluster$genes[c]
+      Genes <- strsplit(Genes, "_", fixed = TRUE)[[1]]
+      
+      # normalize tuple gene names the same way
+      Genes <- gsub("-", ".", Genes, fixed = TRUE)
+      
+      state <- cluster$state[c]
+      State <- as.numeric(strsplit(as.character(state), "")[[1]])
+      
+      count_names <- rownames(count)
+      
+      # safer generic version instead of many if/else blocks
+      idx <- rep(TRUE, nrow(count))
+      for (j in seq_along(Genes)) {
+        if (!Genes[j] %in% colnames(count)) {
+          warning(paste("Gene not found in count:", Genes[j]))
+          idx <- rep(FALSE, nrow(count))
+          break
+        }
+        idx <- idx & (count[, Genes[j]] == State[j])
+      }
+      
+      c1 <- count_names[idx]
+      Cell <- c(Cell, c1)
+    }
+    
+    Cell <- unique(Cell)
+    tmp <- list(Cell)
+    names(tmp) <- paste0("cluster_", i)
+    List <- c(List, tmp)
+  }
+  
+  return(List)
+}
+
+
+GetCellList_v0 <- function(count,summaryTable) { 
   #cutoff,count
+  
   # colnames(count)<-gsub("-",".",colnames(count))
   print("Get cells in each state")
   Devstates<-summaryTable
@@ -112,6 +166,7 @@ GetCellList <- function(count,summaryTable) {
       
       state<-cluster$state[c]
       State<-as.numeric(strsplit(as.character(state),"")[[1]])
+      
       count_names<-rownames(count)
       
       if ( length(Genes)==3 ) {
@@ -148,61 +203,72 @@ GetCellList <- function(count,summaryTable) {
 }
 
 ##GetCell in each d-tuple:
-### Get List of cell
-GetCellList_d <- function(count,summaryTable) { 
-  #cutoff,count
+GetCellList_d <- function(count, summaryTable) { 
   print("Get cells in each d-tuple")
-  Devstates<-summaryTable
-  Devstates$cluster<-paste(Devstates$genes,Devstates$state)
-  # colnames(count)<-gsub("-",".",colnames(count))
-  List=NULL
-  for (i in unique(Devstates$cluster)){
+  
+  Devstates <- summaryTable
+  Devstates$cluster <- paste(Devstates$genes, Devstates$state)
+  
+  # keep original names, but build a normalized lookup
+  orig_colnames <- colnames(count)
+  norm_colnames <- gsub("-", ".", orig_colnames, fixed = TRUE)
+  gene_map <- setNames(orig_colnames, norm_colnames)
+  
+  count_names <- rownames(count)
+  List <- list()
+  
+  for (i in unique(Devstates$cluster)) {
+    cluster <- Devstates[Devstates$cluster == i, , drop = FALSE]
+    Cell <- character(0)
     
-    cluster<-Devstates[Devstates$cluster==i,]
-    Cell<-NULL
-    for (c in 1:length(cluster$genes)){
-      #print(paste0("Cell states: ",cluster$genes[c]))
-      Genes<-cluster$genes[c]
-      Genes<-str_split(Genes, "_")[[1]]
+    for (c in seq_len(nrow(cluster))) {
+      # split genes in d-tuple
+      Genes <- strsplit(cluster$genes[c], "_", fixed = TRUE)[[1]]
       
-      state<-cluster$state[c]
-      State<-as.numeric(strsplit(as.character(state),"")[[1]])
+      # normalize tuple gene names so NR2F2-AS1 matches NR2F2.AS1
+      Genes_norm <- gsub("-", ".", Genes, fixed = TRUE)
+      Genes_mapped <- unname(gene_map[Genes_norm])
       
+      # parse state string into individual digits
+      State <- as.numeric(strsplit(as.character(cluster$state[c]), "")[[1]])
       
-      count_names<-rownames(count)
-      
-      if ( length(Genes)==3 ) {
-        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3])]
-      } else if ( length(Genes)==4) {
-        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4])]
-      } else if ( length(Genes)==5) {
-        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5])]
-      } else if ( length(Genes)==6){
-        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6])]
-      } else if ( length(Genes)==7) {
-        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7])]
-      } else if ( length(Genes)==8) {
-        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8])]
-      } else if ( length(Genes)==9) {
-        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9])]
-      } else {
-        c1<- count_names[which(count[,Genes[1]]==State[1]&count[,Genes[2]]==State[2]&count[,Genes[3]]==State[3]&count[,Genes[4]]==State[4]&count[,Genes[5]]==State[5]&count[,Genes[6]]==State[6]&count[,Genes[7]]==State[7]&count[,Genes[8]]==State[8]&count[,Genes[9]]==State[9]&count[,Genes[10]]==State[10])]
+      # sanity check
+      if (length(Genes_mapped) != length(State)) {
+        warning(
+          sprintf(
+            "Skipping entry '%s %s': number of genes (%d) != number of states (%d)",
+            cluster$genes[c], cluster$state[c], length(Genes_mapped), length(State)
+          )
+        )
+        next
       }
       
+      # check for missing genes
+      if (any(is.na(Genes_mapped))) {
+        missing_genes <- Genes[is.na(Genes_mapped)]
+        warning(
+          sprintf(
+            "Skipping entry '%s %s': gene(s) not found in count: %s",
+            cluster$genes[c], cluster$state[c], paste(missing_genes, collapse = ", ")
+          )
+        )
+        next
+      }
       
-      cellnames<-c1
-      Cell<-c(Cell,cellnames)
-    }  
+      # generic matching across any number of genes
+      idx <- rep(TRUE, nrow(count))
+      for (j in seq_along(Genes_mapped)) {
+        idx <- idx & (count[, Genes_mapped[j]] == State[j])
+      }
+      
+      Cell <- c(Cell, count_names[idx])
+    }
     
-    Cell<-unique(Cell)
-    list=list(Cell)
-    names(list)<-paste0(i)
-    List<-c(List,list)
-    
+    List[[i]] <- unique(Cell)
   }
+  
   return(List)
 }
-
 
 
 
@@ -736,6 +802,147 @@ ListTest <- function(list,N,test) {
   
 }
 
+
+### Get List of cell
+GetCellList_d_v0 <- function(count, summaryTable) { 
+  # cutoff, count
+  print("Get cells in each d-tuple")
+  
+  # colnames(count) <- gsub("-", ".", colnames(count))
+  Devstates <- summaryTable
+  Devstates$cluster <- paste(Devstates$genes, Devstates$state)
+  
+  List <- NULL
+  
+  for (i in unique(Devstates$cluster)) {
+    
+    cluster <- Devstates[Devstates$cluster == i, ]
+    Cell <- NULL
+    
+    for (c in 1:length(cluster$genes)) {
+      # print(paste0("Cell states: ", cluster$genes[c]))
+      Genes <- cluster$genes[c]
+      Genes <- str_split(Genes, "_")[[1]]
+      
+      state <- cluster$state[c]
+      State <- as.numeric(strsplit(as.character(state), "")[[1]])
+      
+      count_names <- rownames(count)
+      
+      if (length(Genes) == 3) {
+        c1 <- count_names[
+          which(
+            count[, Genes[1]] == State[1] &
+              count[, Genes[2]] == State[2] &
+              count[, Genes[3]] == State[3]
+          )
+        ]
+        
+      } else if (length(Genes) == 4) {
+        c1 <- count_names[
+          which(
+            count[, Genes[1]] == State[1] &
+              count[, Genes[2]] == State[2] &
+              count[, Genes[3]] == State[3] &
+              count[, Genes[4]] == State[4]
+          )
+        ]
+        
+      } else if (length(Genes) == 5) {
+        c1 <- count_names[
+          which(
+            count[, Genes[1]] == State[1] &
+              count[, Genes[2]] == State[2] &
+              count[, Genes[3]] == State[3] &
+              count[, Genes[4]] == State[4] &
+              count[, Genes[5]] == State[5]
+          )
+        ]
+        
+      } else if (length(Genes) == 6) {
+        c1 <- count_names[
+          which(
+            count[, Genes[1]] == State[1] &
+              count[, Genes[2]] == State[2] &
+              count[, Genes[3]] == State[3] &
+              count[, Genes[4]] == State[4] &
+              count[, Genes[5]] == State[5] &
+              count[, Genes[6]] == State[6]
+          )
+        ]
+        
+      } else if (length(Genes) == 7) {
+        c1 <- count_names[
+          which(
+            count[, Genes[1]] == State[1] &
+              count[, Genes[2]] == State[2] &
+              count[, Genes[3]] == State[3] &
+              count[, Genes[4]] == State[4] &
+              count[, Genes[5]] == State[5] &
+              count[, Genes[6]] == State[6] &
+              count[, Genes[7]] == State[7]
+          )
+        ]
+        
+      } else if (length(Genes) == 8) {
+        c1 <- count_names[
+          which(
+            count[, Genes[1]] == State[1] &
+              count[, Genes[2]] == State[2] &
+              count[, Genes[3]] == State[3] &
+              count[, Genes[4]] == State[4] &
+              count[, Genes[5]] == State[5] &
+              count[, Genes[6]] == State[6] &
+              count[, Genes[7]] == State[7] &
+              count[, Genes[8]] == State[8]
+          )
+        ]
+        
+      } else if (length(Genes) == 9) {
+        c1 <- count_names[
+          which(
+            count[, Genes[1]] == State[1] &
+              count[, Genes[2]] == State[2] &
+              count[, Genes[3]] == State[3] &
+              count[, Genes[4]] == State[4] &
+              count[, Genes[5]] == State[5] &
+              count[, Genes[6]] == State[6] &
+              count[, Genes[7]] == State[7] &
+              count[, Genes[8]] == State[8] &
+              count[, Genes[9]] == State[9]
+          )
+        ]
+        
+      } else {
+        c1 <- count_names[
+          which(
+            count[, Genes[1]]  == State[1]  &
+              count[, Genes[2]]  == State[2]  &
+              count[, Genes[3]]  == State[3]  &
+              count[, Genes[4]]  == State[4]  &
+              count[, Genes[5]]  == State[5]  &
+              count[, Genes[6]]  == State[6]  &
+              count[, Genes[7]]  == State[7]  &
+              count[, Genes[8]]  == State[8]  &
+              count[, Genes[9]]  == State[9]  &
+              count[, Genes[10]] == State[10]
+          )
+        ]
+      }
+      
+      cellnames <- c1
+      Cell <- c(Cell, cellnames)
+    }
+    
+    Cell <- unique(Cell)
+    
+    list <- list(Cell)
+    names(list) <- paste0(i)
+    List <- c(List, list)
+  }
+  
+  return(List)
+}
 
 
 
