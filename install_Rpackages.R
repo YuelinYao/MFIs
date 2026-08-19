@@ -1,12 +1,13 @@
 # install R packages for the shiny app
 package_list_cran <- c(
-    "shiny", "shinythemes", "shinycssloaders", "import","arules",
-    "reticulate", "shinyBS", "shinyWidgets", "gridExtra",
-    "RColorBrewer", "stringr", "pheatmap","DT", 
-    "data.table", "heatmaply", "plotly", "Seurat")
+  "shiny", "shinythemes", "shinycssloaders", "import", "arules",
+  "reticulate", "shinyBS", "shinyWidgets", "gridExtra",
+  "RColorBrewer", "stringr", "pheatmap", "DT", "data.table",
+  "heatmaply", "plotly", "Seurat", "dplyr", "ggplot2",
+  "igraph", "ggrepel", "dendextend")
 package_list_bioc <- c(
-  "ComplexHeatmap", "dplyr", "rrvgo", "limma",
-  "org.Hs.eg.db", "org.Mm.eg.db", "clusterProfiler", "biomaRt", "ggplot2")
+  "ComplexHeatmap", "rrvgo", "limma",
+  "org.Hs.eg.db", "org.Mm.eg.db", "clusterProfiler", "biomaRt")
 
 for (package in package_list_cran) {
   if (!any(rownames(installed.packages()) == package)) {
