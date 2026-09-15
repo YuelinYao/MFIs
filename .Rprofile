@@ -1,4 +1,4 @@
-# source("renv/activate.R") 
+source("renv/activate.R") 
 # uncomment above if you wish to use renv
 
 
