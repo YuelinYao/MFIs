@@ -1,1 +1,4 @@
+RENV_PYTHON=/home/training/miniforge3/envs/mfis-py38/bin/python
+RETICULATE_PYTHON=/home/training/miniforge3/envs/mfis-py38/bin/python
+RETICULATE_CONDA=/home/training/miniforge3/bin/conda
 R_MAX_VSIZE=100Gb
