@@ -111,9 +111,6 @@ FunctionE <- function(selected_cluster,Mart,kegg_species,go_species,GenesList, b
     BiocManager::install(go_species,update = F)
   }
   library(go_species,character.only = T)
-  mart <- useMart("ENSEMBL_MART_ENSEMBL")
-  mart <- useDataset(Mart, mart) 
-  
   selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
 
   print(paste0("GO & KEGG for cluster(s): ",selected_cluster))
@@ -132,8 +129,7 @@ FunctionE <- function(selected_cluster,Mart,kegg_species,go_species,GenesList, b
       print(length(Genes_set))
       if (length(Genes_set)>0) {
         
-      Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                       filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
+      Genes_set <- gene_symbols_to_entrez(Genes_set, go_species)
       print(head(Genes_set))
       print("KEGG")
       cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
@@ -214,8 +210,7 @@ FunctionE <- function(selected_cluster,Mart,kegg_species,go_species,GenesList, b
   
   else{
   print("Use input background genes")
-  background_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                                               filter="external_gene_name", values=background_genes, uniqueRows=TRUE)
+  background_genes <- gene_symbols_to_entrez(background_genes, go_species)
   
   
   for (i in selected_cluster){
@@ -225,8 +220,7 @@ FunctionE <- function(selected_cluster,Mart,kegg_species,go_species,GenesList, b
   Genes_set<-GenesList[[names]]
   print(length(Genes_set))
   if (length(Genes_set)>0) {
-  Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                   filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
+  Genes_set <- gene_symbols_to_entrez(Genes_set, go_species)
   
   print(Genes_set)
   cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,

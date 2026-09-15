@@ -70,9 +70,6 @@ rrvgo_FunctionE <- function(selected_cluster,subclass,go_species,Mart,GenesList,
   }
   
   library(go_species,character.only = T)
-  mart <- useMart("ENSEMBL_MART_ENSEMBL")
-  mart <- useDataset(Mart, mart)
-  
   i=selected_cluster
   names<-paste0("cluster_",i)
   Genes_set<-GenesList[[names]]
@@ -80,8 +77,7 @@ rrvgo_FunctionE <- function(selected_cluster,subclass,go_species,Mart,GenesList,
   print(length(Genes_set))
   
   if (length(Genes_set)>0) {
-  Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                   filter="external_gene_name", values=Genes_set, uniqueRows=TRUE)
+  Genes_set <- gene_symbols_to_entrez(Genes_set, go_species)
   
   print("GO analysis")  
   
@@ -98,8 +94,7 @@ rrvgo_FunctionE <- function(selected_cluster,subclass,go_species,Mart,GenesList,
   } else{
   
   print("Use input background genes")
-  background_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                           filter="external_gene_name", values=background_genes, uniqueRows=TRUE)
+  background_genes <- gene_symbols_to_entrez(background_genes, go_species)
   cluster_GO <- enrichGO(gene = Genes_set$entrezgene_id,universe = as.character(background_genes$entrezgene_id),
                                OrgDb= go_species,
                                ont = subclass,
@@ -145,7 +140,6 @@ rrvgo_FunctionE <- function(selected_cluster,subclass,go_species,Mart,GenesList,
   return(reducedTerms)
   }
 }
-
 
 
 

@@ -1,3 +1,31 @@
+## Offline gene identifier lookup ####
+# Use the selected Bioconductor OrgDb package instead of querying Ensembl
+# BioMart.  This keeps app startup and enrichment analysis independent of the
+# availability of the BioMart website.
+gene_symbols_to_entrez <- function(symbols, go_species) {
+  symbols <- unique(trimws(as.character(symbols)))
+  symbols <- symbols[!is.na(symbols) & nzchar(symbols)]
+
+  if (!requireNamespace(go_species, quietly = TRUE)) {
+    stop(
+      "The annotation package '", go_species,
+      "' is not installed. Install it before running enrichment analysis.",
+      call. = FALSE
+    )
+  }
+
+  orgdb <- getExportedValue(go_species, go_species)
+  mapped <- AnnotationDbi::select(
+    orgdb,
+    keys = symbols,
+    keytype = "SYMBOL",
+    columns = "ENTREZID"
+  )
+  mapped <- unique(mapped[!is.na(mapped$ENTREZID), c("SYMBOL", "ENTREZID")])
+  names(mapped) <- c("external_gene_name", "entrezgene_id")
+  mapped
+}
+
 ## general UI ####
 UploadFilesUI <- function(){
   tagList(
@@ -135,7 +163,6 @@ processe_srt<-function(Count_matrix){
   return(srt)
   
 }
-
 
 
 

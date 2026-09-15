@@ -160,9 +160,6 @@ MarkerGO<-function(Marker,Mart,kegg_species,go_species,logfc,Pvalue,background_g
   #print(class(selected_cluster))
 
   
-  mart <- useMart("ENSEMBL_MART_ENSEMBL")
-  mart <- useDataset(Mart, mart) 
-  
   AllEnrichment<-NULL
   
   print("Marker GO & KEGG")
@@ -173,8 +170,7 @@ MarkerGO<-function(Marker,Mart,kegg_species,go_species,logfc,Pvalue,background_g
       
       marker<-Marker$gene[Marker$cluster==cluster]
       
-      Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                       filter="external_gene_name", values= marker, uniqueRows=TRUE)
+      Genes_set <- gene_symbols_to_entrez(marker, go_species)
       
       cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
                                  pAdjustMethod = "BH",
@@ -253,15 +249,13 @@ MarkerGO<-function(Marker,Mart,kegg_species,go_species,logfc,Pvalue,background_g
   
   else{
     
-    background_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                            filter="external_gene_name", values=background_genes, uniqueRows=TRUE)
+    background_genes <- gene_symbols_to_entrez(background_genes, go_species)
     
     for (cluster in unique(Marker$cluster)){
       
       marker<-Marker$gene[Marker$cluster==cluster]
       
-      Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                       filter="external_gene_name", values= marker, uniqueRows=TRUE)
+      Genes_set <- gene_symbols_to_entrez(marker, go_species)
       
       
       
@@ -380,6 +374,5 @@ Plot_Marker_enrichment<-function(Marker_Enrichment){
   
   return(p)
 }
-
 
 

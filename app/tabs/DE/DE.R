@@ -201,9 +201,6 @@ DEGO<-function(DE,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
   #selected_cluster<-strsplit(selected_cluster, ",\\s*")[[1]]
   #selected_cluster<-paste0("cluster_C:",selected_cluster)
 
-  mart <- useMart("ENSEMBL_MART_ENSEMBL")
-  mart <- useDataset(Mart, mart) 
-  
   AllEnrichment<-NULL
   
   print("DEG GO & KEGG")
@@ -213,8 +210,7 @@ DEGO<-function(DE,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
     for (cluster in unique(DE$cluster)){
 
       marker<-DE$gene[DE$cluster==cluster]
-      Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                       filter="external_gene_name", values= marker, uniqueRows=TRUE)
+      Genes_set <- gene_symbols_to_entrez(marker, go_species)
       print(head(Genes_set))
       cluster_kegg <- enrichKEGG(gene =  Genes_set$entrezgene_id,organism = kegg_species,
                                  pAdjustMethod = "BH",
@@ -298,16 +294,14 @@ DEGO<-function(DE,Mart,kegg_species,go_species,logfc,Pvalue,background_genes){
     
   else{
     
-    background_genes<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                         filter="external_gene_name", values=background_genes, uniqueRows=TRUE)
+    background_genes <- gene_symbols_to_entrez(background_genes, go_species)
   
     #print(head(background_genes))
   for (cluster in unique(DE$cluster)){
   
   marker<-DE$gene[DE$cluster==cluster]
 
-  Genes_set<-getBM(mart=mart, attributes=c("external_gene_name","entrezgene_id"),
-                   filter="external_gene_name", values= marker, uniqueRows=TRUE)
+  Genes_set <- gene_symbols_to_entrez(marker, go_species)
   
   #print(head(Genes_set))
   
@@ -434,6 +428,5 @@ Plot_DE_enrichment<-function(DE_Enrichment){
   
   return(p)
 }
-
 
 
